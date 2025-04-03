@@ -1,0 +1,794 @@
+[
+ {
+  "nombres": "JUAN",
+  "apellido_paterno": "FRANCISCO",
+  "materno": "BUSTINZA",
+  "nombre_completo": "JUAN FRANCISCO BUSTINZA",
+  "año_inicio": 1917,
+  "año_final": 1925,
+  "ubigeo_cod": 210601
+ },
+ {
+  "nombres": "LUIS",
+  "apellido_paterno": "JIMENEZ",
+  "materno": "VARGAS",
+  "nombre_completo": "LUIS JIMENEZ VARGAS",
+  "año_inicio": 1927,
+  "año_final": 1975,
+  "ubigeo_cod": 210601
+ },
+ {
+  "nombres": "SANTIAGO",
+  "apellido_paterno": "MACHICAO",
+  "materno": "GALVEZ",
+  "nombre_completo": "SANTIAGO MACHICAO GALVEZ",
+  "año_inicio": 1944,
+  "año_final": 1970,
+  "ubigeo_cod": 210601
+ },
+ {
+  "nombres": "JORGE",
+  "apellido_paterno": "CUENTAS",
+  "materno": "VARGAS",
+  "nombre_completo": "JORGE CUENTAS VARGAS",
+  "año_inicio": 1952,
+  "año_final": 1961,
+  "ubigeo_cod": 210601
+ },
+ {
+  "nombres": "MIGUEL",
+  "apellido_paterno": "PINO",
+  "materno": "CHAVEZ",
+  "nombre_completo": "MIGUEL PINO CHAVEZ",
+  "año_inicio": 1963,
+  "año_final": 1964,
+  "ubigeo_cod": 210601
+ },
+ {
+  "nombres": "NORKA",
+  "apellido_paterno": "JIMENEZ",
+  "materno": "MENDOZA",
+  "nombre_completo": "NORKA JIMENEZ MENDOZA",
+  "año_inicio": 1975,
+  "año_final": 2002,
+  "ubigeo_cod": 210601
+ },
+ {
+  "nombres": "ESTEBAN",
+  "apellido_paterno": "VILCA",
+  "materno": "BARRANTES",
+  "nombre_completo": "ESTEBAN VILCA BARRANTES",
+  "año_inicio": 1975,
+  "año_final": 2018,
+  "ubigeo_cod": 210601
+ },
+ {
+  "nombres": "LUIS ALBERTO",
+  "apellido_paterno": "SALAS",
+  "materno": "QUISPE",
+  "nombre_completo": "LUIS ALBERTO SALAS QUISPE",
+  "año_inicio": 2014,
+  "año_final": 2018,
+  "ubigeo_cod": 210501
+ },
+ {
+  "nombres": "RICARDO",
+  "apellido_paterno": "DEZA",
+  "materno": ".",
+  "nombre_completo": "RICARDO DEZA",
+  "año_inicio": 1904,
+  "año_final": 1919,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "MARIANO",
+  "apellido_paterno": "C.",
+  "materno": "GARNICA",
+  "nombre_completo": "MARIANO C. GARNICA",
+  "año_inicio": 1907,
+  "año_final": 1941,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "ALFREDO",
+  "apellido_paterno": "ARAMAYO",
+  "materno": ".",
+  "nombre_completo": "ALFREDO ARAMAYO",
+  "año_inicio": 1916,
+  "año_final": 1938,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "RODOLFO",
+  "apellido_paterno": "ANCIETA",
+  "materno": ".",
+  "nombre_completo": "RODOLFO ANCIETA",
+  "año_inicio": 1919,
+  "año_final": 1929,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "ABELARDO",
+  "apellido_paterno": "ARAMAYO",
+  "materno": ".",
+  "nombre_completo": "ABELARDO ARAMAYO",
+  "año_inicio": 1923,
+  "año_final": 1928,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "GUILLERMO",
+  "apellido_paterno": "GARNICA",
+  "materno": ".",
+  "nombre_completo": "GUILLERMO GARNICA",
+  "año_inicio": 1935,
+  "año_final": 1978,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "LUIS",
+  "apellido_paterno": "PONCE",
+  "materno": ".",
+  "nombre_completo": "LUIS PONCE",
+  "año_inicio": 1939,
+  "año_final": 1974,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "JOSE",
+  "apellido_paterno": "PATRON",
+  "materno": ".",
+  "nombre_completo": "JOSE PATRON",
+  "año_inicio": 1942,
+  "año_final": 1949,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "ELADIO",
+  "apellido_paterno": "QUIROGA",
+  "materno": ".",
+  "nombre_completo": "ELADIO QUIROGA",
+  "año_inicio": 1942,
+  "año_final": 1959,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "DOMINGO",
+  "apellido_paterno": "CHOQUE",
+  "materno": ".",
+  "nombre_completo": "DOMINGO CHOQUE",
+  "año_inicio": 1957,
+  "año_final": 1971,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "FELIX",
+  "apellido_paterno": "MORALES",
+  "materno": ".",
+  "nombre_completo": "FELIX MORALES",
+  "año_inicio": 1961,
+  "año_final": 1968,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "JUANA CH.",
+  "apellido_paterno": "DE CHABELA",
+  "materno": ".",
+  "nombre_completo": "JUANA CH. DE CHABELA",
+  "año_inicio": 1960,
+  "año_final": 1965,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "OLGA",
+  "apellido_paterno": "GARCIA",
+  "materno": "DE VARCARCEL",
+  "nombre_completo": "OLGA GARCIA DE VALCARCEL",
+  "año_inicio": 1975,
+  "año_final": 1982,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "MIGUEL",
+  "apellido_paterno": "PINO",
+  "materno": "CHAVEZ",
+  "nombre_completo": "MIGUEL PINO CHAVEZ",
+  "año_inicio": 1967,
+  "año_final": 1997,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "JULIO",
+  "apellido_paterno": "GARNICA",
+  "materno": "ROSADO",
+  "nombre_completo": "JULIO GARNICA ROSADO",
+  "año_inicio": 1955,
+  "año_final": 1999,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "HECTOR EFRAIN",
+  "apellido_paterno": "GARNICA",
+  "materno": "ROSADO",
+  "nombre_completo": "HECTOR EFRAIN GARNICA ROSADO",
+  "año_inicio": 1976,
+  "año_final": 2002,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "JULIO EDGAR",
+  "apellido_paterno": "LEZANO",
+  "materno": "ZUÑIGA",
+  "nombre_completo": "JULIO EDGAR LEZANO ZUÑIGA",
+  "año_inicio": 1975,
+  "año_final": 2010,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "ELARD WILFREDO",
+  "apellido_paterno": "VILCA",
+  "materno": "MONTEAGUDO",
+  "nombre_completo": "ELARD WILFREDO VILCA MONTEAGUDO",
+  "año_inicio": 1998,
+  "año_final": 2011,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "TOMAS PERCY",
+  "apellido_paterno": "SURCO",
+  "materno": "ILAQUITA",
+  "nombre_completo": "TOMAS PERCY SURCO ILAQUITA",
+  "año_inicio": 1970,
+  "año_final": 2010,
+  "ubigeo_cod": 210101
+ },
+ {
+  "nombres": "MIGUEL FRISANCHO",
+  "apellido_paterno": "BRAVO",
+  "materno": "CALDERON",
+  "nombre_completo": "MANUEL FRISANCHO BRAVO CALDERON",
+  "año_inicio": 1902,
+  "año_final": 1912,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "RICARDO",
+  "apellido_paterno": "DEZA",
+  "materno": ".",
+  "nombre_completo": "RICARDO DEZA",
+  "año_inicio": 1903,
+  "año_final": 1904,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "JUAN JOSE",
+  "apellido_paterno": "SALCEDO",
+  "materno": ".",
+  "nombre_completo": "JUAN JOSE SALCEDO",
+  "año_inicio": 1905,
+  "año_final": 1919,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "AUGUSTO",
+  "apellido_paterno": "VALDIVIA",
+  "materno": "T.",
+  "nombre_completo": "AUGUSTO VALDIVIA T.",
+  "año_inicio": 1915,
+  "año_final": 1916,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "JOSE MARIA",
+  "apellido_paterno": "VALDIVIA",
+  "materno": ".",
+  "nombre_completo": "JOSE MARIA VALDIVIA",
+  "año_inicio": 1917,
+  "año_final": 1922,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "VICTOR",
+  "apellido_paterno": "ECHAVE",
+  "materno": ".",
+  "nombre_completo": "VICTOR ECHAVE",
+  "año_inicio": 1921,
+  "año_final": 1936,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "JUAN",
+  "apellido_paterno": "DE DIOS ",
+  "materno": "VALDIVIA",
+  "nombre_completo": "JUAN DE DIOS VALDIVIA",
+  "año_inicio": 1925,
+  "año_final": 1926,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "VICTOR",
+  "apellido_paterno": "M.",
+  "materno": "CALDERON",
+  "nombre_completo": "VICTOR M. CALDERON",
+  "año_inicio": 1929,
+  "año_final": 1969,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "LUCIO",
+  "apellido_paterno": "BELTRAN",
+  "materno": "FLORES",
+  "nombre_completo": "LUCIO BELTRAN FLORES",
+  "año_inicio": 1936,
+  "año_final": 1953,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "ANGEL",
+  "apellido_paterno": "PEREZ",
+  "materno": "LECHUGA",
+  "nombre_completo": "ANGEL PEREZ LECHUGA",
+  "año_inicio": 1961,
+  "año_final": 1964,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "JOSE MIGUEL",
+  "apellido_paterno": "NAVARRO",
+  "materno": "CALDERON",
+  "nombre_completo": "JOSE MIGUEL NAVARRO CALDERON",
+  "año_inicio": 1969,
+  "año_final": 1985,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "GUSTAVO ADOLFO",
+  "apellido_paterno": "SANCHEZ",
+  "materno": "SALAS",
+  "nombre_completo": "GUSTAVO ADOLFO SANCHEZ SALAS",
+  "año_inicio": 1936,
+  "año_final": 1995,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "LUIS ALBERTO",
+  "apellido_paterno": "LUNA",
+  "materno": "RHODDO",
+  "nombre_completo": "LUIS ALBERTO LUNA RHODDO",
+  "año_inicio": 1955,
+  "año_final": 2016,
+  "ubigeo_cod": 210801
+ },
+ {
+  "nombres": "JUAN CARLOS",
+  "apellido_paterno": "RAMOS",
+  "materno": "PERALTA",
+  "nombre_completo": "JUAN CARLOS RAMOS PERALTA",
+  "año_inicio": 1998,
+  "año_final": 2002,
+  "ubigeo_cod": 211301
+ },
+ {
+  "nombres": "ABELARDO",
+  "apellido_paterno": "ARAMAYO",
+  "materno": "GONZALES",
+  "nombre_completo": "ABELARDO ARAMAYO GONZALES",
+  "año_inicio": 1929,
+  "año_final": 1942,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "HECTOR",
+  "apellido_paterno": "P.",
+  "materno": "VILLENA",
+  "nombre_completo": "HECTOR P. VILLENA",
+  "año_inicio": 1940,
+  "año_final": 1982,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "JORGE",
+  "apellido_paterno": "CUENTAS",
+  "materno": "VARGAS",
+  "nombre_completo": "JORGE CUENTAS VARGAS",
+  "año_inicio": 1961,
+  "año_final": 1962,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "HILDEBRANDO",
+  "apellido_paterno": "CASTILLO",
+  "materno": "SACHUN",
+  "nombre_completo": "HILDEBRANDO CASTILLO SACHUN",
+  "año_inicio": 1963,
+  "año_final": 1989,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "EMILIO",
+  "apellido_paterno": "VASGUEZ",
+  "materno": "ROMERO",
+  "nombre_completo": "EMILIO VASQUEZ ROMERO",
+  "año_inicio": 1954,
+  "año_final": 1993,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "JOSE",
+  "apellido_paterno": "PAREDES",
+  "materno": "FERNANDEZ",
+  "nombre_completo": "JOSE PAREDES FERNANDEZ",
+  "año_inicio": 1947,
+  "año_final": 1995,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "SELMO IVAN",
+  "apellido_paterno": "CARCAUSTO",
+  "materno": "TAPIA",
+  "nombre_completo": "SELMO IVAN CARCAUSTO TAPIA",
+  "año_inicio": 1991,
+  "año_final": 1997,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "OLGA BEATRIZ",
+  "apellido_paterno": "PAREDES",
+  "materno": "EYZAGUIRRE",
+  "nombre_completo": "OLGA BEATRIZ PAREDES EYZAGUIRRE",
+  "año_inicio": 1998,
+  "año_final": 2004,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "GINO ERNESTO",
+  "apellido_paterno": "YANGALI",
+  "materno": "IPARRAGUIRRE",
+  "nombre_completo": "GINO ERNESTO YANGALI IPARRAGUIRRE",
+  "año_inicio": 1998,
+  "año_final": 2004,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "LUIS ALFREDO",
+  "apellido_paterno": "CUBA",
+  "materno": "OVALLE",
+  "nombre_completo": "LUIS ALFREDO CUBA OVALLE",
+  "año_inicio": 1998,
+  "año_final": 2008,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "LUIS ALFREDO",
+  "apellido_paterno": "VASGUEZ",
+  "materno": "ROMERO",
+  "nombre_completo": "LUIS AFREDO VASQUEZ ROMERO",
+  "año_inicio": 1961,
+  "año_final": 2010,
+  "ubigeo_cod": 211100
+ },
+ {
+  "nombres": "FEDERICO",
+  "apellido_paterno": "MACEDO",
+  "materno": ".",
+  "nombre_completo": "FEDERICO MACEDO",
+  "año_inicio": 1919,
+  "año_final": 1919,
+  "ubigeo_cod": 210300
+ },
+ {
+  "nombres": "VICTOR",
+  "apellido_paterno": "M.",
+  "materno": "CALDERON",
+  "nombre_completo": "VICTOR M. CALDERON",
+  "año_inicio": 1927,
+  "año_final": 1929,
+  "ubigeo_cod": 210300
+ },
+ {
+  "nombres": "ADOLFO",
+  "apellido_paterno": "SANCHEZ",
+  "materno": "SALAS",
+  "nombre_completo": "ADOLFO SANCHEZ SALAS",
+  "año_inicio": 1933,
+  "año_final": 1936,
+  "ubigeo_cod": 210300
+ },
+ {
+  "nombres": "EDUARDO",
+  "apellido_paterno": "ARAMAYO",
+  "materno": "GONZALES",
+  "nombre_completo": "EDUARDO ARAMAYO GONZALES",
+  "año_inicio": 1942,
+  "año_final": 1944,
+  "ubigeo_cod": 210300
+ },
+ {
+  "nombres": "BENJAMIN",
+  "apellido_paterno": "DUEÑAS",
+  "materno": "TOVAR",
+  "nombre_completo": "BENJAMIN DUEÑAS TOVAR",
+  "año_inicio": 1948,
+  "año_final": 1975,
+  "ubigeo_cod": 210300
+ },
+ {
+  "nombres": "JOSE MIGUEL",
+  "apellido_paterno": "NAVARRO",
+  "materno": "CALDERON",
+  "nombre_completo": "JOSE MIGUEL NAVARRO CALDERON",
+  "año_inicio": 1957,
+  "año_final": 1968,
+  "ubigeo_cod": 210300
+ },
+ {
+  "nombres": "EDGAR",
+  "apellido_paterno": "LEZANO",
+  "materno": "ZUÑIGA",
+  "nombre_completo": "EDGAR LEZANO ZUÑIGA",
+  "año_inicio": 1977,
+  "año_final": 1977,
+  "ubigeo_cod": 210300
+ },
+ {
+  "nombres": "VICTOR",
+  "apellido_paterno": "MANUEL",
+  "materno": "ROMERO",
+  "nombre_completo": "VICTOR MANUEL ROMERO",
+  "año_inicio": 1890,
+  "año_final": 1919,
+  "ubigeo_cod": 210701
+ },
+ {
+  "nombres": "JULIO",
+  "apellido_paterno": "LEONIDAS",
+  "materno": "FRISANCHO",
+  "nombre_completo": "JULIO LEONIDAS FRISANCHO",
+  "año_inicio": 1929,
+  "año_final": 1961,
+  "ubigeo_cod": 210701
+ },
+ {
+  "nombres": "JOSE ",
+  "apellido_paterno": "ANTONIO",
+  "materno": "TORRES",
+  "nombre_completo": "JOSE ANTONIO TORRES",
+  "año_inicio": 1927,
+  "año_final": 1949,
+  "ubigeo_cod": 210701
+ },
+ {
+  "nombres": "ROBERTO",
+  "apellido_paterno": "RAMOS",
+  "materno": "NUÑEZ",
+  "nombre_completo": "ROBERTO RAMOS NUÑEZ",
+  "año_inicio": 1957,
+  "año_final": 1958,
+  "ubigeo_cod": 210701
+ },
+ {
+  "nombres": "MANUEL GERONIMO",
+  "apellido_paterno": "ROMERO",
+  "materno": "PORTUGAL",
+  "nombre_completo": "MANUEL GERONIMO ROMERO PORTUGAL",
+  "año_inicio": 1961,
+  "año_final": 2004,
+  "ubigeo_cod": 210701
+ },
+ {
+  "nombres": "ARISTIDES",
+  "apellido_paterno": "PANIAGUA",
+  "materno": ".",
+  "nombre_completo": "ARISTIDES PANIAGUA",
+  "año_inicio": 1924,
+  "año_final": 1967,
+  "ubigeo_cod": 211201
+ },
+ {
+  "nombres": "JOSE",
+  "apellido_paterno": "DIAZ",
+  "materno": "BEDREGAL",
+  "nombre_completo": "JOSE DIAZ BEDREGAL",
+  "año_inicio": 1960,
+  "año_final": 1966,
+  "ubigeo_cod": 211201
+ },
+ {
+  "nombres": "ROBERTO",
+  "apellido_paterno": "BUSTINZA",
+  "materno": "RAMOS",
+  "nombre_completo": "RUBERTO BUSTINZA RAMOS",
+  "año_inicio": 1891,
+  "año_final": 1924,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "JUAN",
+  "apellido_paterno": "CHUQUIMIA",
+  "materno": ".",
+  "nombre_completo": "JUAN CHUQUIMIA",
+  "año_inicio": 1906,
+  "año_final": 1922,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "ABELARDO",
+  "apellido_paterno": "ARAMAYO",
+  "materno": "GONZALES",
+  "nombre_completo": "ABELARDO ARAMAYO GONZALES",
+  "año_inicio": 1918,
+  "año_final": 1920,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "OTOYA",
+  "apellido_paterno": "ARISMENDI",
+  "materno": ".",
+  "nombre_completo": "OTOYA ARISMENDI",
+  "año_inicio": 1923,
+  "año_final": 1929,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "JUAN FRANCISCO",
+  "apellido_paterno": "BUSTINZA",
+  "materno": "RAMOS",
+  "nombre_completo": "JUAN FRANCISCO BUSTINZA RAMOS",
+  "año_inicio": 1925,
+  "año_final": 1942,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "CARLOS",
+  "apellido_paterno": "GARCIA",
+  "materno": ".",
+  "nombre_completo": "CARLOS GARCIA",
+  "año_inicio": 1940,
+  "año_final": 1963,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "DOMINGO",
+  "apellido_paterno": "CHOQUE",
+  "materno": "ESCOBEDO",
+  "nombre_completo": "DOMINGO CHOQUE ESCOBEDO",
+  "año_inicio": 1942,
+  "año_final": 1946,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "EDUARDO",
+  "apellido_paterno": "BERMEJO",
+  "materno": "BARRIGA",
+  "nombre_completo": "EDUARDO BERMEJO BARRIGA",
+  "año_inicio": 1943,
+  "año_final": 1979,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "PASTOR",
+  "apellido_paterno": "VELASCO",
+  "materno": "MEZA",
+  "nombre_completo": "PASTOR VELASCO MEZA",
+  "año_inicio": 1951,
+  "año_final": 1989,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "MIGUEL R.",
+  "apellido_paterno": "PINO",
+  "materno": "CHAVEZ",
+  "nombre_completo": "MIGUEL R. PINO CHAVEZ",
+  "año_inicio": 1965,
+  "año_final": 1967,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "EDGAR",
+  "apellido_paterno": "LEZANO",
+  "materno": "ZUÑIGA",
+  "nombre_completo": "EDGAR LEZANO ZUÑIGA",
+  "año_inicio": 1968,
+  "año_final": 1975,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "DARWIN JONHSON",
+  "apellido_paterno": "GALLEGOS",
+  "materno": "PAZ",
+  "nombre_completo": "DARWIN JONHSON GALLEGOS PAZ",
+  "año_inicio": 2001,
+  "año_final": 2015,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "JESUS SUNI",
+  "apellido_paterno": "HUANCA",
+  "materno": "ZEPITA",
+  "nombre_completo": "JESUS SUNI HUANCA ZEPITA",
+  "año_inicio": 2003,
+  "año_final": 2006,
+  "ubigeo_cod": 210401
+ },
+ {
+  "nombres": "FERMIN",
+  "apellido_paterno": "JIMENEZ",
+  "materno": "RAMIREZ",
+  "nombre_completo": "FERMIN JIMENEZ RAMIREZ",
+  "año_inicio": 1901,
+  "año_final": 1928,
+  "ubigeo_cod": 151005
+ },
+ {
+  "nombres": "FILIBERTO",
+  "apellido_paterno": "APARICIO",
+  "materno": ".",
+  "nombre_completo": "FILIBERTO APARICIO",
+  "año_inicio": 1907,
+  "año_final": 1950,
+  "ubigeo_cod": 151005
+ },
+ {
+  "nombres": "JUAN ",
+  "apellido_paterno": "CLEMENTE",
+  "materno": "MURILLO",
+  "nombre_completo": "JUAN CLEMENTE MURILLO",
+  "año_inicio": 1908,
+  "año_final": 1955,
+  "ubigeo_cod": 151005
+ },
+ {
+  "nombres": "EMILIANO",
+  "apellido_paterno": "VASGUEZ",
+  "materno": ".",
+  "nombre_completo": "EMILIANO VASQUEZ",
+  "año_inicio": 1937,
+  "año_final": 1957,
+  "ubigeo_cod": 151005
+ },
+ {
+  "nombres": "MIGUEL FRISANCHO",
+  "apellido_paterno": "APARICIO",
+  "materno": "GOMEZ",
+  "nombre_completo": "MANUEL FRISANCHO APARICIO GOMEZ",
+  "año_inicio": 1952,
+  "año_final": 1990,
+  "ubigeo_cod": 151005
+ },
+ {
+  "nombres": "FRANCISCO",
+  "apellido_paterno": "SANTA CRUZ",
+  "materno": "ZEGARRA",
+  "nombre_completo": "FRANCISCO SANTA CRUZ ZEGARRA",
+  "año_inicio": 1956,
+  "año_final": 1995,
+  "ubigeo_cod": 151005
+ },
+ {
+  "nombres": "RENE R. ",
+  "apellido_paterno": "RODRIGUEZ",
+  "materno": "ZEA",
+  "nombre_completo": "RENE R. RODRIGUEZ ZEA",
+  "año_inicio": 2003,
+  "año_final": 2012,
+  "ubigeo_cod": 151005
+ },
+ {
+  "nombres": "ROLANDO F.",
+  "apellido_paterno": "CONTRERAS",
+  "materno": "VARGAS",
+  "nombre_completo": "ROLANDO F. CONTRERAS VARGAS",
+  "año_inicio": 2001,
+  "año_final": 2014,
+  "ubigeo_cod": 151005
+ },
+ {
+  "nombres": "ROGER",
+  "apellido_paterno": "SALLUCA",
+  "materno": "HUARAYA",
+  "nombre_completo": "ROGER SALLUCA HUARAYA (ASILLO)",
+  "año_inicio": 2003,
+  "año_final": 2007,
+  "ubigeo_cod": 151005
+ }
+]

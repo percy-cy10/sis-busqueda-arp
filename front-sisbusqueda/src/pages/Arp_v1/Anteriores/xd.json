@@ -1,0 +1,208 @@
+{
+  "header": true,
+  "cols": [
+    {
+      "name": "index",
+      "label": "#",
+      "field": "index",
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right"
+    },
+    {
+      "name": "notario",
+      "label": "Notario",
+      "aling": "center",
+      "sortable": true,
+      "search": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    {
+      "name": "lugar",
+      "label": "Lugar",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    {
+      "name": "subserie",
+      "label": "Subserie",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    {
+      "name": "fecha",
+      "label": "Fecha",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    {
+      "name": "bien",
+      "label": "Bien",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    {
+      "name": "protocolo",
+      "label": "Protocolo",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    {
+      "name": "nescritura",
+      "label": "Escritura",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    {
+      "name": "folio",
+      "label": "Folio",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    {
+      "name": "otorgantes",
+      "label": "Otorgantes",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    {
+      "name": "favorecidos",
+      "label": "Favorecidos",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    }
+  ],
+  "colsMap": {
+    "index": {
+      "name": "index",
+      "label": "#",
+      "field": "index",
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right"
+    },
+    "notario": {
+      "name": "notario",
+      "label": "Notario",
+      "aling": "center",
+      "sortable": true,
+      "search": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    "lugar": {
+      "name": "lugar",
+      "label": "Lugar",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    "subserie": {
+      "name": "subserie",
+      "label": "Subserie",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    "fecha": {
+      "name": "fecha",
+      "label": "Fecha",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    "bien": {
+      "name": "bien",
+      "label": "Bien",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    "protocolo": {
+      "name": "protocolo",
+      "label": "Protocolo",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    "nescritura": {
+      "name": "nescritura",
+      "label": "Escritura",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    "folio": {
+      "name": "folio",
+      "label": "Folio",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    "otorgantes": {
+      "name": "otorgantes",
+      "label": "Otorgantes",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    },
+    "favorecidos": {
+      "name": "favorecidos",
+      "label": "Favorecidos",
+      "aling": "center",
+      "sortable": true,
+      "align": "right",
+      "__iconClass": "q-table__sort-icon q-table__sort-icon--right",
+      "__thClass": "text-right sortable"
+    }
+  },
+  "color": "grey-8",
+  "dark": true,
+  "dense": false
+}
