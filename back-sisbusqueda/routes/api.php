@@ -43,42 +43,27 @@ use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 |
 */
 
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     $roles = $request->user()->roles;
     $permisos = [];
-
     foreach ($roles as $rol) {
-        // Si el rol es "admin", otorgar todos los permisos
-        if ($rol->name === 'admin') {
-            $permisos = \App\Models\Permission::pluck('name')->toArray();
-            break;
-        }
 
+        # code...
         $permisos = array_merge($permisos, $rol->permissions->pluck('name')->toArray());
-    }
 
+        // $permisos=$rol->permissions->pluck('name');
+    }
     $permisos = array_values(array_unique($permisos));
-
-    // Asegurar que el rol admin tenga permisos específicos
-    if (in_array('admin', $roles->pluck('name')->toArray())) {
-        $requiredPermissions = [
-            'admin-solicitudes',
-            'admin-registro_busquedas',
-            'admin-registro_verificaciones',
-        ];
-        $permisos = array_unique(array_merge($permisos, $requiredPermissions));
-    }
 
     return response()->json([
         'user' => $request->user(),
+        // 'rolesSelected' => $request->user()->roles,
         'permisos' => $permisos,
         'roles' => $request->user()->roles->pluck('name'),
     ]);
-});
-
-Route::middleware('auth:api')->group(function () {
-    // Nueva ruta para consultar las áreas de usuario
-    Route::get('user-areas', [AreaController::class, 'getUserAreas']);
 });
 
 Route::get('ubigeo', [UbigeoController::class, 'getUbigeo']);
@@ -104,7 +89,9 @@ Route::apiResource('/solicitantes', SolicitanteController::class)->middleware([H
 Route::get('/solicitantes/dni/{dni}', [SolicitanteController::class, 'getSolicitanteDni']);
 
 Route::apiResource('/tupas', TupaController::class)->middleware([HandlePrecognitiveRequests::class]);
-
+Route::apiResource('/solicitudes', SolicitudController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::apiResource('/registro_busquedas', RegistroBusquedaController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::apiResource('/registro_verificaciones', RegistroVerificacionController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/pagos', PagoController::class)->middleware([HandlePrecognitiveRequests::class]);
 
 /** **************************************************************************** */

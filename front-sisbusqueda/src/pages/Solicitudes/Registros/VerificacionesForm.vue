@@ -49,8 +49,8 @@
                 v-model="form.cod_folioInicial" label="Codigo Folio Inicial" mask="F-######" :loading="form.validating"
                 @change="form.validate('cod_folioInicial')" :error="form.invalid('cod_folioInicial')">
                 <template v-slot:label> Folio Inicial <span class="text-red-7 text-weight-bold">(*)</span></template>
-                <template v-slot:append>
-                  <q-toggle v-model="vueltaFI" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FI"/>
+                <template v-slot:append> 
+                  <q-toggle v-model="vueltaFI" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FI"/> 
                   <div class="text-caption">Vuelta</div>
                 </template>
                 <template v-slot:error> {{ form.errors.cod_folioInicial }} </template>
@@ -59,8 +59,8 @@
                 v-model="form.cod_folioFinal" label="Codigo Folio Final" mask="F-######" :loading="form.validating"
                 @change="form.validate('cod_folioFinal')" :error="form.invalid('cod_folioFinal')">
                 <template v-slot:label> Folio Final <span class="text-red-7 text-weight-bold">(*)</span></template>
-                <template v-slot:append>
-                  <q-toggle v-model="vueltaFF" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FF"/>
+                <template v-slot:append> 
+                  <q-toggle v-model="vueltaFF" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FF"/> 
                   <div class="text-caption">Vuelta</div>
                 </template>
                 <template v-slot:error> {{ form.errors.cod_folioFinal }} </template>

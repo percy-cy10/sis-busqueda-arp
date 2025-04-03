@@ -24,6 +24,7 @@ class StoreNotarioRequest extends FormRequest
         return [
             'nombres' => 'required',
             'apellido_paterno' => 'required',
+            //'apellido_materno' => 'required',
             'apellido_materno' => 'nullable',
             'año_inicio' => 'required',
             'año_final' => 'required',

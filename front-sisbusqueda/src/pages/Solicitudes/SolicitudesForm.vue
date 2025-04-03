@@ -34,7 +34,7 @@
                       :rules="[(val) => (val && val !== '') || 'Por favor ingrese Primer Apellido',]">
                       <template v-slot:label> Primer Apellido <span class="text-red-7 text-weight-bold">(*)</span></template>
                     </q-input>
-                    <q-input class="col-12 col-md-4 q-pa-sm" label="Segundo Apellido" dense outlined
+                    <q-input class="col-12 col-md-4 q-pa-sm" label="Segundo Apellido" dense outlined 
                       v-model="solicitudForm.apellido_materno" :loading="loading" lazy-rules
                       :rules="[(val) => (val && val !== '') || 'Por favor ingrese Segundo Apellido',]">
                       <template v-slot:label> Segundo Apellido <span class="text-red-7 text-weight-bold">(*)</span></template>
@@ -72,12 +72,12 @@
               <q-step :name="2" title="Registrar Solicitud" icon="create_new_folder"
                 :done="step > 2" :header-nav="step > 2" >
                 <div class="q-mb-md row">
-
+                  
                   <SelectInput class="col-12 col-md-6 q-pa-sm" label="Notarios" dense outlined clearable lazy-rules
                       v-model="solicitudForm.notario_id" :rules="[(val) => (val && val !== '') || 'Por favor selecciones Notario',]"
                       :options="NotarioServive" OptionLabel="nombre_completo" OptionValue="id" :requerido="true"/>
                   <SelectInput class="col-12 col-md-6 q-pa-sm" label="Subserie" dense outlined clearable
-                      v-model="solicitudForm.subserie_id"
+                      v-model="solicitudForm.subserie_id" 
                       :options="SubSerieService" OptionLabel="nombre" OptionValue="id"/>
                   <InputTextSelect class="col-12 col-md-6 q-pa-sm" dense outlined clearable
                       v-model="solicitudForm.otorgantes" label="Otorgante" :requerido="true"
@@ -246,12 +246,12 @@ const nombreCompleto = computed(() => {
 });
 
 const masDatos = computed(() => {
-  return (
+  return ( 
     solicitudForm.value.sfolio +
     " " +
     solicitudForm.value.sescritura +
     " " +
-    solicitudForm.value.sprotocolo
+    solicitudForm.value.sprotocolo 
   );
 });
 

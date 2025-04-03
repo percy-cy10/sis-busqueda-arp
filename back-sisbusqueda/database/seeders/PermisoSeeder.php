@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -14,59 +15,119 @@ class PermisoSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear roles
-        $admin = Role::updateOrCreate(['name' => 'Administrador'], ['guard_name' => 'api']);
-        $operador = Role::updateOrCreate(['name' => 'Operador'], ['guard_name' => 'api']);
+        //
+        $admin = Role::updateOrCreate(['name' => 'Administrador'], ['name' => 'Administrador', 'guard_name' => 'api']);
+        $personal = Role::updateOrCreate(['name' => 'Operador'], ['name' => 'Operador', 'guard_name' => 'api']);
+        Permission::updateOrCreate(['name' => 'admin-permisos'], [
+            'name' => 'admin-permisos',
+            'description' => 'Administrar Permisos'
+        ])->assignRole([$admin, $personal]);
+        Permission::updateOrCreate(['name' => 'admin-roles'], [
+            'name' => 'admin-roles',
+            'description' => 'Administrar Roles'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-usuarios'], [
+            'name' => 'admin-usuarios',
+            'description' => 'Administrar Usuarios'
+        ])->assignRole([$admin]);
 
-        // Permisos agrupados en un array para evitar repeticiones
-        $permisos = [
-            ['name' => 'admin-permisos', 'description' => 'Administrar Permisos', 'roles' => [$admin]],
-            ['name' => 'admin-roles', 'description' => 'Administrar Roles', 'roles' => [$admin]],
-            ['name' => 'admin-usuarios', 'description' => 'Administrar Usuarios', 'roles' => [$admin]],
-            ['name' => 'admin-areas', 'description' => 'Administrar Áreas', 'roles' => [$admin]],
-            ['name' => 'admin-busquedas', 'description' => 'Administrar Búsquedas', 'roles' => [$admin]],
-            ['name' => 'admin-verificaciones', 'description' => 'Administrar Verificaciones', 'roles' => [$admin]],
-            ['name' => 'admin-libro', 'description' => 'Administrar Libro', 'roles' => [$admin]],
-            ['name' => 'admin-notario', 'description' => 'Administrar Notario', 'roles' => [$admin]],
-            ['name' => 'admin-subseries', 'description' => 'Administrar Subseries', 'roles' => [$admin]],
-            ['name' => 'admin-solicitudes', 'description' => 'Administrar Solicitudes', 'roles' => [$admin]],
-            ['name' => 'admin-registro_busquedas', 'description' => 'Administrar Registro de Búsquedas', 'roles' => [$admin]],
-            ['name' => 'admin-registro_verificaciones', 'description' => 'Administrar Registro de Verificaciones', 'roles' => [$admin]],
-            // Base de datos anterior
-            ['name' => 'admin-anteriores', 'description' => 'Administrar Anteriores', 'roles' => [$admin]],
-            ['name' => 'admin-anteriores2', 'description' => 'Administrar Anteriores 2', 'roles' => [$admin]],
-            ['name' => 'admin-sis2018', 'description' => 'Administrar SIS2018', 'roles' => [$admin]],
-            ['name' => 'admin-sis20182', 'description' => 'Administrar SIS20182', 'roles' => [$admin]],
-            ['name' => 'admin-nuevo', 'description' => 'Administrar Nuevo', 'roles' => [$admin]],
-            ['name' => 'admin-nuevo2', 'description' => 'Administrar Nuevo2', 'roles' => [$admin]],
-            ['name' => 'admin-sia', 'description' => 'Administrar SIA', 'roles' => [$admin]],
-            ['name' => 'admin-arbolito', 'description' => 'Administrar Arbolito', 'roles' => [$admin]],
-        ];
+       
+       
+        Permission::updateOrCreate(['name' => 'admin-areas'], [
+            'name' => 'admin-areas',
+            'description' => 'Administrar Areas'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-busquedas'], [
+            'name' => 'admin-busquedas',
+            'description' => 'Administrar busquedas'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-verificaciones'], [
+            'name' => 'admin-verificaciones',
+            'description' => 'Administrar verificaciones'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-libro'], [
+            'name' => 'admin-libro',
+            'description' => 'Administrar libro'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-notario'], [
+            'name' => 'admin-notario',
+            'description' => 'Administrar notario'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-subseries'], [
+            'name' => 'admin-subseries',
+            'description' => 'Administrar subseries'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-subseries'], [
+            'name' => 'admin-subseries',
+            'description' => 'Administrar subseries'
+        ])->assignRole([$admin]);
 
-        // Crear permisos y asignarlos a roles
-        foreach ($permisos as $permiso) {
-            Permission::updateOrCreate(['name' => $permiso['name']], [
-                'description' => $permiso['description']
-            ])->assignRole($permiso['roles']);
-        }
+        ///anterior bd
+        Permission::updateOrCreate(['name' => 'admin-anteriores'], [
+            'name' => 'admin-anteriores',
+            'description' => 'Administrar anteriores'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-anteriores2'], [
+            'name' => 'admin-anteriores2',
+            'description' => 'Administrar anteriores2'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-sis2018'], [
+            'name' => 'admin-sis2018',
+            'description' => 'Administrar sis2018'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-sis20182'], [
+            'name' => 'admin-sis20182',
+            'description' => 'Administrar sis20182'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-nuevo'], [
+            'name' => 'admin-nuevo',
+            'description' => 'Administrar nuevo'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-nuevo2'], [
+            'name' => 'admin-nuevo2',
+            'description' => 'Administrar nuevo2'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-sia'], [
+            'name' => 'admin-sia',
+            'description' => 'Administrar sia'
+        ])->assignRole([$admin]);
+        Permission::updateOrCreate(['name' => 'admin-arbolito'], [
+            'name' => 'admin-arbolito',
+            'description' => 'Administrar arbolito'
+        ])->assignRole([$admin]);
 
-        // Crear usuarios
-        $usuarios = [
-            ['name' => 'Administrador', 'email' => 'admin@gmail.com', 'password' => 'password', 'role' => $admin],
-            ['name' => 'Area Caja', 'email' => 'areacaja@gmail.com', 'password' => 'areacaja', 'area_id' => 1, 'role' => $operador],
-            ['name' => 'Juan Búsqueda', 'email' => 'busqueda@gmail.com', 'password' => 'busqueda', 'area_id' => 2, 'role' => $operador],
-            ['name' => 'Juan Verificación', 'email' => 'verificacion@gmail.com', 'password' => 'verificacion', 'area_id' => 3, 'role' => $operador],
-            ['name' => 'Juan Dirección', 'email' => 'direccion@gmail.com', 'password' => 'direccion', 'area_id' => 4, 'role' => $operador],
-        ];
 
-        foreach ($usuarios as $data) {
-            $user = User::updateOrCreate(['email' => $data['email']], [
-                'name' => $data['name'],
-                'password' => bcrypt($data['password']),
-                'area_id' => $data['area_id'] ?? null,
-            ]);
-            $user->assignRole($data['role']);
-        }
+        $user = User::create([
+            'name' => 'password',
+            'email' => 'password@gmail.com',
+            'password' => bcrypt('password'),
+            // 'area_id' => 5,
+        ]);
+        $operador = User::create([
+            'name' => 'area',
+            'email' => 'areacaja@gmail.com',
+            'password' => bcrypt('areacaja'),
+            'area_id'=> 1,
+        ]);
+        $operador = User::create([
+            'name' => 'Juan Busqueda',
+            'email' => 'busqueda@gmail.com',
+            'password' => bcrypt('busqueda'),
+            'area_id'=> 2,
+        ]);
+        $operador = User::create([
+            'name' => 'Juan Verificacion',
+            'email' => 'verificacion@gmail.com',
+            'password' => bcrypt('verificacion'),
+            'area_id'=> 3,
+        ]);
+        $operador = User::create([
+            'name' => 'Juan Direccion',
+            'email' => 'direccion@gmail.com',
+            'password' => bcrypt('direccion'),
+            'area_id'=> 4,
+        ]);
+        $user->assignRole('Administrador');
+        $operador->assignRole('Operador');
     }
 }
-// Compare this snippet from app/Models/User.php:

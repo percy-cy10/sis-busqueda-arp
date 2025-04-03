@@ -36,14 +36,43 @@
             <SugerenciasIntersection :notario_id="D_solicitud.notario_id" @sugerencia="DarSugerencia($event)" style="max-height: 150px;"/>
             <div class="col-12 q-py-sm text-weight-bold text-subtitle1">Registro de busqueda</div>
             <div class="row q-mb-md">
-              <q-form @submit.prevent="submit">
-                <q-input v-model="form.cod_protocolo" label="Protocolo" outlined dense />
-                <q-input v-model="form.cod_escritura" label="Código de Escritura" outlined dense />
-                <q-input v-model="form.cod_folioInicial" label="Folio Inicial" outlined dense />
-                <q-input v-model="form.cod_folioFinal" label="Folio Final" outlined dense />
-                <q-input v-model="form.observaciones" label="Observaciones" outlined dense type="textarea" />
-                <q-btn label="Guardar" type="submit" color="primary" />
-              </q-form>
+              <q-input class="col-12 col-sm-6 q-pa-sm" :class="form.invalid('cod_protocolo') ? 'q-mb-sm' : ''" dense outlined
+                  v-model="form.cod_protocolo" label="Protocolo" mask="P-######" :loading="form.validating"
+                  @change="form.validate('cod_protocolo')" :error="form.invalid('cod_protocolo')">
+                  <template v-slot:label> Protocolo <span class="text-red-7 text-weight-bold">(*)</span></template>
+                  <template v-slot:error> {{ form.errors.cod_protocolo }} </template>
+              </q-input>
+              <q-input class="col-12 col-sm-6 q-pa-sm" :class="form.invalid('cod_escritura') ? 'q-mb-sm' : ''" dense outlined
+                  v-model="form.cod_escritura" label="Codigo de Escritura" mask="E-######" :loading="form.validating"
+                  @change="form.validate('cod_escritura')" :error="form.invalid('cod_escritura')">
+                  <template v-slot:label> Codigo de Escritura <span class="text-red-7 text-weight-bold">(*)</span></template>
+                  <template v-slot:error>{{ form.errors.cod_escritura }}</template>
+              </q-input>
+              <q-input class="col-12 col-sm-6 q-pa-sm" :class="form.invalid('cod_folioInicial') ? 'q-mb-sm' : ''" dense outlined
+                  v-model="form.cod_folioInicial" label="Codigo Folio Inicial" mask="F-######" :loading="form.validating"
+                  @change="form.validate('cod_folioInicial')" :error="form.invalid('cod_folioInicial')">
+                  <template v-slot:label> Folio Inicial <span class="text-red-7 text-weight-bold">(*)</span></template>
+                  <template v-slot:append> 
+                    <q-toggle v-model="vueltaFI" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FI" /> 
+                    <div class="text-caption">Vuelta</div>
+                  </template>
+                  <template v-slot:error> {{ form.errors.cod_folioInicial }} </template>
+              </q-input>
+              <q-input class="col-12 col-sm-6 q-pa-sm" :class="form.invalid('cod_folioFinal') ? 'q-mb-sm' : ''" dense outlined
+                  v-model="form.cod_folioFinal" label="Codigo Folio Final" mask="F-######" :loading="form.validating"
+                  @change="form.validate('cod_folioFinal')" :error="form.invalid('cod_folioFinal')">
+                  <template v-slot:label> Folio Final <span class="text-red-7 text-weight-bold">(*)</span></template>
+                  <template v-slot:append> 
+                    <q-toggle v-model="vueltaFF" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FF" /> 
+                    <div class="text-caption">Vuelta</div>
+                  </template>
+                  <template v-slot:error> {{ form.errors.cod_folioFinal }} </template>
+              </q-input>
+              <q-input class="col-12 q-pa-sm" :class="form.invalid('observaciones') ? 'q-mb-sm' : ''" dense type="textarea" outlined
+                  v-model="form.observaciones" label="observaciones" :loading="form.validating"
+                  @change="form.validate('observaciones')" :error="form.invalid('observaciones')">
+                  <template v-slot:error> {{ form.errors.observaciones }} </template>
+              </q-input>
             </div>
           </q-card-section>
         </div>
@@ -82,22 +111,16 @@ onMounted(async() => {
   // await DatosSugerencia();
 });
 const submit = () => {
-  if (vueltaFI.value) {
-    form.cod_folioInicial = CargaVueltaFolio(form.cod_folioInicial)
-      ? form.cod_folioInicial
-      : form.cod_folioInicial + ' V';
-  }
-  if (vueltaFF.value) {
-    form.cod_folioFinal = CargaVueltaFolio(form.cod_folioFinal)
-      ? form.cod_folioFinal
-      : form.cod_folioFinal + ' V';
-  }
+  if(vueltaFI.value) form.cod_folioInicial = CargaVueltaFolio(form.cod_folioInicial) ? form.cod_folioInicial : form.cod_folioInicial+' V';
+  if(vueltaFF.value) form.cod_folioFinal = CargaVueltaFolio(form.cod_folioFinal) ? form.cod_folioFinal : form.cod_folioFinal+' V';
   form.submit()
     .then((response) => {
-      emits("save", "busqueda");
-    })
-    .catch((error) => {
-      console.error("Error al guardar la búsqueda:", error);
+      // form.reset();
+      // form.setData()
+      // console.log(response);
+      emits("save",'busqueda');
+    }).catch((error) => {
+      // alert(error);
     });
 };
 function CargaVueltaFolio(dato){
@@ -139,3 +162,4 @@ defineExpose({
     max-width: 80vw;
   }
 </style>
+  

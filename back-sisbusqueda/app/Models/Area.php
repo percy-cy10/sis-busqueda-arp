@@ -10,13 +10,15 @@ class Area extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
-        'user_id',
+        'nombre'
     ];
 
-    public function user()
+    public function usuarios()
     {
-        return $this->belongsTo(User::class); // Relación con el modelo User
+        return $this->hasMany(User::class);
+    }
+
+    public function solicituds(){
+        return $this->hasMany(Solicitud::class);
     }
 }

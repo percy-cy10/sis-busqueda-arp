@@ -53,21 +53,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    //
     public function area()
     {
         return $this->belongsTo(Area::class);
-    }
-
-    // metodo para obtener los registros de tabla user_has_areas
-    public function userHasAreas()
-    {
-        // Relación uno a muchos con UserHasArea
-        return $this->hasMany(UserHasArea::class, 'user_id', 'id');
-    }
-
-    public function areas()
-    {
-        return $this->hasMany(Area::class); // Relación con el modelo Area
     }
 }

@@ -44,7 +44,6 @@
             </template>
           </q-input>
           <q-input
-
             dense
             outlined
             v-model="form.apellido_materno"
@@ -53,12 +52,18 @@
 
             :error="form.invalid('apellido_materno')"
 
-
-
-
             >
-            <!-- Eliminado de codigo --- por datos faltantes
-              dense
+
+            <template v-slot:prepend>
+              <q-icon name="mdi-key" />
+            </template>
+
+
+
+            <!-- reemplazado
+
+            <q-input
+            dense
             outlined
             v-model="form.apellido_materno"
             :loading="form.validating"
@@ -66,16 +71,18 @@
             @change="form.validate('apellido_materno')"
             :error="form.invalid('apellido_materno')"
             :class="form.invalid('apellido_materno') ? 'q-mb-sm' : ''"
-             -->
+            >
 
             <template v-slot:prepend>
               <q-icon name="mdi-key" />
             </template>
-            <!-- <template v-slot:error>
+
+            <template v-slot:error>
               <div>
                 {{ form.errors.apellido_materno }}
               </div>
             </template> -->
+
           </q-input>
           <q-input
             dense
@@ -215,17 +222,10 @@
   // }
 
   const submit = () => {
-    if (!form.apellido_materno) {
-    form.apellido_materno = ""; // Enviar una cadena vacía en lugar de null
-  }
-
-  if (form.nombre_completo === "") {
-    form.nombre_completo =
-      form.nombres +
-      " " +
-      form.apellido_paterno +
-      (form.apellido_materno ? " " + form.apellido_materno : "");
-  }
+    if (form.nombre_completo === "") {
+        form.nombre_completo =
+            form.nombres + " " + form.apellido_paterno + " " + (form.apellido_materno || "");
+    }
 
     form
       .submit()
