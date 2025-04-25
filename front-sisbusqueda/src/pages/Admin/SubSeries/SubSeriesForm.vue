@@ -1,6 +1,6 @@
 <template>
     <!-- content -->
-    <q-card class="my-card">
+    <q-card class="my-card" style="width: 25%; max-width: 900px">
       <q-card-section class="bg-primary text-white">
         <div class="text-h6">{{ title }}</div>
         <!-- <div class="text-subtitle2">Usuario</div> -->
@@ -27,7 +27,7 @@
           </q-input>
         </q-card-section>
         <q-separator />
-  
+
         <q-card-actions align="right">
           <q-btn label="Cancelar" flat v-close-popup></q-btn>
           <q-btn
@@ -40,7 +40,7 @@
       </q-form>
     </q-card>
   </template>
-  
+
   <script setup>
   import { useForm } from "laravel-precognition-vue";
   import { onMounted, ref } from "vue";
@@ -56,13 +56,13 @@
       default: false,
     },
   });
-  
+
   let form;
   if (props.edit) {
     form = useForm("put", "api/subseries/" + props.id, {
       id: "",
       nombre: "",
-  
+
     });
   } else {
     form = useForm("post", "api/subseries", {
@@ -77,37 +77,36 @@
   //   roles.value = data;
   //   console.log(roles.value);
   // }
-  
+
   const submit = () => {
     form
       .submit()
       .then((response) => {
         form.reset();
         // form.setData()
-  
+
         emits("save");
       })
       .catch((error) => {
         // alert("An error occurred.");
       });
   };
-  
+
   onMounted(() => {
     // setData();
     console.log(props.edit);
     // cargar();
     // console.log(form);
   });
-  
+
   defineExpose({
     // setData,
     form,
   });
   </script>
   <style scoped>
-  .my-card{
-    width: 100%;
-    max-width: 80vw;
-  }
+  .my-card {
+
+  width: auto;
+}
   </style>
-  

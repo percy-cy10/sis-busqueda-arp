@@ -16,8 +16,17 @@ return new class extends Migration
             $table->string('nombre')->nullable();
             $table->string('apellido_paterno')->nullable();
             $table->string('apellido_materno')->nullable();
-            $table->string('nombre_completo');
+            $table->string('nombre_completo'); // Eliminar ->nullable() para hacerlo obligatorio
+            $table->string('razon_social')->nullable();
+            $table->enum('tipo', ['natural', 'juridica']); // Añadir campo "tipo" (obligatorio)
+            $table->unsignedBigInteger('user_id'); // Correcto: no nullable
             $table->timestamps();
+
+            // Clave foránea
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
         });
     }
 

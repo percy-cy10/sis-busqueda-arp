@@ -124,6 +124,43 @@ const routes = [
         name: "Verificacioneshow",
         component: () => import("components/ShowVerificacion.vue"),
       },
+
+      // Nueva ruta para Gestión de Libros
+      {
+        path: "libros",
+        name: "Libros",
+        component: () => import("src/pages/Admin/Libros/LibrosList.vue"),
+        // meta: { requiresAuth: true },
+      },
+
+      // Nueva ruta para Gestión de Escrituras
+      {
+        path: 'escrituras',
+        name: 'Escrituras',
+        component: () => import('src/pages/Admin/Escrituras/EscrituraList.vue')
+      }, // Added comma here
+
+      // Nueva ruta para Gestión de Favorecidos
+      {
+        path: "favorecido",
+        name: "Favorecido",
+        component: () => import("src/pages/Admin/Favorecidos/FavorecidoList.vue"),
+        // meta: { requiresAuth: true },
+      },
+
+      // Nueva ruta para Gestión de Otorgante
+      {
+        path: "otorgante",
+        name: "Otorgante",
+        component: () => import("src/pages/Admin/Otorgantes/OtorganteList.vue"),
+        // meta: { requiresAuth: true },
+      },
+      // {
+      //   path: "/libros/:id",
+      //   name: "libroShow",
+      //   component: () => import("pages/Admin/Libros/ListadoLibros.vue"),
+      //   //component: () => import("components/ShowVerificacion.vue"),
+      // },
     ],
   },
 

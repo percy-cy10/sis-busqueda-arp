@@ -14,10 +14,16 @@ class Favorecido extends Model
         'apellido_paterno',
         'apellido_materno',
         'nombre_completo',
-        'escritura_id',
+        'razon_social',
+        'tipo',
+        'user_id'
+    ];
+    protected $casts = [
+        'user_id' => 'integer',
+        'tipo' => 'string',
     ];
     public function escrituras()
     {
-        return $this->belongsToMany(Escritura::class);
+        return $this->belongsToMany(Escritura::class, 'escritura_favorecido');
     }
 }

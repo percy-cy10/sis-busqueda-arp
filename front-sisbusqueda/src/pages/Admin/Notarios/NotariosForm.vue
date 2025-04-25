@@ -1,6 +1,6 @@
 <template>
     <!-- content -->
-    <q-card class="my-card">
+    <q-card class="my-card" style="max-width: 800px">
       <q-card-section class="bg-primary text-white">
         <div class="text-h6">{{ title }}</div>
         <!-- <div class="text-subtitle2">Usuario</div> -->

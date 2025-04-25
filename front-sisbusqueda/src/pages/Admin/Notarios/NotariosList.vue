@@ -13,7 +13,7 @@
         <q-breadcrumbs>
           <q-breadcrumbs-el icon="home" />
 
-          <q-breadcrumbs-el label="Notarios" icon="mdi-key" />
+          <q-breadcrumbs-el label="Notarios" icon="mdi-account-tie" />
         </q-breadcrumbs>
       </div>
       <q-separator />
@@ -194,6 +194,7 @@
 
   const save = () => {
     formPermisos.value = false;
+    
     tableRef.value.requestServerInteraction();
     $q.notify({
       type: "positive",

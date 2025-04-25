@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('escritura_otorgante', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('escritura_id')->constrained();
-            $table->foreignId('otorgante_id')->constrained();
+            $table->foreignId('escritura_id')->constrained()->onDelete('cascade'); // Elimina registros relacionados
+            $table->foreignId('otorgante_id')->constrained()->onDelete('cascade'); // Opcional, si deseas eliminar otorgantes relacionados
             $table->timestamps();
         });
     }

@@ -12,8 +12,8 @@
       <div class="q-pa-md q-gutter-sm">
         <q-breadcrumbs>
           <q-breadcrumbs-el icon="home" />
-  
-          <q-breadcrumbs-el label="Sub Series" icon="mdi-key" />
+
+          <q-breadcrumbs-el label="Sub Series" icon="mdi-folder-multiple" />
         </q-breadcrumbs>
       </div>
       <q-separator />
@@ -32,7 +32,7 @@
           "
         />
       </div>
-  
+
       <q-table
         :rows-per-page-options="[7, 10, 15]"
         class="my-sticky-header-table htable q-ma-sm"
@@ -70,7 +70,7 @@
             <q-th auto-width> Acciones </q-th>
           </q-tr>
         </template>
-  
+
         <template v-slot:body="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -100,7 +100,7 @@
       </q-table>
     </q-page>
   </template>
-  
+
   <script setup>
   import { ref, onMounted } from "vue";
   import SubSerieService from "src/services/SubSerieService";
@@ -123,7 +123,7 @@
       sortable: true,
     },
   ];
-  
+
   const tableRef = ref();
   const formPermisos = ref(false);
   const subseriesformRef = ref();
@@ -140,12 +140,12 @@
     rowsPerPage: 7,
     rowsNumber: 10,
   });
-  
+
   async function onRequest(props) {
     const { page, rowsPerPage, sortBy, descending } = props.pagination;
     const filter = props.filter;
     loading.value = true;
-  
+
     const fetchCount = rowsPerPage === 0 ? 0 : rowsPerPage;
     const order_by = descending ? "-" + sortBy : sortBy;
     const { data, total = 0 } = await SubSerieService.getData({
@@ -165,11 +165,11 @@
     // ...and turn of loading indicator
     loading.value = false;
   }
-  
+
   onMounted(() => {
     tableRef.value.requestServerInteraction();
   });
-  
+
   const save = () => {
     formPermisos.value = false;
     tableRef.value.requestServerInteraction();
@@ -188,13 +188,13 @@
     editId.value = id;
     const row = await SubSerieService.get(id);
     console.log(row);
-  
+
     subseriesformRef.value.form.setData({
       id: row.id,
       nombre: row.nombre,
     });
   }
-  
+
   async function eliminar(id) {
     $q.dialog({
       title: "¿Estas seguro de eliminar este registro?",
@@ -214,5 +214,4 @@
     });
   }
   </script>
-  
-  
+

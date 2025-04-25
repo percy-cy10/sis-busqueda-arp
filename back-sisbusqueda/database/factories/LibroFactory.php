@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Notario;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -14,14 +15,13 @@ class LibroFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    private $v = 10;
     public function definition(): array
     {
         return [
-            'protocolo' => 'P-'.str_pad(++$this->v, 6, '0', STR_PAD_LEFT),
-            'estado' => 0,
+            'protocolo' => 'P-' . fake()->unique()->numerify('######'),
+            'estado' => fake()->boolean(),
             'user_id' => 1,
-            'notario_id' => fake()->numberBetween(1,10),
+            'notario_id' => Notario::factory(),
         ];
     }
 }

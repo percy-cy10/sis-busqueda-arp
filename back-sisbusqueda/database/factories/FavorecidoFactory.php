@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,11 +17,18 @@ class FavorecidoFactory extends Factory
      */
     public function definition(): array
     {
+        $tipo = fake()->randomElement(['natural', 'juridica']);
+
         return [
-            'nombre' => fake()->name(),
-            'apellido_paterno' => fake()->lastName(),
-            'apellido_materno' => fake()->lastName(),
-            'nombre_completo' => fake()->name().' '.fake()->lastName(),
+            'tipo' => $tipo,
+            'nombre' => $tipo === 'natural' ? fake()->firstName() : null,
+            'apellido_paterno' => $tipo === 'natural' ? fake()->lastName() : null,
+            'apellido_materno' => $tipo === 'natural' ? fake()->lastName() : null,
+            'nombre_completo' => $tipo === 'natural'
+                ? fake()->firstName() . ' ' . fake()->lastName() . ' ' . fake()->lastName()
+                : fake()->company(),
+            'razon_social' => $tipo === 'juridica' ? fake()->company() : null,
+            'user_id' => User::factory(), // Relación con el modelo User
         ];
     }
 }

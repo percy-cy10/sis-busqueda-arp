@@ -62,3 +62,64 @@ function filterFn(val, update, abort) {
   );
 }
 </script>
+
+<!--
+<template>
+  <q-select
+    dense
+    outlined
+    v-model="selected"
+    :options="subseries"
+    option-label="nombre"
+    option-value="id"
+    label="Subserie *"
+    emit-value
+    map-options
+    clearable
+    @update:model-value="handleChange"
+  >
+    <template v-slot:prepend>
+      <q-icon name="mdi-folder" />
+    </template>
+    <template v-slot:no-option>
+      <q-item>
+        <q-item-section class="text-grey">
+          No hay subseries disponibles
+        </q-item-section>
+      </q-item>
+    </template>
+  </q-select>
+</template>
+
+<script setup>
+import { ref, onMounted, watch } from 'vue'
+import SubserieService from 'src/services/SubSerieService'
+
+const props = defineProps({
+  subserieId: Number  // Prop para inicializar el valor seleccionado
+})
+
+const emit = defineEmits(['selectedItem'])
+
+const subseries = ref([])  // Lista de subseries
+const selected = ref(props.subserieId)  // Valor seleccionado de subserie, que se obtiene del prop
+
+// Cargar subseries al montar el componente
+onMounted(async () => {
+  try {
+    const { data } = await SubserieService.getData()
+    subseries.value = data
+  } catch (error) {
+    console.error("Error cargando subseries:", error)
+  }
+})
+
+// Escuchar cambios en el prop 'subserieId' y actualizar 'selected'
+watch(() => props.subserieId, (newVal) => {
+  selected.value = newVal
+})
+
+const handleChange = (value) => {
+  emit('selectedItem', value)  // Emitir el valor seleccionado al componente padre
+}
+</script> -->

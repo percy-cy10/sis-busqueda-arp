@@ -3,7 +3,7 @@
       <SolicitudesForm title="Registrar una Solicitud" @save="save($event)"/>
     </q-dialog>
     <q-dialog v-if="userStore.getAreaId === 2" v-model="busquedaForm" persistent>
-      <BusquedasForm title="Registro de Resultados de Busqueda" 
+      <BusquedasForm title="Registro de Resultados de Busqueda"
         :D_solicitud="DatosSolicitu" @save="save($event)" />
     </q-dialog>
     <q-dialog v-if="userStore.getAreaId === 3" v-model="verificaForm" persistent>
@@ -59,12 +59,12 @@
               </span>
               <div v-else-if="col.name === 'acciones'">
                 <GenerarPDFSolicitud :vericon="true" icon="picture_as_pdf" size="sm" outline round class="q-mr-xs"
-                  :datosSolicitudRow="props.row" :datosBusqueda="DatosBusqueda" :datosVerificacion="DatosVerifica" 
+                  :datosSolicitudRow="props.row" :datosBusqueda="DatosBusqueda" :datosVerificacion="DatosVerifica"
                   :datosPagos="DatosPagos" @clickPDF="generarPDF($event,props.row.id)"/>
                 <q-btn v-if="userStore.getAreaId === 2" outline color="blue"  icon="search" size="sm" round class="q-mr-xs"
                     @click="busqueda(props.row)" />
                 <q-btn v-if="userStore.getAreaId === 3" outline color="blue"  icon="rule" size="sm" round class="q-mr-xs"
-                    @click="verificacion(props.row.id,props.row)" /> 
+                    @click="verificacion(props.row.id,props.row)" />
                 <q-btn v-if="userStore.getAreaId===1 && props.row.area_id===1 && props.row.estado!=='Finalizado'" outline color="blue"  icon="point_of_sale" size="sm" round class="q-mr-xs"
                     @click="caja(props.row.id,props.row)" />
               </div>
@@ -126,14 +126,14 @@ async function onRequest(props) {
   const fetchCount = rowsPerPage === 0 ? 0 : rowsPerPage;
   const order_by = descending ? "-" + sortBy : sortBy;
   const { data, total = 0 } = await SolicitudService.getData({
-    params: { 
-      area_id: userStore.getAreaId!==1?userStore.getAreaId:"", 
-      user_id: userStore.getAreaId===1?userStore.id:"", 
+    params: {
+      area_id: userStore.getAreaId!==1?userStore.getAreaId:"",
+      user_id: userStore.getAreaId===1?userStore.id:"",
       estado: "",
-      rowsPerPage: fetchCount, 
-      page, 
-      search: filter, 
-      order_by, 
+      rowsPerPage: fetchCount,
+      page,
+      search: filter,
+      order_by,
     },
   });
   // clear out existing data and add new
@@ -224,7 +224,7 @@ async function caja(id,_soli){
   //   solicitudForm.value = true;
   //   edit.value = true;
   //   editId.value = id;
-    
+
   //   const row = await SolicitudService.get(id);
   //   console.log(row);
   //   // solicitudesformRef.value.setValue(row);

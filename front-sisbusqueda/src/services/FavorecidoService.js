@@ -1,8 +1,8 @@
 import { api } from "src/boot/axios";
 
 class FavorecidoService {
-  static async getData(params) {
-    return (await api.get("/api/favorecidos", params)).data;
+  static async getData(params = {}) {
+    return (await api.get("/api/favorecidos", { params })).data;
   }
 
   static async get(id) {

@@ -32,7 +32,7 @@ const emit = defineEmits(['update:modelValue']);
 const props = defineProps({
   modelValue: { default:null },
   RangoAnios: { default: [null, null] },
-  RangoFechas: { default: ['01/01/1901', convertDate(new Date(),'dd/MM/yyyy')] },
+  RangoFechas: { default: ['01/01/1801', convertDate(new Date(),'dd/MM/yyyy')] },
   requerido: { default: false },
   label: { default: 'Año' },
 });
@@ -89,7 +89,7 @@ function encontrarSlide(año){
 }
 </script>
 <style lang="sass" scoped>
-.classAnio 
+.classAnio
   padding: 4px
   height: 25px
   text-align: center
@@ -100,7 +100,7 @@ function encontrarSlide(año){
   background-color: $grey-3
 .darkAnio:hover
   background-color: $grey-9
-.selectAnio 
+.selectAnio
   background-color: $primary
   color: white
 // .q-field--with-bottom

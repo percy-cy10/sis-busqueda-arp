@@ -22,8 +22,11 @@ class StoreLibroRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'protocolo'=>'required|unique:libros,protocolo,'.$this->id,
-            'notario_id'=>'required',
+            'protocolo' => 'required|unique:libros,protocolo,' . $this->route('libro')->id,
+            'notario_id' => 'required|exists:notarios,id',
+            'estado' => 'nullable|boolean',
+            // 'estado' => 'required|in:0,1,true,false',
+
         ];
     }
 }

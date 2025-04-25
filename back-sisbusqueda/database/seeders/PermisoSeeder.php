@@ -31,8 +31,8 @@ class PermisoSeeder extends Seeder
             'description' => 'Administrar Usuarios'
         ])->assignRole([$admin]);
 
-       
-       
+
+
         Permission::updateOrCreate(['name' => 'admin-areas'], [
             'name' => 'admin-areas',
             'description' => 'Administrar Areas'
@@ -45,8 +45,8 @@ class PermisoSeeder extends Seeder
             'name' => 'admin-verificaciones',
             'description' => 'Administrar verificaciones'
         ])->assignRole([$admin]);
-        Permission::updateOrCreate(['name' => 'admin-libro'], [
-            'name' => 'admin-libro',
+        Permission::updateOrCreate(['name' => 'admin-libros'], [
+            'name' => 'admin-libros',
             'description' => 'Administrar libro'
         ])->assignRole([$admin]);
         Permission::updateOrCreate(['name' => 'admin-notario'], [

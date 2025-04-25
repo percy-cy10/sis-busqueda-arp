@@ -2,7 +2,7 @@ import { api } from "src/boot/axios";
 
 class OtorganteService {
   static async getData(params) {
-    return (await api.get("/api/otorgantes", params)).data;
+    return (await api.get("/api/otorgantes", {params})).data;
   }
 
   static async get(id) {

@@ -82,9 +82,13 @@ Route::apiResource('/subseries', SubSerieController::class)->middleware([HandleP
 Route::apiResource('/areas', AreaController::class)->middleware([HandlePrecognitiveRequests::class]);
 
 Route::apiResource('/libros', LibroController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::patch('/libros/{libro}/toggle-estado', [LibroController::class, 'toggleEstado']);
 Route::apiResource('/escrituras', EscrituraController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/otorgantes', OtorganteController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/favorecidos', FavorecidoController::class)->middleware([HandlePrecognitiveRequests::class]);
+// Route::apiResource('favorecidos', FavorecidoController::class);
+
+
 Route::apiResource('/solicitantes', SolicitanteController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/solicitantes/dni/{dni}', [SolicitanteController::class, 'getSolicitanteDni']);
 

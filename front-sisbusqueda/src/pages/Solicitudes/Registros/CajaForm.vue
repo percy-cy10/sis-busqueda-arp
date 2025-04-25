@@ -18,13 +18,13 @@
                             <div class="q-pa-sm text-weight-bold text-subtitle1 text-right">Costo de Verificación :</div>
                             <div class="q-pa-sm row items-center justify-end">
                               <span class="q-pr-md text-weight-bold text-subtitle1">Cantidad de Folios :</span>
-                              <q-btn round color="primary" icon="horizontal_rule" size="xs" @click="cantiFolio>1?cantiFolio=cantiFolio-1:null" :disable="true"/> 
+                              <q-btn round color="primary" icon="horizontal_rule" size="xs" @click="cantiFolio>1?cantiFolio=cantiFolio-1:null" :disable="true"/>
                               <span class="q-px-md text-weight-bold">{{ cantiFolio }}</span>
                               <q-btn round color="primary" icon="add" size="xs"  @click="cantiFolio<8?cantiFolio=cantiFolio+1:null" :disable="true"/>
                             </div>
                             <div class="q-pa-sm row items-center justify-end">
                               <span class="q-pr-md text-weight-bold text-subtitle1">Cantidad de copias :</span>
-                              <q-btn round color="primary" icon="horizontal_rule" size="xs" @click="cantiCopia>1?cantiCopia=cantiCopia-1:null"/> 
+                              <q-btn round color="primary" icon="horizontal_rule" size="xs" @click="cantiCopia>1?cantiCopia=cantiCopia-1:null"/>
                               <span class="q-px-md text-weight-bold">{{ cantiCopia }}</span>
                               <q-btn round color="primary" icon="add" size="xs"  @click="cantiCopia<8?cantiCopia=cantiCopia+1:null"/>
                             </div>

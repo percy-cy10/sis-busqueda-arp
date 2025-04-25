@@ -102,7 +102,7 @@ class TupaSeeder extends Seeder
             'sub_code' => '0000',
             'denominacion' => 'UIT',
             'derecho_pago' => '0.0',
-            'costo' => '4950',
+            'costo' => '5350.00',
         ]);
     }
 }

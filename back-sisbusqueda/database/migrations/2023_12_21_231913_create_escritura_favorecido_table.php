@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('escritura_favorecido', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('escritura_id')->constrained();
-            $table->foreignId('favorecido_id')->constrained();
+            $table->foreignId('escritura_id')->constrained()->onDelete('cascade'); // Elimina registros relacionados
+            $table->foreignId('favorecido_id')->constrained()->onDelete('cascade'); // Opcional, si deseas eliminar favorecidos relacionados
             $table->timestamps();
         });
     }

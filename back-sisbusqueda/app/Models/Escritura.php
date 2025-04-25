@@ -21,6 +21,7 @@ class Escritura extends Model
         'cod_folioFinal',
         'libro_id',
         'observaciones',
+        'file_name',
     ];
     public function subSerie()
     {
@@ -33,10 +34,10 @@ class Escritura extends Model
 
     public function favorecidos()
     {
-        return $this->belongsToMany(Favorecido::class);
+        return $this->belongsToMany(Favorecido::class, 'escritura_favorecido');
     }
     public function otorgantes()
     {
-        return $this->belongsToMany(Otorgante::class);
+        return $this->belongsToMany(Otorgante::class, 'escritura_otorgante');
     }
 }

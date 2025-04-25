@@ -83,12 +83,12 @@ export const useUserStore = defineStore("user", {
       this.roles = null;
       this.area = null;
     },
+
+    
     hasPermission(permission) {
-      // const areaId = userStore.areaId; // Assuming `areaId` is stored in `userStore`
-      //   if (areaId === null || areaId === "N/A") {
-      //     return true; // Grant all permissions
-      //   }
+
       return this.permisos?.includes(permission);
+
     },
   },
 });
