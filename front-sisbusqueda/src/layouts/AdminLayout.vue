@@ -81,7 +81,7 @@
             active-class="my-menu-link"
           >
             <q-item-section avatar>
-              <q-icon name="mdi-account" />
+              <q-icon name="group" />
             </q-item-section>
 
             <q-item-section> Usuarios </q-item-section>
@@ -98,7 +98,7 @@
             active-class="my-menu-link"
           >
             <q-item-section avatar>
-              <q-icon name="mdi-account" />
+              <q-icon name="business" />
             </q-item-section>
 
             <q-item-section> Areas </q-item-section>
@@ -115,10 +115,10 @@
             active-class="my-menu-link"
           >
             <q-item-section avatar>
-              <q-icon name="mdi-account" />
+              <q-icon name="search" />
             </q-item-section>
 
-            <q-item-section> Busqueda </q-item-section>
+            <q-item-section> Busquedas </q-item-section>
           </q-item>
 
           <q-item
@@ -132,13 +132,29 @@
             active-class="my-menu-link"
           >
             <q-item-section avatar>
-              <q-icon name="mdi-account" />
+              <q-icon name="check_circle" />
             </q-item-section>
 
-            <q-item-section> Verificacion </q-item-section>
+            <q-item-section> Verificaciones </q-item-section>
           </q-item>
 
-          <!--  gestioanr libro -->
+          <!--  CAJA -->
+          <q-item
+
+            :to="{ name: 'Caja' }"
+            :active="link === 'Caja'"
+            @click="link = 'Caja'"
+            clickable
+            v-ripple
+            class="q-ma-xs rounded-borders"
+            active-class="my-menu-link"
+          >
+            <q-item-section avatar>
+              <q-icon name="inventory" />
+            </q-item-section>
+
+            <q-item-section> Caja </q-item-section>
+          </q-item>
 
 
 
@@ -210,7 +226,7 @@
               <!-- escrituras v-if="userStore.hasPermission('admin-escrituras')"-->
 
               <q-item
-                
+
                 clickable
                 v-ripple
                 class="q-ma-xs rounded-borders"
@@ -261,8 +277,21 @@
                 <q-item-section> Otorgante </q-item-section>
               </q-item>
 
+              <q-item
 
-
+                clickable
+                v-ripple
+                class="q-ma-xs rounded-borders"
+                active-class="my-menu-link"
+                :to="{ name: 'BuscadorEscritura' }"
+                :active="link === 'BuscadorEscritura'"
+                @click="link = 'BuscadorEscritura'"
+              >
+                <q-item-section avatar>
+                  <q-icon name="people" />
+                </q-item-section>
+                <q-item-section> Buscador Escritura </q-item-section>
+              </q-item>
             </div>
           </q-expansion-item>
 

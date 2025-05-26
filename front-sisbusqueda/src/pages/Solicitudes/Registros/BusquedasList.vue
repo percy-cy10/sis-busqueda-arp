@@ -33,14 +33,14 @@
       /> -->
     </div>
     <div class="q-gutter-xs q-pa-sm">
-    <div class="row">
-      <SelectInput dense clearable outlined 
-      class="col-4 q-px-xs" 
+    <!-- <div class="row">
+      <SelectInput dense clearable outlined
+      class="col-4 q-px-xs"
       label="Usuario Registrado"
       v-model="usarioregistrado"
-      :options="BusquedaService" OptionLabel="name" OptionValue="id" 
+      :options="BusquedaService" OptionLabel="name" OptionValue="id"
       />
-    </div>
+    </div> -->
     </div>
     <q-table
       :rows-per-page-options="[7, 10, 15]"

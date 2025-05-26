@@ -7,8 +7,8 @@
 -->
 <template>
   <q-select v-if="cod_departamento === null || show_departamento"
-      use-input hide-selected fill-input input-debounce="0" 
-      :clearable="clearable" :dense="dense" :outlined="outlined" 
+      use-input hide-selected fill-input input-debounce="0"
+      :clearable="clearable" :dense="dense" :outlined="outlined"
       v-model="model_depa" label="Departamento" :class="Class" lazy-rules
       :rules="requerido?[(val) => (val!==null) || 'Por favor seleccione departamento',]:[]"
       :options="optionsDepartamentos" option-label="nombre" option-value="cod_dep"
@@ -23,8 +23,8 @@
       </template>
   </q-select>
   <q-select v-if="cod_provincia === null || show_provincia"
-      use-input hide-selected fill-input input-debounce="0" 
-      :clearable="clearable" :dense="dense" :outlined="outlined" 
+      use-input hide-selected fill-input input-debounce="0"
+      :clearable="clearable" :dense="dense" :outlined="outlined"
       v-model="model_prov" label="Provincia" :class="Class" lazy-rules
       :rules="requerido?[(val) => (val!==null) || 'Por favor seleccione provincia',]:[]"
       :options="optionsProvincias"  option-label="nombre" option-value="cod_prov" :readonly="model_depa===null"
@@ -38,8 +38,8 @@
           </q-item>
       </template>
   </q-select>
-  <q-select use-input hide-selected fill-input input-debounce="0" 
-      :clearable="clearable" :dense="dense" :outlined="outlined" 
+  <q-select use-input hide-selected fill-input input-debounce="0"
+      :clearable="clearable" :dense="dense" :outlined="outlined"
       v-model="model_dist" label="Distrito" :class="Class" lazy-rules
       :rules="requerido?[(val) => (val!==null) || 'Por favor seleccione distrito',]:[]"
       :options="optionsDistritos"  option-label="nombre" option-value="cod_dist" :readonly="model_prov===null"
@@ -111,14 +111,14 @@ function getDistritos(cod_dep, cod_prov) {
 watch(()=>model_depa.value,(newval,oldval)=>{
   if(newval && auxi_dep!==newval.cod_dep) {
     model_prov.value = null; model_dist.value = null;
-    getProvincias(newval.cod_dep); 
+    getProvincias(newval.cod_dep);
     auxi_dep=newval.cod_dep;
   }else if(newval === null) model_prov.value = null;
 });
 watch(()=>model_prov.value,(newval,oldval)=>{
   if(newval && auxi_pro!==newval.cod_prov) {
     model_dist.value = null;
-    getDistritos(newval.cod_dep, newval.cod_prov); 
+    getDistritos(newval.cod_dep, newval.cod_prov);
     auxi_pro=newval.cod_prov;
   } else if(newval === null) model_dist.value = null;;
 });
@@ -145,12 +145,25 @@ watch(()=>props.modelValue,(newval,oldval)=>{
   }
 });
 /*** ********************************************************************* */
+// function separarCadena(cadena) {
+//   let codigo_array = cadena && cadena !=="" && cadena.length === 6? cadena.match(/.{1,2}/g) || [null,null,null]:[null,null,null];
+//   if (props.cod_departamento) codigo_array[0] = props.cod_departamento;
+//   if (props.cod_departamento && props.cod_provincia) codigo_array[1] = props.cod_provincia;
+//   return codigo_array;
+// }
+
 function separarCadena(cadena) {
-  let codigo_array = cadena && cadena !=="" && cadena.length === 6? cadena.match(/.{1,2}/g) || [null,null,null]:[null,null,null];
+  let codigo_array = cadena && cadena !== "" && cadena.length === 6
+    ? cadena.match(/.{1,2}/g)
+    : [props.cod_departamento || "21", null, null]; // Default Puno
+
   if (props.cod_departamento) codigo_array[0] = props.cod_departamento;
-  if (props.cod_departamento && props.cod_provincia) codigo_array[1] = props.cod_provincia;
+  if (props.cod_provincia) codigo_array[1] = props.cod_provincia;
+
   return codigo_array;
 }
+
+
 function CargarModelDep(_dep){
   model_depa.value = _dep ? stringDepartamentos.find(v => v.cod_dep === _dep) : _dep;
 }

@@ -27,7 +27,12 @@ class UserRequest extends FormRequest
             //
             'name' => 'required',
             'email' => 'required|email|unique:users,email,'.$this->id,
-            'password' => ($this->id)?'min:8':'required|min:8'
+            'password' => ($this->id)?'min:8':'required|min:8',
+
+            // 'name' => 'required',
+            // 'email' => 'required|email|unique:users,email,'.$this->id,
+            // 'password' => ($this->id)?'min:8':'required|min:8',
+            'estado' => 'sometimes|boolean',
         ];
     }
 }

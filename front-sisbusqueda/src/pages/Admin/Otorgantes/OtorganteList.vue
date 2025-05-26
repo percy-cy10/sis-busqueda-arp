@@ -48,6 +48,7 @@
         <q-td auto-width class="q-gutter-x-sm">
           <q-btn
             icon="edit"
+            size="sm"
             color="primary"
             round
             outline
@@ -56,6 +57,7 @@
           <q-btn
             icon="delete"
             color="negative"
+            size="sm"
             round
             outline
             @click="eliminar(props.row.id)"

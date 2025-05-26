@@ -49,8 +49,8 @@
                 v-model="form.cod_folioInicial" label="Codigo Folio Inicial" mask="F-######" :loading="form.validating"
                 @change="form.validate('cod_folioInicial')" :error="form.invalid('cod_folioInicial')">
                 <template v-slot:label> Folio Inicial <span class="text-red-7 text-weight-bold">(*)</span></template>
-                <template v-slot:append> 
-                  <q-toggle v-model="vueltaFI" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FI"/> 
+                <template v-slot:append>
+                  <q-toggle v-model="vueltaFI" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FI"/>
                   <div class="text-caption">Vuelta</div>
                 </template>
                 <template v-slot:error> {{ form.errors.cod_folioInicial }} </template>
@@ -59,8 +59,8 @@
                 v-model="form.cod_folioFinal" label="Codigo Folio Final" mask="F-######" :loading="form.validating"
                 @change="form.validate('cod_folioFinal')" :error="form.invalid('cod_folioFinal')">
                 <template v-slot:label> Folio Final <span class="text-red-7 text-weight-bold">(*)</span></template>
-                <template v-slot:append> 
-                  <q-toggle v-model="vueltaFF" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FF"/> 
+                <template v-slot:append>
+                  <q-toggle v-model="vueltaFF" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FF"/>
                   <div class="text-caption">Vuelta</div>
                 </template>
                 <template v-slot:error> {{ form.errors.cod_folioFinal }} </template>
@@ -85,72 +85,215 @@
 import { useForm } from "laravel-precognition-vue";
 import { onMounted, ref, watch } from "vue";
 import GenerarPDFSolicitud from "src/components/GenerarPDFSolicitud.vue";
+import { useQuasar } from 'quasar';
+
+const $q = useQuasar();
 const emits = defineEmits(["save"]);
 const props = defineProps({
   title: String,
-  D_solicitud: {default: null,},
-  D_busqueda: {default: null,},
+  D_solicitud: {
+    type: Object,
+    required: true,
+    validator: (value) => value && value.id && value.solicitante
+  },
+  D_busqueda: {
+    type: Object,
+    required: true,
+    validator: (value) => value && value.id && value.cod_protocolo
+  },
 });
+
+// Validación inicial de props
+if (!props.D_solicitud?.id || !props.D_busqueda?.id) {
+  console.error('Faltan datos requeridos en las props');
+  $q.notify({
+    type: 'negative',
+    message: 'Error: Datos incompletos para la verificación',
+    position: 'top'
+  });
+}
+
 const opcionVista = ref(1);
 const vueltaFI = ref(false);
 const vueltaFF = ref(false);
-function CargaVueltaFolio(dato){
+
+function CargaVueltaFolio(dato) {
   return dato && /[vV]/.test(dato);
 }
+
+// Inicialización del formulario con validación
 let form = useForm("post", "api/registro_verificaciones", {
-  solicitud_id: props.D_solicitud.id,
-  cod_protocolo: props.D_busqueda.cod_protocolo,
-  cod_escritura: props.D_busqueda.cod_escritura,
-  cod_folioInicial: props.D_busqueda.cod_folioInicial,
-  cod_folioFinal: props.D_busqueda.cod_folioFinal,
-  observaciones: props.D_busqueda.observaciones,
-  RB_id_derivado: props.D_busqueda.id,
+  solicitud_id: props.D_solicitud?.id || null,
+  RB_id_derivado: props.D_busqueda?.id || null,
+  cod_protocolo: props.D_busqueda?.cod_protocolo || '',
+  cod_escritura: props.D_busqueda?.cod_escritura || '',
+  cod_folioInicial: props.D_busqueda?.cod_folioInicial || '',
+  cod_folioFinal: props.D_busqueda?.cod_folioFinal || '',
+  observaciones: props.D_busqueda?.observaciones || '',
 });
+
 onMounted(async() => {
+  if (!props.D_busqueda) return;
+
   vueltaFI.value = CargaVueltaFolio(props.D_busqueda.cod_folioInicial);
   vueltaFF.value = CargaVueltaFolio(props.D_busqueda.cod_folioFinal);
+
+  // Validación inicial del formulario
+  ['cod_protocolo', 'cod_escritura', 'cod_folioInicial', 'cod_folioFinal'].forEach(field => {
+    form.validate(field);
+  });
 });
-const submit = () => {
-  if(vueltaFI.value) form.cod_folioInicial = CargaVueltaFolio(form.cod_folioInicial) ? form.cod_folioInicial : form.cod_folioInicial+' V';
-  if(vueltaFF.value) form.cod_folioFinal = CargaVueltaFolio(form.cod_folioFinal) ? form.cod_folioFinal : form.cod_folioFinal+' V';
-  form.submit()
-    .then((response) => {
-      // form.reset();
-      // form.setData()
-      // console.log(response);
-      emits("save",'verificacion');
-    }).catch((error) => {
-      // alert(error);
+
+// const submit = async () => {
+//   console.log('Datos a enviar:', {
+//   ...form.data(),
+//   RB_id_derivado: form.RB_id_derivado,
+//   solicitud_id: form.solicitud_id
+// });
+//   try {
+//     // Aplicar modificaciones de "vuelta" si es necesario
+//     if(vueltaFI.value) {
+//       form.cod_folioInicial = CargaVueltaFolio(form.cod_folioInicial)
+//         ? form.cod_folioInicial
+//         : `${form.cod_folioInicial} V`;
+//     }
+
+//     if(vueltaFF.value) {
+//       form.cod_folioFinal = CargaVueltaFolio(form.cod_folioFinal)
+//         ? form.cod_folioFinal
+//         : `${form.cod_folioFinal} V`;
+//     }
+
+//     // Validación manual de campos requeridos
+//     const requiredFields = ['solicitud_id', 'RB_id_derivado', 'cod_protocolo', 'cod_escritura', 'cod_folioInicial', 'cod_folioFinal'];
+//     const missingFields = requiredFields.filter(field => !form[field]);
+
+//     if (missingFields.length > 0) {
+//       throw new Error(`Faltan campos requeridos: ${missingFields.join(', ')}`);
+//     }
+
+//     const response = await form.submit();
+
+//     $q.notify({
+//       type: 'positive',
+//       message: 'Verificación guardada correctamente',
+//       position: 'top-right'
+//     });
+
+//     emits("save", 'verificacion');
+
+//   } catch (error) {
+//     console.error('Error al guardar verificación:', error);
+//     console.log('Respuesta completa del error:', error.response?.data);
+
+//     let errorMessage = 'Error al guardar la verificación';
+
+//     if (error.response?.status === 422) {
+//       errorMessage = Object.values(error.response.data.errors).flat().join(', ');
+//     } else if (error.message) {
+//       errorMessage = error.message;
+//     }
+
+//     $q.notify({
+//       type: 'negative',
+//       message: errorMessage,
+//       position: 'top-right',
+//       timeout: 5000
+//     });
+//   }
+// };
+
+// Watchers para manejar el estado de los toggles de "vuelta"
+
+const submit = async () => {
+  try {
+    // Verificar que los datos requeridos existen
+    if (!props.D_solicitud?.id || !props.D_busqueda?.id) {
+      throw new Error('Datos incompletos para realizar la verificación');
+    }
+
+    // Aplicar modificaciones de "vuelta"
+    if (vueltaFI.value) {
+      form.cod_folioInicial = form.cod_folioInicial.includes(' V')
+        ? form.cod_folioInicial
+        : `${form.cod_folioInicial} V`;
+    }
+
+    if (vueltaFF.value) {
+      form.cod_folioFinal = form.cod_folioFinal.includes(' V')
+        ? form.cod_folioFinal
+        : `${form.cod_folioFinal} V`;
+    }
+
+    // Mostrar datos que se enviarán
+    console.log('Enviando datos:', {
+      solicitud_id: props.D_solicitud.id,
+      RB_id_derivado: props.D_busqueda.id,
+      ...form.data()
     });
+
+    const response = await form.submit();
+
+    $q.notify({
+      type: 'positive',
+      message: 'Verificación registrada correctamente',
+      position: 'top',
+      timeout: 2000
+    });
+
+    emits("save", 'verificacion');
+
+  } catch (error) {
+    let errorMessage = 'Error al guardar la verificación';
+
+    if (error.response?.data?.errors) {
+      // Mostrar todos los errores de validación
+      errorMessage = Object.values(error.response.data.errors)
+        .flat()
+        .join(', ');
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    $q.notify({
+      type: 'negative',
+      message: errorMessage,
+      position: 'top',
+      timeout: 5000,
+      actions: [{ icon: 'close', color: 'white' }]
+    });
+
+    console.error('Error detallado:', {
+      error: error.response?.data || error.message,
+      requestData: form.data()
+    });
+  }
 };
-function DarSugerencia(datos){
-  form.cod_protocolo = datos.libro.protocolo;
-  form.cod_escritura = datos.escritura.cod_escritura;
-  vueltaFI.value = CargaVueltaFolio(datos.escritura.cod_folioInicial);
-  vueltaFF.value = CargaVueltaFolio(datos.escritura.cod_folioFinal);
-  form.cod_folioInicial = datos.escritura.cod_folioInicial;
-  form.cod_folioFinal = datos.escritura.cod_folioFinal;
-}
-const deshabili_FI = ref(form.cod_folioInicial === '')
-watch(()=>form.cod_folioInicial,(newVal,oldVal)=>{
-  if(newVal===''){
+
+
+const deshabili_FI = ref(form.cod_folioInicial === '');
+watch(() => form.cod_folioInicial, (newVal) => {
+  if (newVal === '') {
     vueltaFI.value = false;
     deshabili_FI.value = true;
-  }else
+  } else {
     deshabili_FI.value = false;
+  }
 });
-const deshabili_FF = ref(form.cod_folioFinal === '')
-watch(()=>form.cod_folioFinal,(newVal,oldVal)=>{
-  if(newVal===''){
+
+const deshabili_FF = ref(form.cod_folioFinal === '');
+watch(() => form.cod_folioFinal, (newVal) => {
+  if (newVal === '') {
     vueltaFF.value = false;
     deshabili_FF.value = true;
-  }else
+  } else {
     deshabili_FF.value = false;
+  }
 });
-defineExpose({
-  form,
-});
+
+defineExpose({ form });
 </script>
+
 <style scoped>
 .my-card{
   width: 100%;

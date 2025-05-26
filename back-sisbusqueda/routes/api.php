@@ -73,6 +73,7 @@ Route::get('distritos', [UbigeoController::class, 'getDistritos']);
 
 Route::apiResource('/folios', FolioController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/usuarios', UserController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::patch('/usuarios/{usuario}/toggle-estado', [UserController::class, 'toggleEstado']);
 Route::apiResource('/roles', RoleController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/permisos', PermisoController::class)->middleware([HandlePrecognitiveRequests::class]);
 

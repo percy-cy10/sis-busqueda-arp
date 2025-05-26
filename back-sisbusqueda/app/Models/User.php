@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'area_id',
+        'estado', // Nuevo campo
     ];
     protected $guard_name = 'api';
     protected $with = ['area'];
@@ -57,4 +58,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Area::class);
     }
+
+    //Funcion de estado
+    public function findForPassport($username)
+    {
+        return $this->where('email', $username)
+                    ->where('estado', 1) // Solo usuarios activos
+                    ->first();
+    }
+
 }

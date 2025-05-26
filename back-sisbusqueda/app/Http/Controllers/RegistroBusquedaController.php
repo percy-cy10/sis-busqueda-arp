@@ -12,15 +12,23 @@ class RegistroBusquedaController extends Controller
 
     public function index(Request $request)
     {
+        // return $this->generateViewSetList(
+        //     $request,
+        //     RegistroBusqueda::query()
+        //     ->leftJoin('users','users.id', '=','registro_busquedas.user_id')
+        //     ->leftJoin('solicituds','solicituds.id', '=','registro_busquedas.solicitud_id')
+        //     ->select('registro_busquedas.*','users.*','solicituds.*'),
+        //     RegistroBusqueda::getModel()->getFillable(),
+        //     ['id'],
+        //     ['id'],
+        // );
+
         return $this->generateViewSetList(
             $request,
-            RegistroBusqueda::query()
-            ->leftJoin('users','users.id', '=','registro_busquedas.user_id')
-            ->leftJoin('solicituds','solicituds.id', '=','registro_busquedas.solicitud_id')
-            ->select('registro_busquedas.*','users.*','solicituds.*'),
+            RegistroBusqueda::with(['solicitud', 'user']), // Carga relaciones
             RegistroBusqueda::getModel()->getFillable(),
             ['id'],
-            ['id'],
+            ['id']
         );
     }
 

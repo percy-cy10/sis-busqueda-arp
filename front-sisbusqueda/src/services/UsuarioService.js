@@ -32,6 +32,16 @@ class UsuarioService {
   static async delete(id) {
     return (await api.delete(`api/usuarios/${id}`)).data;
   }
+
+  static async toggleEstado(id) {
+    try {
+      return (await api.patch(`/api/usuarios/${id}/toggle-estado`)).data;
+    } catch (error) {
+      console.error("Error al cambiar el estado del usuario:", error);
+      throw error;
+    }
+  }
+
 }
 
 export default UsuarioService;

@@ -87,15 +87,21 @@
 
       <template v-slot:body-cell-estado="props">
         <q-td :props="props" class="text-center">
-          <q-badge :color="props.row.estado ? 'green' : 'red'">
+          <q-badge
+            :color="props.row.estado ? 'green-6' : 'red-5'"
+            text-color="white"
+            rounded
+            class="q-badge--estado"
+          >
             {{ props.row.estado ? 'ACTIVO' : 'INACTIVO' }}
           </q-badge>
         </q-td>
       </template>
 
+
       <!-- Columna de Acciones -->
       <template v-slot:body-cell-actions="props">
-        <q-td :props="props" class="q-gutter-x-sm">
+        <q-td auto-width class="q-gutter-x-sm">
 
 
           <!-- Botón de Editar -->
@@ -498,6 +504,15 @@ const handleSave = async () => {
 .q-table {
   height: calc(100vh - 220px);
 }
+.q-badge--estado {
+  font-size: 0.85rem; /* Tamaño de letra un poquito más pequeño */
+  padding: 6px 12px; /* Más espacio interno */
+  font-weight: bold; /* Texto en negrita */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra suave */
+  text-transform: uppercase; /* Texto en mayúsculas */
+}
+
 
 .q-badge {
   font-size: 0.9em;

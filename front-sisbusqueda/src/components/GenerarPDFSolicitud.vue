@@ -1,6 +1,6 @@
 <template>
     <iframe v-if="ver" :src="data" width="100%" height="100%"></iframe>
-    <q-btn v-else :color="$q.dark.isActive? 'red-6':'negative'" :label="$q.screen.lt.sm || vericon? '' : label" :icon-right="vericon?'':'picture_as_pdf'" 
+    <q-btn v-else :color="$q.dark.isActive? 'red-6':'negative'" :label="$q.screen.lt.sm || vericon? '' : label" :icon-right="vericon?'':'picture_as_pdf'"
       @click="Evento" :loading="loading" :disable="loading">
       <q-tooltip anchor="top middle" self="bottom middle" :offset="[10, 10]">
           Ver en PDF
@@ -94,7 +94,7 @@ function generarPDF(datos) {
   doc.text("DATOS DEL DOCUMENTO:", 20, 90);
   doc.line(20, 92, 70, 92);
   const lineas = doc.splitTextToSize(parrafo1, maxWidth);
-  doc.text("Escritura Pública", 25, 98);  doc.text(": "+limitarLineas(doc,datos.subserie,120,2), 60, 98,{ align: "justify" , maxWidth: 130});
+  doc.text("Escritura Pública", 25, 98);  doc.text(": "+limitarLineas(doc,datos.sub_serie,120,2), 60, 98,{ align: "justify" , maxWidth: 130});
   doc.text("Otorgado por", 25, 108);      doc.text(": "+limitarLineas(doc,datos.otorgantes,120,2), 60, 108,{ align: "justify" , maxWidth: 130});
   doc.text("A Favor de", 25, 118);        doc.text(": "+limitarLineas(doc,datos.favorecidos ,120,2), 60, 118,{ align: "justify" , maxWidth: 130});
   doc.text("Notario Público", 25, 128);   doc.text(": "+limitarLineas(doc,datos.notario ,120,2), 60, 128,{ align: "justify" , maxWidth: 130});
@@ -160,13 +160,13 @@ function VerificaDatos(){
       bien: props.datosSolicitudRow.bien,
       mas_datos: props.datosSolicitudRow.mas_datos,
       notario:props.datosSolicitudRow.notario?props.datosSolicitudRow.notario.nombre_completo:'',
-      subserie:props.datosSolicitudRow.subserie?props.datosSolicitudRow.subserie.nombre:'',
+      sub_serie:props.datosSolicitudRow.sub_serie?props.datosSolicitudRow.sub_serie.nombre:'',
       tipo_copia:props.datosSolicitudRow.tipo_copia,
       cantidad_copia:props.datosSolicitudRow.cantidad_copia,
       created_at:props.datosSolicitudRow.created_at,
       pago_busqueda:props.datosSolicitudRow.pago_busqueda,
     };
-    
+
   }
   if(props.datosBusqueda){
     datosEnPDF.nombreBuscador=props.datosBusqueda.user?props.datosBusqueda.user.name:'';

@@ -107,19 +107,50 @@ watch(()=>props.modelValue,(newVal,oldVal)=>{
   CargarModel(newVal);
 });
 const filterOptions = ref(stringOptions);
+
+// function filter(val, update) {
+//   update(() => {
+//     if (val === '') filterOptions.value = stringOptions;
+//     else {
+//       filterOptions.value = stringOptions.filter(v => {
+//         if(typeof v === 'object'){
+//           return v[op_label.value].toString().toLowerCase().includes(val.toLowerCase());
+//         }else
+//           return v.toString().toLowerCase().includes(val.toLowerCase())
+//       });
+//     }
+//   });
+// }
+
 function filter(val, update) {
   update(() => {
-    if (val === '') filterOptions.value = stringOptions;
-    else {
-      filterOptions.value = stringOptions.filter(v => {
-        if(typeof v === 'object'){
-          return v[op_label.value].toString().toLowerCase().includes(val.toLowerCase());
-        }else
-          return v.toString().toLowerCase().includes(val.toLowerCase())
+    if (val === "") {
+      filterOptions.value = stringOptions;
+    } else {
+      const searchTerm = val.toLowerCase().trim();
+      filterOptions.value = stringOptions.filter((item) => {
+        // Obtener la etiqueta generada por la función `option-label`
+        let label;
+        if (typeof op_label.value === "function") {
+          label = op_label.value(item)?.toString().toLowerCase() || "";
+        } else {
+          label = item[op_label.value]?.toString().toLowerCase() || "";
+        }
+
+        // Buscar en la etiqueta combinada
+        const matchesLabel = label.includes(searchTerm);
+
+        // Buscar también en los campos individuales (nombre_completo y ubigeo.nombre)
+        const matchesNombre = item.nombre_completo?.toLowerCase().includes(searchTerm) || false;
+        const matchesUbigeo = item.ubigeo?.nombre?.toLowerCase().includes(searchTerm) || false;
+
+        return matchesLabel || matchesNombre || matchesUbigeo;
       });
     }
   });
 }
+
+
 async function ExtraerDatos(options){
   if(props.options.hasOwnProperty('getData')){
     if(props.GenerateList) return await props.options.getData(props.GenerateList);

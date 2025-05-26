@@ -70,6 +70,26 @@
             </div>
           </template>
         </q-input>
+
+        <!-- estado -->
+
+        <q-select
+          dense
+          outlined
+          v-model="form.estado"
+          :options="estadoOptions"
+          label="Estado *"
+          emit-value
+          map-options
+          class="q-mb-sm"
+          :rules="[val => val !== null || 'Seleccione estado']"
+        >
+          <template v-slot:prepend>
+            <q-icon name="mdi-state-machine" />
+          </template>
+        </q-select>
+        <!-- estado -->
+
         <SelectArea ref="areaSelectRef"
           class="q-mb-md"
           label="Area de Trabajo"
@@ -129,6 +149,13 @@ const idSelectArea = ref(null);
 //   console.log(data1);
 // };
 
+//Estado
+
+const estadoOptions = [
+  { label: "Activo", value: true },
+  { label: "Inactivo", value: false },
+];
+
 // data();
 
 const props = defineProps({
@@ -182,6 +209,9 @@ function updateArea(event) {
  const areaSelectRef = ref("");
 
   function setValue(values) {
+      // Convertir el estado a booleano si no lo es
+      values.estado = Boolean(values.estado);
+
       form.value = values;
       areaSelectRef.value.get(form.value.area_id);
   }

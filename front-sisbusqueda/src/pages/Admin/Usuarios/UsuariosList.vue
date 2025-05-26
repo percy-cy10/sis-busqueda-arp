@@ -1,38 +1,37 @@
 <template>
-  <q-dialog v-model="formUser">
-    <UsuariosForm
-      :title="title"
-      :edit="edit"
-      :id="editId"
-      ref="usuariosformRef"
-      @save="save"
-    ></UsuariosForm>
-  </q-dialog>
   <q-page>
+    <!-- Diálogo de formulario -->
+    <q-dialog v-model="formUser">
+      <UsuariosForm
+        :title="title"
+        :edit="edit"
+        :id="editId"
+        ref="usuariosformRef"
+        @save="save"
+      />
+    </q-dialog>
+
+    <!-- Encabezado y controles -->
     <div class="q-pa-md q-gutter-sm">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" />
-
         <q-breadcrumbs-el label="Usuarios" icon="mdi-account" />
       </q-breadcrumbs>
     </div>
     <q-separator />
+
+    <!-- Botón de agregar -->
     <div class="q-gutter-xs q-pa-sm">
       <q-btn
         color="primary"
         :disable="loading"
         :label="$q.screen.lt.sm ? '' : 'Agregar'"
         icon-right="add"
-        @click="
-          {
-            formUser = true;
-            edit = false;
-            title = 'Añadir Usuario';
-          }
-        "
+        @click="openForm"
       />
     </div>
 
+    <!-- Tabla principal -->
     <q-table
       :rows-per-page-options="[7, 10, 15]"
       class="my-sticky-header-table htable q-ma-sm"
@@ -47,17 +46,18 @@
       binary-state-sort
       @request="onRequest"
     >
-      <!-- <template v-slot:top-left>
+      <!-- Estado como badge mejorado -->
+      <q-badge
+        class="estado-badge"
+        :class="props.row.estado ? 'activo' : 'inactivo'"
+      >
+        {{ props.row.estado ? 'ACTIVO' : 'INACTIVO' }}
+      </q-badge>
 
-        <q-btn
-          color="primary"
-          :disable="loading"
-          :label="$q.screen.lt.sm ? '' : 'Agregar'"
-          icon-right="add"
-          @click="usuariosformRef.show = true"
-        />
-      </template> -->
 
+
+
+      <!-- Buscador -->
       <template v-slot:top-right>
         <q-input
           active-class="text-white"
@@ -73,20 +73,18 @@
           </template>
         </q-input>
       </template>
+
+      <!-- Encabezados de tabla -->
       <template v-slot:header="props">
         <q-tr :props="props">
-          <q-th
-  
-            v-for="col in props.cols"
-            :key="col.name"
-            :props="props"
-          >
+          <q-th v-for="col in props.cols" :key="col.name" :props="props">
             {{ col.label }}
           </q-th>
-          <q-th auto-width> Acciones </q-th>
+          <q-th auto-width>Acciones</q-th>
         </q-tr>
       </template>
 
+      <!-- Filas y acciones -->
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -96,7 +94,7 @@
             <q-btn
               size="sm"
               outline
-              color="green"
+              color="blue"
               round
               @click="editar(props.row.id)"
               icon="edit"
@@ -110,6 +108,17 @@
               @click="eliminar(props.row.id)"
               icon="delete"
             />
+            <q-btn
+              size="sm"
+              outline
+              round
+              :color="props.row.estado ? 'green' : 'gray'"
+            :icon="props.row.estado ? 'toggle_on' : 'toggle_off'"
+              @click="toggleEstado(props.row)"
+              :disable="loading"
+            >
+              <q-tooltip>{{ props.row.estado ? 'Desactivar' : 'Activar' }}</q-tooltip>
+            </q-btn>
           </q-td>
         </q-tr>
       </template>
@@ -118,167 +127,297 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import UsuarioService from "src/services/UsuarioService";
-import { useQuasar } from "quasar";
-import UsuariosForm from "src/pages/Admin/Usuarios/UsuariosForm.vue";
-const $q = useQuasar();
+import { ref, onMounted } from 'vue'
+import { useQuasar } from 'quasar'
+import UsuarioService from 'src/services/UsuarioService'
+import UsuariosForm from 'src/pages/Admin/Usuarios/UsuariosForm.vue'
+
+const $q = useQuasar()
+const tableRef = ref()
+const formUser = ref(false)
+const usuariosformRef = ref()
+const title = ref('')
+const edit = ref(false)
+const editId = ref()
+const rows = ref([])
+const filter = ref('')
+const loading = ref(false)
+
+// Configuración de columnas
 const columns = [
   {
-    name: "id",
-    label: "Id",
-    aling: "center",
-    field: (row) => row.id,
-    sortable: true,
+    name: 'id',
+    label: 'Id',
+    align: 'center',
+    field: row => row.id,
+    sortable: true
   },
   {
-    name: "name",
-    label: "Usuario",
-    aling: "center",
-    field: (row) => row.name,
-    sortable: true,
+    name: 'name',
+    label: 'Usuario',
+    align: 'center',
+    field: row => row.name,
+    sortable: true
   },
   {
-    name: "email",
-    label: "Email",
-    aling: "center",
-    field: (row) => row.email,
-    sortable: true,
+    name: 'email',
+    label: 'Email',
+    align: 'center',
+    field: row => row.email,
+    sortable: true
   },
   {
-    name: "area",
-    label: "Area",
-    aling: "center",
-    field: (row) => (row.area ? row.area.nombre : "N/A"),
-    sortable: true,
+    name: 'area',
+    label: 'Area',
+    align: 'center',
+    field: row => row.area?.nombre || 'N/A',
+    sortable: true
   },
-];
+  {
+    name: 'estado',
+    label: 'Estado',
+    align: 'center',
+    field: row => row.estado ? 'ACTIVO' : 'INACTIVO',
+    sortable: true
+  },
 
-const tableRef = ref();
-const formUser = ref(false);
-const usuariosformRef = ref();
-const title = ref("");
-const edit = ref(false);
-const editId = ref();
-const rows = ref([]);
-const filter = ref("");
-const loading = ref(false);
+]
+
+// Configuración de paginación
 const pagination = ref({
-  sortBy: "id",
+  sortBy: 'id',
   descending: false,
   page: 1,
   rowsPerPage: 7,
-  rowsNumber: 10,
-});
+  rowsNumber: 10
+})
 
-async function onRequest(props) {
-  const { page, rowsPerPage, sortBy, descending } = props.pagination;
-  const filter = props.filter;
-  loading.value = true;
-
-  const fetchCount = rowsPerPage === 0 ? 0 : rowsPerPage;
-  const order_by = descending ? "-" + sortBy : sortBy;
-  const { data, total = 0 } = await UsuarioService.getData({
-    params: { rowsPerPage: fetchCount, page, search: filter, order_by },
-  });
-  console.log(data);
-  // clear out existing data and add new
-  rows.value.splice(0, rows.value.length, ...data);
-  // don't forget to update local pagination object
-  !total
-    ? (pagination.value.rowsNumber = data.length)
-    : (pagination.value.rowsNumber = total);
-  pagination.value.page = page;
-  pagination.value.rowsPerPage = rowsPerPage;
-  pagination.value.sortBy = sortBy;
-  pagination.value.descending = descending;
-  // ...and turn of loading indicator
-  loading.value = false;
+// Métodos
+const openForm = () => {
+  formUser.value = true
+  edit.value = false
+  title.value = 'Añadir Usuario'
 }
-
-onMounted(() => {
-  tableRef.value.requestServerInteraction();
-});
 
 const save = () => {
-  formUser.value = false;
-  tableRef.value.requestServerInteraction();
-  $q.notify({
-    type: "positive",
-    message: "Guardado con Exito.",
-    position: "top-right",
-    progress: true,
-    timeout: 1000,
-  });
-};
-async function editar(id) {
-  title.value = "Editar Usuario";
-  formUser.value = true;
-  edit.value = true;
-  editId.value = id;
-  const row = await UsuarioService.get(id);
-  console.log(row);
-
-  usuariosformRef.value.form.setData({
-    id: row.user.id,
-    name: row.user.name,
-    email: row.user.email,
-    rolesSelected: row.rolesSelected,
-  });
-
-  // permisosformRef.value.setValue(row);
-  // usuariosformRef.value.setData(row);
+  formUser.value = false
+  tableRef.value.requestServerInteraction()
+  showNotification('positive', 'Guardado con éxito')
 }
 
-async function eliminar(id) {
+const editar = async id => {
+  title.value = 'Editar Usuario'
+  formUser.value = true
+  edit.value = true
+  editId.value = id
+
+  try {
+    const { user, rolesSelected } = await UsuarioService.get(id)
+    usuariosformRef.value.setFormData({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      estado: Boolean(user.estado),
+      rolesSelected
+    })
+  } catch (error) {
+    showNotification('negative', 'Error al cargar datos del usuario')
+  }
+}
+
+const eliminar = async id => {
   $q.dialog({
-    title: "¿Estas seguro de eliminar este registro?",
-    message: "Este proceso es irreversible.",
+    title: 'Confirmación',
+    message: '¿Estás seguro de eliminar este registro?',
     cancel: true,
-    persistent: true,
+    persistent: true
   }).onOk(async () => {
-    await UsuarioService.delete(id);
-    tableRef.value.requestServerInteraction();
-    $q.notify({
-      type: "positive",
-      message: "Eliminado con Exito.",
-      position: "top-right",
-      progress: true,
-      timeout: 1000,
-    });
-  });
+    try {
+      await UsuarioService.delete(id)
+      tableRef.value.requestServerInteraction()
+      showNotification('positive', 'Eliminado con éxito')
+    } catch (error) {
+      showNotification('negative', 'Error al eliminar usuario')
+    }
+  })
 }
+
+const toggleEstado = async usuario => {
+  const estadoOriginal = usuario.estado
+  try {
+    loading.value = true
+    usuario.estado = !estadoOriginal
+    rows.value = [...rows.value]
+
+    await UsuarioService.toggleEstado(usuario.id)
+    showNotification('positive', `Estado cambiado a ${usuario.estado ? 'ACTIVO' : 'INACTIVO'}`)
+  } catch (error) {
+    usuario.estado = estadoOriginal
+    rows.value = [...rows.value]
+    showNotification('negative', 'Error al cambiar estado')
+  } finally {
+    loading.value = false
+  }
+}
+
+const onRequest = async props => {
+  const { page, rowsPerPage, sortBy, descending } = props.pagination
+  loading.value = true
+
+  try {
+    const { data, total } = await UsuarioService.getData({
+      params: {
+        rowsPerPage,
+        page,
+        search: props.filter,
+        order_by: descending ? `-${sortBy}` : sortBy
+      }
+    })
+
+    // // Conversión robusta del estado
+    rows.value = data.map(usuario => ({
+      ...usuario,
+      estado: [1, '1', true, 'true'].includes(usuario.estado) // Maneja múltiples formatos
+    }))
+
+    updatePagination({ page, rowsPerPage, sortBy, descending, total })
+  } catch (error) {
+    showNotification('negative', 'Error al cargar datos')
+  } finally {
+    loading.value = false
+  }
+}
+
+// Helpers
+const updatePagination = ({ page, rowsPerPage, sortBy, descending, total }) => {
+  pagination.value = {
+    ...pagination.value,
+    page,
+    rowsPerPage,
+    sortBy,
+    descending,
+    rowsNumber: total || rows.value.length
+  }
+}
+
+const showNotification = (type, message) => {
+  $q.notify({
+    type,
+    message,
+    position: 'top-right',
+    progress: true,
+    timeout: 1000
+  })
+}
+
+// Ciclo de vida
+onMounted(() => {
+  tableRef.value.requestServerInteraction()
+})
 </script>
 
-<style lang="sass">
-.my-sticky-header-table
-  /* height or max-height is important */
-  height: 80vh
+<style scoped>
+.q-table {
+  height: calc(100vh - 220px);
+}
 
-  .q-table__top,
-  .q-table__bottom,
-  thead tr:first-child th
-    /* bg color is important for th; just specify one */
+.estado-badge {
+  font-size: 0.9rem;
+  padding: 6px 14px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+  min-width: 90px;
+  display: inline-block;
+  text-transform: uppercase;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.q-table {
+  height: calc(100vh - 220px);
+}
+.q-badge--estado {
+  font-size: 0.85rem; /* Tamaño de letra un poquito más pequeño */
+  padding: 6px 12px; /* Más espacio interno */
+  font-weight: bold; /* Texto en negrita */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra suave */
+  text-transform: uppercase; /* Texto en mayúsculas */
+}
 
 
-  thead tr th
-    position: sticky
-    z-index: 1
-    background-color: $primary
-    color: white
-  thead tr:first-child th
-    top: 0
+.q-badge {
+  font-size: 0.9em;
+  padding: 4px 8px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
 
-  /* this is when the loading indicator appears */
-  &.q-table--loading thead tr:last-child th
-    /* height of all previous header rows */
-    top: 48px
+.q-tooltip {
+  font-size: 0.9em;
+  white-space: pre-line;
+}
 
-  /* prevent scrolling behind sticky top row on focus */
-  tbody
-    /* height of all previous header rows */
-    scroll-margin-top: 48px
+/* Estilos mejorados para botones */
+.q-table__container .q-btn {
+  margin: 0 4px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
 
-.htable
-  #height: calc(100vh - 157px)
+.q-table__container .q-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.q-table__container .q-btn[color="green"] {
+  background: linear-gradient(145deg, #4CAF50, #81C784);
+}
+
+.q-table__container .q-btn[color="red"] {
+  background: linear-gradient(145deg, #F44336, #E57373);
+}
+
+.q-table__container .q-btn[color="blue"] {
+  background: linear-gradient(145deg, #2196F3, #64B5F6);
+}
+
+.q-table__container .q-btn[color="orange"] {
+  background: linear-gradient(145deg, #FF9800, #FFB74D);
+}
+
+.q-btn {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.q-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.estado-badge {
+  font-size: 0.9rem;
+  padding: 6px 14px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+  min-width: 90px;
+  display: inline-block;
+  text-transform: uppercase;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.estado-badge.activo {
+  background-color: #e8f5e9; /* verde claro */
+  color: #2e7d32; /* verde oscuro */
+  box-shadow: 0 2px 4px rgba(46, 125, 50, 0.2);
+}
+
+.estado-badge.inactivo {
+  background-color: #ffebee; /* rojo claro */
+  color: #c62828; /* rojo oscuro */
+  box-shadow: 0 2px 4px rgba(198, 40, 40, 0.2);
+}
+
+
 </style>

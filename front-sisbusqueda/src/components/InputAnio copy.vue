@@ -45,7 +45,7 @@ const props = defineProps({
     default: () => [1801, new Date().getFullYear()],
     validator: (val) =>
       val.length === 2 &&
-      val.every(v => !isNaN(Number(v))) // Acepta strings numéricos
+      val.every(v => !isNaN(Number(v))) // Valida que sean convertibles a número
   },
   RangoFechas: {
     type: Array,
@@ -64,14 +64,15 @@ let auxiAnio = null;
 // const [inicio, fin] = props.RangoAnios[0]?props.RangoAnios:props.RangoFechas.map(fecha => parseInt(fecha.split('/')[2]));
 // Añadir esto:
 // Variables reactivas con valores iniciales
-// Convertir a número y manejar casos edge
-const inicio = ref(Math.max(1801, Number(props.RangoAnios[0]) || 1801));
-const fin = ref(Math.min(Number(props.RangoAnios[1]) || new Date().getFullYear(), new Date().getFullYear()));
+const inicio = ref(Number(props.RangoAnios[0]));
+const fin = ref(Number(props.RangoAnios[1]));
 
+// Watcher para actualización dinámica
 watch(() => props.RangoAnios, (newVal) => {
-  inicio.value = Math.max(1801, Number(newVal[0]) || 1801);
-  fin.value = Math.min(Number(newVal[1]) || new Date().getFullYear());
-}, { immediate: true, deep: true });
+  inicio.value = Number(newVal[0]);
+  fin.value = Number(newVal[1]);
+}, { immediate: true });
+
 
 onBeforeMount(()=>{
   if (props.modelValue) modelAño.value=props.modelValue;
@@ -113,8 +114,7 @@ watch(()=>props.modelValue,(newval,oldval) => {
 // }
 
 function validaAnio(val) {
-  const year = parseInt(val);
-  return !isNaN(year) && year >= inicio.value && year <= fin.value;
+  return val >= inicio.value && val <= fin.value; // Usar .value
 }
 
 

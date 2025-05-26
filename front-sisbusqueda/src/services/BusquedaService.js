@@ -4,7 +4,7 @@ class BusquedaService {
     static async getData(params) {
         return (await api.get('/api/registro_busquedas',params)).data;
     }
-
+    
     static async get(id) {
         return (await api.get(`/api/registro_busquedas/${id}`)).data;
     }

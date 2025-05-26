@@ -19,8 +19,8 @@ class UserController extends Controller
             $request,
             User::query(),
             [],
-            ['id', 'name'],
-            ['id', 'name']
+            ['id', 'name', 'estado'],
+            ['id', 'name', 'estado']
         );
     }
 
@@ -35,6 +35,7 @@ class UserController extends Controller
             'email' => $request->email,
             'area_id'=>$request->area_id,
             'password' => bcrypt($request->password),
+            'estado' => $request->estado ?? 1, // Valor por defecto 1 si no se envía
         ]);
         $user->syncRoles($request->rolesSelected);
         return response()->json([$user->save()], 201);
@@ -51,6 +52,7 @@ class UserController extends Controller
         return response()->json([
             'user' => $usuario,
             'rolesSelected' => $usuario->roles->pluck('id'),
+            'estado' => $usuario->estado, // Opcional, si es necesario
         ]);
     }
 
@@ -70,6 +72,7 @@ class UserController extends Controller
             'email' => $request->email,
             'area_id'=>$request->area_id,
             'password' => $request->password ? bcrypt($request->password) : $usuario->password,
+            'estado' => $request->estado ?? $usuario->estado, // Mantener el valor actual si no se envía
         ]);
         return response()->json($usuario);
     }
@@ -81,5 +84,14 @@ class UserController extends Controller
     {
         //
         return response()->json($usuario->delete());
+    }
+
+    public function toggleEstado(User $usuario)
+    {
+        $usuario->updateQuietly(['estado' => !$usuario->estado]);
+        return response()->json([
+            'message' => 'Estado actualizado',
+            'estado' => $usuario->estado
+        ], 200);
     }
 }

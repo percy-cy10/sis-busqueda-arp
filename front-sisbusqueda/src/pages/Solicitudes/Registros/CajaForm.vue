@@ -13,7 +13,7 @@
                         :options="[ { label: `Copia Simple (${formatNumberToSoles(precios[0])})`, value: 0 },
                                 { label: `Copia certificada (${formatNumberToSoles(precios[1])})`, value: 1 },
                                 { label: `Testimonio (${formatNumberToSoles(precios[2])})`, value: 2 } ]" />
-                     <div class="col-12 row justify-end">
+                        <div class="col-12 row justify-end">
                         <div class="col-7">
                             <div class="q-pa-sm text-weight-bold text-subtitle1 text-right">Costo de Verificación :</div>
                             <div class="q-pa-sm row items-center justify-end">

@@ -155,12 +155,20 @@ const routes = [
         component: () => import("src/pages/Admin/Otorgantes/OtorganteList.vue"),
         // meta: { requiresAuth: true },
       },
-      // {
-      //   path: "/libros/:id",
-      //   name: "libroShow",
-      //   component: () => import("pages/Admin/Libros/ListadoLibros.vue"),
-      //   //component: () => import("components/ShowVerificacion.vue"),
-      // },
+
+      // Nueva ruta para Gestión de Otorgante
+      {
+        path: "BuscadorEscritura",
+        name: "BuscadorEscritura",
+        component: () => import("src/pages/Admin/Buscador/BuscadorEscrituras.vue"),
+        // meta: { requiresAuth: true },
+      },
+      {
+        path: "Caja",
+        name: "Caja",
+        component: () => import("pages/Admin/Caja/CajaForm.vue"),
+        //component: () => import("components/ShowVerificacion.vue"),
+      },
     ],
   },
 

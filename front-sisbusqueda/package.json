@@ -2,7 +2,7 @@
   "name": "front-sisbusqueda",
   "version": "0.0.1",
   "description": "Sistema de busqueda Escritura",
-  "productName": "Sis busqueda",
+  "productName": "SIS - BUSQUEDA",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
