@@ -133,6 +133,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import LoginForm from 'pages/Auth/LoginForm.vue'
+import carousel1 from 'assets/img/carousel1.jpg'
+import carousel2 from 'assets/img/carousel2.jpg'
 
 // Utilidades
 const $q = useQuasar()
@@ -143,8 +145,6 @@ const showLogin = ref(false)
 
 // Imágenes
 import logo from 'assets/img/logo_ARP.png'
-import carousel1 from 'assets/img/carousel1.png'
-import carousel2 from 'assets/img/carousel2.png'
 const logoSrc = logo
 const images = [{ src: carousel1 }, { src: carousel2 }]
 

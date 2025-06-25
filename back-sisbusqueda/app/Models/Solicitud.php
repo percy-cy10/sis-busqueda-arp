@@ -49,10 +49,16 @@ class Solicitud extends Model
     {
         return $this->hasOne(RegistroBusqueda::class, 'solicitud_id');
     }
+    // public function ubigeo()
+    // {
+    //     return $this->belongsTo(Ubigeo::class, 'ubigeo_cod','codigo');
+    // }
     public function ubigeo()
     {
-        return $this->belongsTo(Ubigeo::class, 'ubigeo_cod','codigo');
+        return $this->belongsTo(Ubigeo::class, 'ubigeo_cod', 'codigo');
     }
+
+
     public function tupa()
     {
         return $this->belongsTo(Tupa::class);

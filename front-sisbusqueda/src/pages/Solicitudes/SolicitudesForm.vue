@@ -1,10 +1,8 @@
 <template>
-  <!-- content -->
   <q-card class="my-card" style="width: 1400px; max-width: 80vw">
     <q-card-section class="bg-primary text-white row">
       <div class="text-h6">{{ title }}</div>
       <q-space />
-
       <q-btn icon="close" color="negative" round v-close-popup />
     </q-card-section>
     <q-card-section class="q-pa-none">
@@ -23,6 +21,7 @@
             flat
             bordered
           >
+            <!-- Paso 1: Solicitante -->
             <q-step
               :name="1"
               title="Registro Solicitante"
@@ -68,8 +67,8 @@
               >
                 <template v-slot:label>
                   {{ solicitudForm.tipo_documento }}
-                  <span class="text-red-7 text-weight-bold">(*)</span></template
-                >
+                  <span class="text-red-7 text-weight-bold">(*)</span>
+                </template>
                 <template v-slot:after>
                   <q-btn
                     :label="$q.screen.lt.sm ? '' : 'Buscar'"
@@ -101,10 +100,8 @@
                   >
                     <template v-slot:label>
                       Primer Apellido
-                      <span class="text-red-7 text-weight-bold"
-                        >(*)</span
-                      ></template
-                    >
+                      <span class="text-red-7 text-weight-bold">(*)</span>
+                    </template>
                   </q-input>
                   <q-input
                     class="col-12 col-md-4 q-pa-sm"
@@ -122,10 +119,8 @@
                   >
                     <template v-slot:label>
                       Segundo Apellido
-                      <span class="text-red-7 text-weight-bold"
-                        >(*)</span
-                      ></template
-                    >
+                      <span class="text-red-7 text-weight-bold">(*)</span>
+                    </template>
                   </q-input>
                   <q-input
                     class="col-12 col-md-4 q-pa-sm"
@@ -142,10 +137,8 @@
                   >
                     <template v-slot:label>
                       Nombres
-                      <span class="text-red-7 text-weight-bold"
-                        >(*)</span
-                      ></template
-                    >
+                      <span class="text-red-7 text-weight-bold">(*)</span>
+                    </template>
                   </q-input>
                 </q-tab-panel>
                 <q-tab-panel name="RUC" class="q-pa-none q-mb-md">
@@ -164,14 +157,11 @@
                   >
                     <template v-slot:label>
                       Asunto
-                      <span class="text-red-7 text-weight-bold"
-                        >(*)</span
-                      ></template
-                    >
+                      <span class="text-red-7 text-weight-bold">(*)</span>
+                    </template>
                   </q-input>
                 </q-tab-panel>
               </q-tab-panels>
-
               <div v-if="okSolicitante" class="row">
                 <div class="row full-width">
                   <SelectUbigeoPlus
@@ -219,6 +209,7 @@
               </div>
             </q-step>
 
+            <!-- Paso 2: Solicitud -->
             <q-step
               :name="2"
               title="Registrar Solicitud"
@@ -251,26 +242,6 @@
                   option-value="id"
                   :requerido="true"
                 />
-                <!-- <SelectInput
-                    class="col-12 col-md-6 q-pa-sm"
-                    label="Notarios"
-                    dense
-                    outlined
-                    clearable
-                    lazy-rules
-                    v-model="solicitudForm.notario_id"
-                    :rules="[(val) => (val && val !== '') || 'Por favor seleccione un notario']"
-                    :options="notarios.value"
-                    :option-label="(notario) => {
-                      const nombreUbigeo = notario.ubigeo?.nombre;
-                      return nombreUbigeo
-                        ? `${notario.nombre_completo} - ${nombreUbigeo}`.trim()
-                        : notario.nombre_completo;
-                    }"
-                    option-value="id"
-                    :requerido="true"
-                /> -->
-
                 <SelectInput
                   class="col-12 col-md-6 q-pa-sm"
                   label="Subserie"
@@ -308,7 +279,6 @@
                 />
                 <div class="row full-width"></div>
                 <div class="col-12 col-md-6 q-pa-sm row">
-
                   <InputAnio
                     :requerido="true"
                     class="col-12 col-sm-4"
@@ -318,22 +288,6 @@
                     :RangoAnios="rangoAnios"
                     :key="'anio-' + rangoAnios.join('-')"
                   />
-
-                  <!-- <InputAnio
-                    :requerido="true"
-                    class="col-12 col-sm-4"
-                    dense
-                    outlined
-                    v-model="solicitudForm.anio"
-                  /> -->
-
-                  <!-- holalalla rangops -->
-
-
-
-                  <!-- holalalla rangops -->
-
-
                   <InputMes
                     :readonly="solicitudForm.anio === null"
                     class="col-12 col-sm-4"
@@ -390,21 +344,20 @@
                   label="Folio"
                   mask="F-######"
                 />
-
                 <q-input
                   dense
                   outlined
                   clearable
                   class="col-12 q-pa-sm"
-                  v-model="solicitudForm.mas_datos"
+                  v-model="solicitudForm.observaciones"
                   label="Observaciones"
                   type="textarea"
                   rows="3"
-                  
                 />
-
               </div>
             </q-step>
+
+            <!-- Paso 3: Caja -->
             <q-step
               :name="3"
               title="Registro Caja"
@@ -412,85 +365,79 @@
               :done="step > 3"
               :header-nav="step > 3"
             >
-              <div class="row full-width">
+              <div class="row full-width q-mb-md">
                 <q-space />
+                <!-- <div class="row items-center text-body">
+                  <q-icon name="description" class="q-mr-xs" />
+                  <span class="text-bold">Concepto:</span>
+                  <span class="q-ml-xs">Búsqueda de documentos</span>
+                  <q-space />
+                  <span class="q-ml-md">Precio: <span class="text-primary">{{ formatNumberToSoles(redondearConDecimales(precioVigente)) }}</span></span>
+                </div> -->
                 <div class="row items-center text-body">
-                  Precio por Busqueda: {{ formatNumberToSoles(precioVigente) }}
+                  <q-icon name="description" class="q-mr-xs" />
+                  <span class="text-bold">Concepto:</span>
+                  <span class="q-ml-xs">{{ tupaBusqueda?.denominacion || 'Búsqueda de documentos' }}</span>
+                  <q-space />
+                  <span class="q-ml-md">
+                    Precio:
+                    <span class="text-primary">
+                      {{ tupaBusqueda ? formatNumberToSoles(Number(tupaBusqueda.costo)) : '' }}
+                    </span>
+                  </span>
                 </div>
               </div>
               <div class="row">
                 <div class="col-12 col-md-6">
                   <q-input
                     class="q-pa-sm"
-                    mask="###"
-                    prefix="s/"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    prefix="S/"
                     dense
                     outlined
                     clearable
-                    v-model="montoEntregado"
+                    v-model.number="montoEntregado"
                     label="Monto entregado"
+                    :rules="[val => val === null || val === '' || Number(val) >= 0 || 'Ingrese un monto válido']"
                   />
                 </div>
                 <div class="col-12 col-md-6 row">
                   <div class="col-7">
-                    <div
-                      v-if="montoEntregado"
-                      class="q-ma-sm text-right text-weight-bold text-subtitle1"
-                    >
-                      Monto Entregado :
+                    <div v-if="montoEntregado" class="q-ma-sm text-right text-weight-bold text-subtitle1">
+                      Monto Entregado:
                     </div>
-                    <div
-                      class="q-ma-sm text-right text-weight-bold text-subtitle1"
-                    >
-                      Subtotal :
+                    <div class="q-ma-sm text-right text-weight-bold text-subtitle1">
+                      Subtotal:
                     </div>
-                    <div
-                      v-if="montoEntregado"
-                      class="q-ma-sm text-right text-weight-bold text-subtitle1"
-                    >
-                      Monto de Cambio (vuelto) :
+                    <div v-if="montoEntregado" class="q-ma-sm text-right text-weight-bold text-subtitle1">
+                      {{ Number(montoEntregado) < redondearConDecimales(tupaBusqueda.costo) ? 'Faltante:' : 'Vuelto:' }}
                     </div>
                   </div>
                   <div class="col-5">
                     <div v-if="montoEntregado" class="q-ma-sm text-subtitle1">
-                      {{
-                        montoEntregado
-                          ? formatNumberToSoles(montoEntregado)
-                          : ""
-                      }}
+                      {{ formatNumberToSoles(montoEntregado) }}
                     </div>
-                    <div
-                      class="q-ma-sm text-green-13 text-weight-bold text-subtitle1"
-                    >
-                      {{
-                        formatNumberToSoles(
-                          redondearConDecimales(precioVigente)
-                        )
-                      }}
+                    <div class="q-ma-sm text-green-13 text-weight-bold text-subtitle1">
+                      {{ formatNumberToSoles(redondearConDecimales(tupaBusqueda.costo)) }}
                     </div>
-                    <div
-                      v-if="montoEntregado"
-                      class="q-ma-sm text-yellow-9 text-subtitle1"
-                    >
-                      {{
-                        montoEntregado
-                          ? formatNumberToSoles(
-                              montoEntregado -
-                                redondearConDecimales(precioVigente)
-                            )
-                          : ""
-                      }}
+                    <div v-if="montoEntregado" class="q-ma-sm text-subtitle1"
+                      :class="Number(montoEntregado) < redondearConDecimales(tupaBusqueda.costo) ? 'text-negative' : 'text-positive'">
+                      {{ formatNumberToSoles(Number(montoEntregado) - redondearConDecimales(tupaBusqueda.costo)) }}
                     </div>
                   </div>
                 </div>
               </div>
             </q-step>
+
             <template v-slot:navigation>
               <q-stepper-navigation>
                 <q-btn
                   color="primary"
                   type="submit"
-                  :label="step === 3 ? 'Enviar' : 'Siguiente'"
+                  :label="step === 3 ? 'Enviar Con Pago' : 'Siguiente'"
+                  :disable="step === 3 && (!montoEntregado || Number(montoEntregado) < redondearConDecimales(tupaBusqueda?.costo))"
                 />
                 <q-btn
                   v-if="step > 1"
@@ -500,12 +447,19 @@
                   label="Regresar"
                   class="q-ml-sm"
                 />
+                <q-btn
+                  v-if="step === 3"
+                  color="secondary"
+                  label="Enviar sin pago"
+                  @click="enviarSinPago"
+                  class="q-ml-sm"
+                  :disable="montoEntregado !== undefined && montoEntregado !== null && montoEntregado !== '' && Number(montoEntregado) >= redondearConDecimales(tupaBusqueda?.costo)"
+                />
               </q-stepper-navigation>
             </template>
           </q-stepper>
         </q-form>
       </div>
-      <!-- </div> -->
     </q-card-section>
   </q-card>
 </template>
@@ -517,6 +471,7 @@ import SolicitudService from "src/services/SolicitudService";
 import NotarioServive from "src/services/NotarioService";
 import SubSerieService from "src/services/SubSerieService";
 import TupaService from "src/services/TupaService";
+import PagoService from "src/services/PagoService";
 import OtorganteService from "src/services/OtorganteService";
 import FavorecidoService from "src/services/FavorecidoService";
 import SelectUbigeoPlus from "src/components/SelectUbigeoPlus.vue";
@@ -531,55 +486,43 @@ import InputMes from "src/components/InputMes.vue";
 import InputDia from "src/components/InputDia.vue";
 import InputTextSelect from "src/components/InputTextSelect.vue";
 
-// Propiedad computada para formato personalizado
-
 const $q = useQuasar();
-
 const step = ref(1);
-
 const emit = defineEmits(["save"]);
-
 const montoEntregado = ref();
 const precioVigente = ref();
 const props = defineProps({
   title: String,
 });
 
-
 const notarioAñoInicio = ref(1801);
 const notarioAñoFinal  = ref(new Date().getFullYear());
-
 const rangoAnios = computed(() => [
   notarioAñoInicio.value,
   notarioAñoFinal.value
 ]);
+const notarios = ref([]);
 
+const tupaBusqueda = ref(null);
 
-// En la sección de variables reactivas
-const notarios = ref([]); // Lista local de notarios
-
-// En NotarioService
+async function cargarTupaBusqueda() {
+  const resp = await TupaService.getData({ params: { sub_code: "0101" } });
+  tupaBusqueda.value = Array.isArray(resp.data) ? resp.data[0] : resp.data;
+}
 
 onMounted(async () => {
+  await cargarTupaBusqueda();
+  await getPrecioVigente();
   try {
     await getPrecioVigente();
-    // Llamada al servicio para obtener los datos de los notarios
-    const response = await NotarioServive.getData();
-    console.log("Notarios cargados correctamente:", response);
-
-    // Validar si la respuesta contiene datos válidos
+    const response = await NotarioServive.getData({ params: { rowsPerPage: 0 } });
     if (response && Array.isArray(response.data) && response.data.length > 0) {
-      notarios.value = response.data; // Asignar la lista de notarios
-      console.log("Notarios cargados correctamente:", notarios.value);
+      notarios.value = response.data;
     } else {
-      console.warn(
-        "El servicio NotarioServive devolvió una lista vacía o inválida."
-      );
-      notarios.value = []; // Asignar una lista vacía si los datos no son válidos
+      notarios.value = [];
     }
   } catch (error) {
-    console.error("Error al obtener los datos de los notarios:", error);
-    notarios.value = []; // Asignar una lista vacía en caso de error
+    notarios.value = [];
     $q.notify({
       type: "negative",
       message:
@@ -589,7 +532,6 @@ onMounted(async () => {
 });
 
 const solicitudForm = ref({
-  //parte de solicitante ************
   id: null,
   nombres: "",
   apellido_paterno: "",
@@ -602,8 +544,6 @@ const solicitudForm = ref({
   correo: "",
   celular: "",
   ubigeo_cod: "",
-
-  //parte de solicitud **************
   notario_id: "",
   subserie_id: "",
   otorgantes: "",
@@ -613,20 +553,19 @@ const solicitudForm = ref({
   dia: null,
   ubigeo_cod_soli: "",
   bien: "",
-  mas_datos: "",
-
-  //datos para generar PDF **********
+  observaciones: "",
   precio: "",
   sfolio: "",
   sprotocolo: "",
   sescritura: "",
+  mas_datos: ""
 });
 
 async function getPrecioVigente() {
-  precioVigente.value = await TupaService.getData({
-    params: { precio_sub_code: "0101" },
-  });
-  solicitudForm.value.precio = redondearConDecimales(precioVigente.value);
+  // Asegúrate de usar el valor reactivo de tupaBusqueda
+  const costo = Number(tupaBusqueda.value?.costo ?? 0);
+  precioVigente.value = costo;
+  solicitudForm.value.precio = redondearConDecimales(costo);
 }
 
 const okSolicitante = computed(() => {
@@ -655,20 +594,18 @@ const nombreCompleto = computed(() => {
   );
 });
 
+
 const masDatos = computed(() => {
-  return (
-    solicitudForm.value.sfolio +
-    " " +
-    solicitudForm.value.sescritura +
-    " " +
-    solicitudForm.value.sprotocolo
-  );
+  const parts = [
+    solicitudForm.value.observaciones,
+    solicitudForm.value.sescritura,
+    solicitudForm.value.sprotocolo,
+    solicitudForm.value.sfolio
+  ].filter(Boolean); // Elimina valores vacíos
+
+  return parts.join(' - '); // Une con guiones
 });
 
-// const notario = notarios.value.find(n => n.id === solicitudForm.value.notario_id);
-// if (notario?.ubigeo_cod) {
-//   solicitudForm.value.ubigeo_cod_soli = notario.ubigeo_cod;
-// }
 
 const loading = ref(false);
 const NoEncontroDatosPersona = ref(false);
@@ -689,7 +626,6 @@ async function getSolicitante() {
       solicitudForm.value.celular = res_solicitante.celular;
       solicitudForm.value.ubigeo_cod = res_solicitante.ubigeo_cod;
     } else if (res_solicitante?.message) {
-      console.log(res_solicitante.message);
       NoEncontroDatosPersona.value = true;
       onReset(false);
     } else {
@@ -699,7 +635,6 @@ async function getSolicitante() {
       solicitudForm.value.apellido_materno = res_solicitante.apellidoMaterno;
     }
   } catch (error) {
-    console.log(error.response?.data.errors);
     NoEncontroDatosPersona.value = true;
   }
   loading.value = false;
@@ -721,71 +656,28 @@ function onReset(n_documento = true) {
   solicitudForm.value.ubigeo_cod = null;
 }
 
-// watch(
-//   () => solicitudForm.value.notario_id,
-//   (newNotarioId) => {
-//     if (!notarios.value.length) {
-//       console.warn(
-//         "La lista de notarios está vacía. No se puede buscar el notario."
-//       );
-//       solicitudForm.value.ubigeo_cod_soli = "";
-//       notarioAñoInicio.value = 1801;
-//       notarioAñoFinal.value = new Date().getFullYear();
-//       return;
-//     }
-
-//     if (newNotarioId) {
-//       const notarioSeleccionado = notarios.value.find(
-//         (n) => n.id === newNotarioId
-//       );
-//       if (notarioSeleccionado) {
-//         solicitudForm.value.ubigeo_cod_soli =
-//           notarioSeleccionado.ubigeo_cod || "";
-//         notarioAñoInicio.value = notarioSeleccionado.año_inicio ?? 1801;
-//         notarioAñoFinal.value =
-//           notarioSeleccionado.año_final ?? new Date().getFullYear();
-//         console.log("UBIGEO asignado:", solicitudForm.value.ubigeo_cod_soli);
-//       } else {
-//         console.warn("No se encontró un notario con el ID:", newNotarioId);
-//         solicitudForm.value.ubigeo_cod_soli = "";
-//         notarioAñoInicio.value = 1801;
-//         notarioAñoFinal.value = new Date().getFullYear();
-//       }
-//     } else {
-//       solicitudForm.value.ubigeo_cod_soli = "";
-//       notarioAñoInicio.value = 1801;
-//       notarioAñoFinal.value = new Date().getFullYear();
-//     }
-//   }
-// );
-
-
-
-
 watch(
   () => solicitudForm.value.notario_id,
   (newNotarioId) => {
-    // Resetear campos de fecha al cambiar notario
     solicitudForm.value.anio = null;
     solicitudForm.value.mes = null;
     solicitudForm.value.dia = null;
-
     if (!notarios.value.length) {
-      console.warn("La lista de notarios está vacía.");
-      solicitudForm.value.ubigeo_cod_soli = "";
       notarioAñoInicio.value = 1801;
       notarioAñoFinal.value = new Date().getFullYear();
       return;
     }
+    const notarioSeleccionado = notarios.value.find(n => String(n.id) === String(newNotarioId));
+    const codUbigeo = notarioSeleccionado?.ubigeo_cod || '';
+    solicitudForm.value.ubigeo_cod_soli = codUbigeo;
+    // solicitudForm.value.ubigeo_cod = codUbigeo;
 
     if (newNotarioId) {
       const notarioSeleccionado = notarios.value.find(n => n.id === newNotarioId);
       if (notarioSeleccionado) {
-        solicitudForm.value.ubigeo_cod_soli = notarioSeleccionado.ubigeo_cod || "";
         notarioAñoInicio.value = notarioSeleccionado.año_inicio ?? 1801;
         notarioAñoFinal.value = notarioSeleccionado.año_final ?? new Date().getFullYear();
       } else {
-        console.warn("No se encontró el notario:", newNotarioId);
         notarioAñoInicio.value = 1801;
         notarioAñoFinal.value = new Date().getFullYear();
       }
@@ -793,58 +685,265 @@ watch(
       notarioAñoInicio.value = 1801;
       notarioAñoFinal.value = new Date().getFullYear();
     }
-  },
-
+  }
 );
 
-const onSubmit = async () => {
-  // console.log('subm');
-};
+// Modifica la función para asignar el ubigeo del notario seleccionado
+function asignarUbigeoNotario() {
+  const notarioSeleccionado = notarios.value.find(
+    n => String(n.id) === String(solicitudForm.value.notario_id)
+  );
+  const codUbigeo = notarioSeleccionado?.ubigeo_cod || '';
+  solicitudForm.value.ubigeo_cod_soli = codUbigeo;
+  // solicitudForm.value.ubigeo_cod = codUbigeo; // <-- Asigna también al campo principal de la solicitud
+}
+
+const onSubmit = async () => {};
+
+
+// async function ValidaSuccess(event, step) {
+//   if (step === 3) {
+
+//     if (solicitudForm.value.tipo_documento === 'DNI') {
+//       solicitudForm.value.nombre_completo =
+//         solicitudForm.value.apellido_paterno + ' ' +
+//         solicitudForm.value.apellido_materno + ' ' +
+//         solicitudForm.value.nombres;
+//     } else {
+//       solicitudForm.value.nombre_completo = solicitudForm.value.asunto;
+//     }
+
+//     solicitudForm.value.mas_datos = masDatos.value;
+//     asignarUbigeoNotario();
+
+//     // Mostrar los valores de ubigeo antes de guardar
+//     console.log("Ubigeo principal (ubigeo_cod):", solicitudForm.value.ubigeo_cod);
+//     console.log("Ubigeo del notario (ubigeo_cod_soli):", solicitudForm.value.ubigeo_cod_soli);
+
+
+
+//     try {
+
+
+
+//       // const notarioSeleccionado = notarios.value.find(
+//       //   n => n.id === solicitudForm.value.notario_id
+//       // );
+//       // if (notarioSeleccionado?.ubigeo_cod) {
+//       //   solicitudForm.value.ubigeo_cod_soli = notarioSeleccionado.ubigeo_cod;
+//       // }
+
+//       // Mostrar datos de la solicitud antes de guardar
+//       console.log("Datos enviados de la solicitud:", solicitudForm.value);
+
+//       // 1. Guardar la solicitud y obtener el ID generado
+//       const request = await SolicitudService.save(solicitudForm.value);
+//       console.log("Respuesta del backend al guardar solicitud:", request);
+
+//       let solicitudId = request?.data?.id || request?.id;
+
+//       // Si no se obtuvo el ID, buscar el mayor ID de la lista de solicitudes
+//       if (!solicitudId) {
+//         try {
+//           const listaSolicitudes = await SolicitudService.getData();
+//           if (Array.isArray(listaSolicitudes.data)) {
+//             // Ordenar de mayor a menor por id
+//             const ordenadas = listaSolicitudes.data.sort((a, b) => b.id - a.id);
+//             if (ordenadas.length > 0) {
+//               solicitudId = ordenadas[0].id;
+//             }
+//           }
+//         } catch (e) {
+//           solicitudId = null;
+//         }
+//       }
+
+//       // Validar que el ID exista
+//       if (!solicitudId) {
+//         $q.notify({
+//           type: "negative",
+//           message: "No se pudo obtener el ID de la solicitud. El pago no se guardará."
+//         });
+//         return;
+//       }
+
+//       // 2. Buscar el TUPA de búsqueda de documentos (sub_code 0101)
+//       const tupaBusquedaResp = await TupaService.getData({ params: { sub_code: "0101" } });
+//       const tupaBusqueda = Array.isArray(tupaBusquedaResp.data)
+//         ? tupaBusquedaResp.data[0]
+//         : tupaBusquedaResp.data;
+
+//       // 3. Obtener el user_id del usuario logueado
+//       let userId = null;
+//       try {
+//         const user = JSON.parse(localStorage.getItem('user'));
+//         userId = user?.id || user?.user?.id || null;
+//       } catch (e) {
+//         userId = null;
+//       }
+
+//       // 4. Construir el objeto de pago
+//       const costo = Number(tupaBusqueda.costo);
+//       const denominacion = tupaBusqueda.denominacion;
+
+//       // Generar nombre completo correctamente
+//       const nombreCompletoPago = [
+//         solicitudForm.value.nombres,
+//         solicitudForm.value.apellido_paterno,
+//         solicitudForm.value.apellido_materno
+//       ].filter(Boolean).join(' ').trim();
+
+//       const pagoPayload = {
+//         solicitud_id: solicitudId,
+//         tipo_documento: solicitudForm.value.tipo_documento,
+//         num_documento: solicitudForm.value.num_documento,
+//         nombre_completo: nombreCompletoPago,
+//         total: costo,
+//         user_id: userId,
+//         estado: 0,
+//         tupas: [
+//           {
+//             tupa_id: tupaBusqueda.id,
+//             cantidad: 1,
+//             Subtotal: costo,
+//             precio: costo,
+//             denominacion: denominacion
+//           }
+//         ],
+//         desde_solicitud: true // <--- AGREGADO
+//       };
+
+//       // Mostrar datos del pago antes de guardar
+//       console.log("Datos enviados en el pago:", pagoPayload);
+
+//       await PagoService.save(pagoPayload);
+
+//       emit("save", "solicitud");
+//     } catch (error) {
+//       if (error.response && error.response.data && error.response.data.errors) {
+//         console.error("Errores de validación:", error.response.data.errors);
+//         $q.notify({
+//           type: "negative",
+//           message: Object.values(error.response.data.errors).flat().join('\n')
+//         });
+//       } else {
+//         console.error("Error en ValidaSuccess:", error);
+//         if (error.response && error.response.data) {
+//           console.error("Respuesta del backend:", error.response.data);
+//         }
+//         $q.notify({
+//           type: "negative",
+//           message: "Error al guardar el pago"
+//         });
+//       }
+//     }
+//   } else if (step === 2) {
+//     event.next();
+//   } else {
+//     event.next();
+//   }
+// }
 
 async function ValidaSuccess(event, step) {
   if (step === 3) {
+    // Asignar nombre completo correctamente
+    if (solicitudForm.value.tipo_documento === 'DNI') {
+      solicitudForm.value.nombre_completo =
+        `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
+    } else {
+      solicitudForm.value.nombre_completo = solicitudForm.value.asunto;
+    }
+
+    solicitudForm.value.mas_datos = masDatos.value;
+    asignarUbigeoNotario();
+
     try {
-      // Verificar si la lista de notarios está cargada
-      if (!notarios.value.length) {
-        console.warn("La lista de notarios no está cargada o está vacía.");
+      // Guardar la solicitud
+      const request = await SolicitudService.save(solicitudForm.value);
+      let solicitudId = request?.data?.id || request?.id;
+
+      if (!solicitudId) {
+        try {
+          const listaSolicitudes = await SolicitudService.getData();
+          if (Array.isArray(listaSolicitudes.data)) {
+            const ordenadas = listaSolicitudes.data.sort((a, b) => b.id - a.id);
+            if (ordenadas.length > 0) {
+              solicitudId = ordenadas[0].id;
+            }
+          }
+        } catch (e) {
+          solicitudId = null;
+        }
+      }
+
+      if (!solicitudId) {
+        $q.notify({
+          type: "negative",
+          message: "No se pudo obtener el ID de la solicitud. El pago no se guardará."
+        });
         return;
       }
 
-      // Buscar el notario seleccionado
-      const notarioSeleccionado = notarios.value.find(
-        (n) => n.id === solicitudForm.value.notario_id
-      );
-      console.log("Notario seleccionado:", notarioSeleccionado);
+      // Buscar el TUPA de búsqueda de documentos (sub_code 0101)
+      const tupaBusquedaResp = await TupaService.getData({ params: { sub_code: "0101" } });
+      const tupaBusqueda = Array.isArray(tupaBusquedaResp.data)
+        ? tupaBusquedaResp.data[0]
+        : tupaBusquedaResp.data;
 
-      if (notarioSeleccionado?.ubigeo_cod) {
-        solicitudForm.value.ubigeo_cod_soli = notarioSeleccionado.ubigeo_cod;
-        console.log("UBIGEO asignado:", solicitudForm.value.ubigeo_cod_soli);
-      } else {
-        console.warn(
-          "No se encontró un notario con el ID:",
-          solicitudForm.value.notario_id
-        );
+      // Obtener el user_id del usuario logueado
+      let userId = null;
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        userId = user?.id || user?.user?.id || null;
+      } catch (e) {
+        userId = null;
       }
 
-      console.log(
-        "ID del notario seleccionado:",
-        solicitudForm.value.notario_id
-      );
-      console.log("Lista de notarios:", notarios.value);
+      // Generar nombre completo correctamente para el pago
+      let nombreCompletoPago = "";
+      if (solicitudForm.value.tipo_documento === 'DNI') {
+        nombreCompletoPago = `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
+      } else {
+        nombreCompletoPago = solicitudForm.value.asunto;
+      }
 
-      solicitudForm.value.nombre_completo = nombreCompleto.value;
-      solicitudForm.value.mas_datos = [
-        solicitudForm.value.mas_datos,
-        masDatos.value,
-      ]
-        .filter(Boolean)
-        .join(". ");
+      // Crear el pago con estado 0 y flags correctos
+      const pagoPayload = {
+        solicitud_id: solicitudId,
+        tipo_documento: solicitudForm.value.tipo_documento,
+        num_documento: solicitudForm.value.num_documento,
+        nombre_completo: nombreCompletoPago,
+        total: Number(tupaBusqueda.costo),
+        user_id: userId,
+        estado: 0,
+        tupas: [
+          {
+            tupa_id: tupaBusqueda.id,
+            cantidad: 1,
+            Subtotal: Number(tupaBusqueda.costo),
+            precio: Number(tupaBusqueda.costo),
+            denominacion: tupaBusqueda.denominacion
+          }
+        ],
+        desde_solicitud: true,
+        con_pago: true // <--- IMPORTANTE: aquí indicas que es CON pago
+      };
 
-      console.log(step, solicitudForm.value.nombre_completo);
-      const request = await SolicitudService.save(solicitudForm.value);
+      await PagoService.save(pagoPayload);
+
       emit("save", "solicitud");
     } catch (error) {
-      console.error("Error en ValidaSuccess:", error);
+      if (error.response && error.response.data && error.response.data.errors) {
+        $q.notify({
+          type: "negative",
+          message: Object.values(error.response.data.errors).flat().join('\n')
+        });
+      } else {
+        $q.notify({
+          type: "negative",
+          message: "Error al guardar el pago"
+        });
+      }
     }
   } else if (step === 2) {
     event.next();
@@ -853,12 +952,145 @@ async function ValidaSuccess(event, step) {
   }
 }
 
-function ValidaError(step) {
-  // console.log('Error:',step);
+async function enviarSinPago() {
+  try {
+    // Asignar nombre completo correctamente
+    if (solicitudForm.value.tipo_documento === 'DNI') {
+      solicitudForm.value.nombre_completo =
+        `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
+    } else {
+      solicitudForm.value.nombre_completo = solicitudForm.value.asunto;
+    }
+
+    asignarUbigeoNotario();
+    solicitudForm.value.mas_datos = masDatos.value;
+
+    // Guardar la solicitud y obtener el ID generado
+    const request = await SolicitudService.save(solicitudForm.value);
+    let solicitudId = request?.data?.id || request?.id;
+
+    if (!solicitudId) {
+      try {
+        const listaSolicitudes = await SolicitudService.getData();
+        if (Array.isArray(listaSolicitudes.data)) {
+          const ordenadas = listaSolicitudes.data.sort((a, b) => b.id - a.id);
+          if (ordenadas.length > 0) {
+            solicitudId = ordenadas[0].id;
+          }
+        }
+      } catch (e) {
+        solicitudId = null;
+      }
+    }
+
+    // Buscar el TUPA de búsqueda de documentos (sub_code 0101)
+    const tupaBusquedaResp = await TupaService.getData({ params: { sub_code: "0101" } });
+    const tupaBusqueda = Array.isArray(tupaBusquedaResp.data)
+      ? tupaBusquedaResp.data[0]
+      : tupaBusquedaResp.data;
+
+    // Obtener el user_id del usuario logueado
+    let userId = null;
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      userId = user?.id || user?.user?.id || null;
+    } catch (e) {
+      userId = null;
+    }
+
+    // Generar nombre completo correctamente para el pago
+    let nombreCompletoPago = "";
+    if (solicitudForm.value.tipo_documento === 'DNI') {
+      nombreCompletoPago = `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
+    } else {
+      nombreCompletoPago = solicitudForm.value.asunto;
+    }
+
+    // Crear el pago con estado 1 y flags correctos
+    const pagoPayload = {
+      solicitud_id: solicitudId,
+      tipo_documento: solicitudForm.value.tipo_documento,
+      num_documento: solicitudForm.value.num_documento,
+      nombre_completo: nombreCompletoPago,
+      total: Number(tupaBusqueda.costo),
+      user_id: userId,
+      estado: 1,
+      tupas: [
+        {
+          tupa_id: tupaBusqueda.id,
+          cantidad: 1,
+          Subtotal: Number(tupaBusqueda.costo),
+          precio: Number(tupaBusqueda.costo),
+          denominacion: tupaBusqueda.denominacion
+        }
+      ],
+      desde_solicitud: true,
+      con_pago: false // <--- IMPORTANTE: aquí indicas que es SIN pago
+    };
+
+    await PagoService.save(pagoPayload);
+
+    $q.notify({ type: "positive", message: "Solicitud enviada y pago generado sin boleta." });
+    emit("save", "solicitud");
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.errors) {
+      $q.notify({
+        type: "negative",
+        message: Object.values(error.response.data.errors).flat().join('\n')
+      });
+    } else {
+      $q.notify({
+        type: "negative",
+        message: "Error al enviar la solicitud sin pago"
+      });
+    }
+  }
 }
+// async function enviarSinPago() {
+//   try {
+//     // Asignar el nombre completo según el tipo de documento
+//     if (solicitudForm.value.tipo_documento === 'DNI') {
+//       solicitudForm.value.nombre_completo =
+//         solicitudForm.value.apellido_paterno + ' ' +
+//         solicitudForm.value.apellido_materno + ' ' +
+//         solicitudForm.value.nombres;
+//     } else {
+//       solicitudForm.value.nombre_completo = solicitudForm.value.asunto;
+//     }
+
+//     // Asignar el ubigeo_cod del notario seleccionado
+//     // Siempre asignar el ubigeo del notario antes de guardar
+//     asignarUbigeoNotario();
+//     solicitudForm.value.mas_datos = masDatos.value;
+
+//     // Mostrar datos de la solicitud antes de guardar
+//     console.log("Datos enviados de la solicitud (sin pago):", solicitudForm.value);
+
+//     // Guardar la solicitud y obtener el ID generado
+//     const request = await SolicitudService.save(solicitudForm.value);
+//     console.log("Respuesta del backend al guardar solicitud (sin pago):", request);
+
+//     // Notificar éxito y cerrar modal
+//     $q.notify({ type: "positive", message: "Solicitud enviada sin pago." });
+//     emit("save", "solicitud");
+//   } catch (error) {
+//     if (error.response && error.response.data && error.response.data.errors) {
+//       $q.notify({
+//         type: "negative",
+//         message: Object.values(error.response.data.errors).flat().join('\n')
+//       });
+//     } else {
+//       $q.notify({
+//         type: "negative",
+//         message: "Error al enviar la solicitud sin pago"
+//       });
+//     }
+//   }
+// }
+
+function ValidaError(step) {}
 
 function setValue(values) {
-  // solicitudForm.value = values;
   solicitudForm.value.id = values.id;
   solicitudForm.value.nombres = values.solicitante.nombres;
   solicitudForm.value.apellido_paterno = values.solicitante.apellido_paterno;
@@ -872,11 +1104,10 @@ function setValue(values) {
   solicitudForm.value.favorecidos = values.favorecidos;
   solicitudForm.value.ubigeo_cod_soli = values.ubigeo_cod;
   solicitudForm.value.bien = values.bien;
-  solicitudForm.value.mas_datos = values.mas_datos;
+  solicitudForm.value.mas_datos = values.masDatos;
 }
 
 defineExpose({
-  // setData,
   setValue,
 });
 </script>

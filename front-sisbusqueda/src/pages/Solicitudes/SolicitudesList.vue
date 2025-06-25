@@ -10,9 +10,9 @@
       <VerificacionesForm title="Registro de Verificación de Busqueda"
         :D_solicitud="DatosSolicitu" :D_busqueda="DatosBusqueda" @save="save($event)" />
     </q-dialog>
-    <q-dialog v-if="userStore.getAreaId === 1" v-model="cajaForm" persistent>
+    <!-- <q-dialog v-if="userStore.getAreaId === 1" v-model="cajaForm" persistent>
       <CajaForm title="Caja" :D_solicitud="DatosSolicitu" :D_busqueda="DatosBusqueda" :D_verificacion="DatosVerifica" @save="save($event)"/>
-    </q-dialog>
+    </q-dialog> -->
     <q-page>
       <div class="q-pa-md q-gutter-sm">
         <q-breadcrumbs>
@@ -65,8 +65,8 @@
                     @click="busqueda(props.row)" />
                 <q-btn v-if="userStore.getAreaId === 3" outline color="blue"  icon="rule" size="sm" round class="q-mr-xs"
                     @click="verificacion(props.row.id,props.row)" />
-                <q-btn v-if="userStore.getAreaId===1 && props.row.area_id===1 && props.row.estado!=='Finalizado'" outline color="blue"  icon="point_of_sale" size="sm" round class="q-mr-xs"
-                    @click="caja(props.row.id,props.row)" />
+                <!-- <q-btn v-if="userStore.getAreaId===1 && props.row.area_id===1 && props.row.estado!=='Finalizado'" outline color="blue"  icon="point_of_sale" size="sm" round class="q-mr-xs"
+                    @click="caja(props.row.id,props.row)" /> -->
               </div>
               <span v-else>{{ col.value }}</span>
             </q-td>
@@ -95,7 +95,16 @@ const $q = useQuasar();
 
 const columns = [
   { field: (row) => row.id, name: "id", label: "ID", align: "left", sortable_: true },
-  { field: (row) => row.solicitante.tipo_documento ==='DNI'?row.solicitante.nombre_completo:row.solicitante.asunto, name: "solicitante.nombre_completo", label: "Solicitante", align: "left", sortable_: true },
+  //{ field: (row) => row.solicitante.tipo_documento ==='DNI'?row.solicitante.nombre_completo:row.solicitante.asunto, name: "solicitante.nombre_completo", label: "Solicitante", align: "left", sortable_: true },
+  {
+    field: (row) => row.solicitante.tipo_documento === 'RUC'
+      ? row.solicitante.asunto
+      : row.solicitante.nombre_completo,
+    name: "solicitante",
+    label: "Solicitante",
+    align: "left",
+    sortable_: true
+  },
   { field: (row) => row.estado, name: "estado", label: "Estado", align: "center", sortable_: true, },
   { field: (row) => row.updated_at , name: "updated_at", label: "Fecha actualizacion", align: "center", sortable_: true, },
   { field: '' , name: "acciones", label: "Acciones", align: "center" },

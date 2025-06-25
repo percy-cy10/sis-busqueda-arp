@@ -98,6 +98,10 @@ Route::apiResource('/solicitudes', SolicitudController::class)->middleware([Hand
 Route::apiResource('/registro_busquedas', RegistroBusquedaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/registro_verificaciones', RegistroVerificacionController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/pagos', PagoController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::patch('pagos/{pago}/toggle-estado', [PagoController::class, 'toggleEstado']);
+Route::put('pagos/{pago}/anular', [PagoController::class, 'anular']);
+
+
 
 /** **************************************************************************** */
 Route::apiResource('/anteriores', AnteriorController::class)->middleware([HandlePrecognitiveRequests::class]);

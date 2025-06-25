@@ -2,8 +2,13 @@ import { api } from "src/boot/axios";
 
 class SolicitudService {
   static async getData(params) {
+    // return (await api.get("/api/solicitudes", { params })).data;
     return (await api.get("/api/solicitudes", params)).data;
   }
+
+  // static async getData(params = {}) {
+  //   return (await api.get("/api/solicitudes", { params: { ...params, rowsPerPage: -1 } })).data;
+  // }
 
   static async get(id) {
     return (await api.get(`/api/solicitudes/${id}`)).data;

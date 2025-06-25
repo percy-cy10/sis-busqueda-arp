@@ -35,6 +35,9 @@ return new class extends Migration
             // $table->unsignedBigInteger('area_id')->nullable();
             // $table->foreign('area_id')->references('id')->on('areas')->nullOnDelete();
             $table->string('estado');
+
+            // $table->foreignId('nivel')->nullable()->references('id')->on('niveles')->nullOnDelete();
+
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             $table->timestamps();
@@ -44,6 +47,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
+
     public function down(): void
     {
         Schema::dropIfExists('solicituds');

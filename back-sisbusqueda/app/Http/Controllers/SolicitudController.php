@@ -16,13 +16,20 @@ class SolicitudController extends Controller
      */
     public function index(Request $request)
     {
+        // return $this->generateViewSetList(
+        //     $request,
+        //     Solicitud::orderBy('updated_at', 'desc'),
+        //     ['area_id','estado','user_id'],
+        //     ['id'],
+        //     ['id'],
+        //     // $solicitudesConUbigeos,
+        // );
         return $this->generateViewSetList(
             $request,
             Solicitud::orderBy('updated_at', 'desc'),
             ['area_id','estado','user_id'],
             ['id'],
-            ['id'],
-            // $solicitudesConUbigeos,
+            ['id']
         );
     }
 
@@ -73,9 +80,9 @@ class SolicitudController extends Controller
             $id_solicitabte = $solicitante->id;
         }
         $uit = \env('PAGO');
-        
+
         Solicitud::create([
-            'notario_id' => $request->notario_id, 
+            'notario_id' => $request->notario_id,
             'subserie_id'=> $request->subserie_id,
             'solicitante_id'=> $id_solicitabte,
             'otorgantes'=> $request->otorgantes,
@@ -103,9 +110,16 @@ class SolicitudController extends Controller
     /**
      * Display the specified resource.
      */
+    // public function show(Solicitud $solicitude)
+    // {
+    //     return response()->json($solicitude);
+    // }
+
     public function show(Solicitud $solicitude)
     {
-        return response()->json($solicitude);
+        return response()->json(
+            $solicitude->load(['ubigeo', 'solicitante.ubigeo', 'notario', 'sub_serie'])
+        );
     }
 
     /**
@@ -136,6 +150,111 @@ class SolicitudController extends Controller
         return RegistroBusqueda::create([
             'solicitud_id' =>$solicitude->id,
             'estado' => 0,
+        ]);
+    }
+
+    // public function generateViewSetList(Request $request, $query, $filterFields = [], $searchFields = [], $orderFields = [])
+    // {
+    //     // --- FILTROS ---
+    //     foreach ($filterFields as $field) {
+    //         if ($request->filled($field)) {
+    //             $query->where($field, $request->input($field));
+    //         }
+    //     }
+
+    //     // --- BÚSQUEDA GENERAL ---
+    //     if ($request->filled('filter')) {
+    //         $filter = $request->input('filter');
+    //         $query->where(function($q) use ($searchFields, $filter) {
+    //             foreach ($searchFields as $field) {
+    //                 $q->orWhere($field, 'like', "%$filter%");
+    //             }
+    //         });
+    //     }
+
+    //     // --- ORDENAMIENTO ---
+    //     $sortBy = $request->input('sortBy', $orderFields[0] ?? 'id');
+    //     $direction = $request->boolean('descending', true) ? 'desc' : 'asc';
+    //     if (in_array($sortBy, $orderFields)) {
+    //         $query->orderBy($sortBy, $direction);
+    //     }
+
+    //     // --- DEVOLVER TODOS SI rowsPerPage = -1 ---
+    //     $perPage = $request->input('rowsPerPage', 7);
+    //     if ($perPage == -1) {
+    //         $data = $query->get();
+    //         return response()->json([
+    //             'data' => $data,
+    //             'total' => $data->count(),
+    //             'current_page' => 1,
+    //             'per_page' => $data->count(),
+    //         ]);
+    //     }
+
+    //     // --- PAGINACIÓN NORMAL ---
+    //     $paginated = $query->paginate($perPage);
+
+    //     return response()->json([
+    //         'data' => $paginated->items(),
+    //         'total' => $paginated->total(),
+    //         'current_page' => $paginated->currentPage(),
+    //         'per_page' => $paginated->perPage(),
+    //     ]);
+    // }
+
+    // ...existing code...
+    public function generateViewSetList(
+        \Illuminate\Http\Request $request,
+        \Illuminate\Database\Eloquent\Builder $querySet,
+        array $filterBy,
+        array $searchBy,
+        array $orderBy,
+        array $relationFields = []
+    ) {
+        // --- FILTROS ---
+        foreach ($filterBy as $field) {
+            if ($request->filled($field)) {
+                $querySet->where($field, $request->input($field));
+            }
+        }
+
+        // --- BÚSQUEDA GENERAL ---
+        if ($request->filled('filter')) {
+            $filter = $request->input('filter');
+            $querySet->where(function($q) use ($searchBy, $filter) {
+                foreach ($searchBy as $field) {
+                    $q->orWhere($field, 'like', "%$filter%");
+                }
+            });
+        }
+
+        // --- ORDENAMIENTO ---
+        $sortBy = $request->input('sortBy', $orderBy[0] ?? 'id');
+        $direction = $request->boolean('descending', true) ? 'desc' : 'asc';
+        if (in_array($sortBy, $orderBy)) {
+            $querySet->orderBy($sortBy, $direction);
+        }
+
+        // --- DEVOLVER TODOS SI rowsPerPage = -1 ---
+        $perPage = $request->input('rowsPerPage', 7);
+        if ($perPage == -1) {
+            $data = $querySet->get();
+            return response()->json([
+                'data' => $data,
+                'total' => $data->count(),
+                'current_page' => 1,
+                'per_page' => $data->count(),
+            ]);
+        }
+
+        // --- PAGINACIÓN NORMAL ---
+        $paginated = $querySet->paginate($perPage);
+
+        return response()->json([
+            'data' => $paginated->items(),
+            'total' => $paginated->total(),
+            'current_page' => $paginated->currentPage(),
+            'per_page' => $paginated->perPage(),
         ]);
     }
 }

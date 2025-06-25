@@ -13,15 +13,15 @@
               :options="[ {label: 'Datos', value: 1}, {label: 'Ver en PDF', value: 2}]" />
             <div v-if="opcionVista === 1" class="full-width row">
               <template v-for="(item) in [
-                  { label: 'SOLICITANTE', value: D_solicitud?.solicitante.tipo_documento === 'DNI' ? 'Nombres:' : 'Asunto:', data: D_solicitud?.solicitante.tipo_documento === 'DNI' ? D_solicitud?.solicitante.nombre_completo : D_solicitud?.solicitante.asunto },
-                  { label: 'DATOS DEL DOCUMENTO', value: 'Escritura Pública:', data: D_solicitud?.sub_serie.nombre },
-                  { label: null, value: 'Notario:', data: D_solicitud?.notario.nombre_completo },
-                  { label: null, value: 'Otorgantes:', data: D_solicitud?.otorgantes },
-                  { label: null, value: 'Favorecidos:', data: D_solicitud?.favorecidos },
-                  { label: null, value: 'Lugar y Fecha:', data: `${D_solicitud?.ubigeo.nombre}, Año:${D_solicitud?.anio} Mes:${D_solicitud?.mes} Día:${D_solicitud?.dia}` },
-                  { label: null, value: 'Bien:', data: D_solicitud?.bien },
-                  { label: null, value: 'Otros Datos:', data: D_solicitud?.mas_datos }
-                ]" :key="item">
+                  { label: 'SOLICITANTE', value: D_solicitud?.solicitante?.tipo_documento === 'DNI' ? 'Nombres:' : 'Asunto:', data: D_solicitud?.solicitante?.tipo_documento === 'DNI' ? D_solicitud?.solicitante?.nombre_completo : D_solicitud?.solicitante?.asunto },
+                  { label: 'DATOS DEL DOCUMENTO', value: 'Escritura Pública:', data: D_solicitud?.sub_serie?.nombre || '' },
+                  { label: null, value: 'Notario:', data: D_solicitud?.notario?.nombre_completo || '' },
+                  { label: null, value: 'Otorgantes:', data: D_solicitud?.otorgantes || '' },
+                  { label: null, value: 'Favorecidos:', data: D_solicitud?.favorecidos || '' },
+                  { label: null, value: 'Lugar y Fecha:', data: `${D_solicitud?.ubigeo?.nombre || ''}, Año:${D_solicitud?.anio || ''} Mes:${D_solicitud?.mes || ''} Día:${D_solicitud?.dia || ''}` },
+                  { label: null, value: 'Bien:', data: D_solicitud?.bien || '' },
+                  { label: null, value: 'Otros Datos:', data: D_solicitud?.mas_datos || '' }
+                ]" :key="item.value">
                 <div v-if="item.label" class="col-12 q-py-sm text-weight-bold text-subtitle2">{{ item.label }}</div>
                 <div class="col-12 col-sm-3 items-center row q-py-sm q-pl-sm text-weight-bold">{{ item.value }}</div>
                 <div class="col-12 col-sm-9 items-center row q-py-sm q-pl-sm">{{ item.data }}</div>

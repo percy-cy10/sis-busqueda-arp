@@ -13,4 +13,11 @@ class Tupa extends Model
     {
         return $this->hasMany(Solicitud::class);
     }
+
+    public function pagos()
+    {
+        return $this->belongsToMany(Pago::class, 'pagos_tupa', 'tupa_id', 'pagos_id')
+            ->withPivot('cantidad', 'Subtotal')
+            ->withTimestamps();
+    }
 }

@@ -141,9 +141,9 @@
           <!--  CAJA -->
           <q-item
 
-            :to="{ name: 'Caja' }"
-            :active="link === 'Caja'"
-            @click="link = 'Caja'"
+            :to="{ name: 'Pagos' }"
+            :active="link === 'Pagos'"
+            @click="link = 'pagos'"
             clickable
             v-ripple
             class="q-ma-xs rounded-borders"
@@ -153,7 +153,7 @@
               <q-icon name="inventory" />
             </q-item-section>
 
-            <q-item-section> Caja </q-item-section>
+            <q-item-section> Pagos </q-item-section>
           </q-item>
 
 
@@ -300,6 +300,25 @@
           <!-- /******** ************************************************************************* */ -->
           <q-separator />
           <!-- Pante de Tablas Anteriores  **************************************************** -->
+
+          <!--  CAJA -->
+          <q-item
+
+            :to="{ name: 'Reportes' }"
+            :active="link === 'Reportes'"
+            @click="link = 'reportes'"
+            clickable
+            v-ripple
+            class="q-ma-xs rounded-borders"
+            active-class="my-menu-link"
+          >
+            <q-item-section avatar>
+              <q-icon name="assessment" />
+            </q-item-section>
+
+            <q-item-section> Reportes </q-item-section>
+          </q-item>
+
           <q-expansion-item
             expand-separator
             icon="list"

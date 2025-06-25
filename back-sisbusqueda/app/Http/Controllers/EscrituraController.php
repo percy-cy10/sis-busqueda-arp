@@ -13,20 +13,116 @@ class EscrituraController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index(Request $request)
+    // {
+    //     // Consulta base para obtener las escrituras con relaciones
+    //     $escrituras = Escritura::with(['subSerie', 'libro', 'favorecidos', 'otorgantes']) // Eager load
+    //         ->when($request->subserie_id, function ($query) use ($request) {
+    //             return $query->where('subserie_id', $request->subserie_id);
+    //         })
+    //         ->when($request->libro_id, function ($query) use ($request) {
+    //             return $query->where('libro_id', $request->libro_id);
+    //         })
+    //         ->paginate(10); // Paginación
+
+    //     return response()->json($escrituras);
+    // }
+
     public function index(Request $request)
     {
-        // Consulta base para obtener las escrituras con relaciones
-        $escrituras = Escritura::with(['subSerie', 'libro', 'favorecidos', 'otorgantes']) // Eager load
-            ->when($request->subserie_id, function ($query) use ($request) {
-                return $query->where('subserie_id', $request->subserie_id);
-            })
-            ->when($request->libro_id, function ($query) use ($request) {
-                return $query->where('libro_id', $request->libro_id);
-            })
-            ->paginate(10); // Paginación
+        $query = Escritura::with(['subSerie', 'libro', 'favorecidos', 'otorgantes']);
+
+        $busqueda = [
+            'otorgante' => $request->otorgante,
+            'favorecido' => $request->favorecido,
+            'notario' => $request->notario,
+            'bien' => $request->bien,
+
+        ];
+
+        
+        // Filtro por fecha exacta
+        if ($request->filled('anio') && $request->filled('mes') && $request->filled('dia')) {
+            $fecha = sprintf('%04d-%02d-%02d', $request->anio, $request->mes, $request->dia);
+            $query->whereDate('fecha', $fecha);
+        } else {
+            // Filtro por año
+            if ($request->filled('anio')) {
+                $query->whereYear('fecha', $request->anio);
+            }
+            // Filtro por mes
+            if ($request->filled('mes')) {
+                $query->whereMonth('fecha', $request->mes);
+            }
+            // Filtro por día
+            if ($request->filled('dia')) {
+                $query->whereDay('fecha', $request->dia);
+            }
+        }
+
+
+        // Contar cuántos filtros de texto hay activos
+        $activos = array_filter($busqueda, fn($v) => $v && strlen($v) >= 3);
+
+        // Si solo hay un filtro activo, buscar solo en ese campo
+        if (count($activos) > 1) {
+            $query->where(function($q) use ($request) {
+                if ($request->otorgante && strlen($request->otorgante) >= 3) {
+                    $valor = strtolower($request->otorgante);
+                    $q->orWhereHas('otorgantes', fn($q2) => $q2->whereRaw('LOWER(nombre_completo) LIKE ?', ["%$valor%"]));
+                }
+                if ($request->favorecido && strlen($request->favorecido) >= 3) {
+                    $valor = strtolower($request->favorecido);
+                    $q->orWhereHas('favorecidos', fn($q2) => $q2->whereRaw('LOWER(nombre_completo) LIKE ?', ["%$valor%"]));
+                }
+                if ($request->notario && strlen($request->notario) >= 3) {
+                    $valor = strtolower($request->notario);
+                    $q->orWhereHas('libro', fn($q2) => $q2->whereRaw('LOWER(notario) LIKE ?', ["%$valor%"]));
+                }
+                if ($request->bien && strlen($request->bien) >= 3) {
+                    $valor = strtolower($request->bien);
+                    $q->orWhereRaw('LOWER(bien) LIKE ?', ["%$valor%"]);
+                }
+            });
+        } else {
+            // Si hay más de uno, aplicar todos los filtros activos (como ya tienes)
+            if ($request->otorgante && strlen($request->otorgante) >= 3) {
+                $valor = strtolower($request->otorgante);
+                $query->whereHas('otorgantes', fn($q) => $q->whereRaw('LOWER(nombre_completo) LIKE ?', ["%$valor%"]));
+            }
+            if ($request->favorecido && strlen($request->favorecido) >= 3) {
+                $valor = strtolower($request->favorecido);
+                $query->whereHas('favorecidos', fn($q) => $q->whereRaw('LOWER(nombre_completo) LIKE ?', ["%$valor%"]));
+            }
+            if ($request->notario && strlen($request->notario) >= 3) {
+                $valor = strtolower($request->notario);
+                $query->whereHas('libro', fn($q) => $q->whereRaw('LOWER(notario) LIKE ?', ["%$valor%"]));
+            }
+            if ($request->bien && strlen($request->bien) >= 3) {
+                $valor = strtolower($request->bien);
+                $query->whereRaw('LOWER(bien) LIKE ?', ["%$valor%"]);
+            }
+        }
+
+        $escrituras = $query->paginate($request->get('per_page', 10));
+
+        // Marcar en qué columna hubo coincidencia
+        $campoCoincidencia = count($activos) === 1 ? array_key_first($activos) : null;
+
+        $escrituras->getCollection()->transform(function($item) use ($campoCoincidencia, $busqueda) {
+            $item->coincidencia = null;
+            if ($campoCoincidencia) {
+                if ($campoCoincidencia === 'otorgante') $item->coincidencia = 'Otorgante';
+                if ($campoCoincidencia === 'favorecido') $item->coincidencia = 'Favorecido';
+                if ($campoCoincidencia === 'notario') $item->coincidencia = 'Notario';
+                if ($campoCoincidencia === 'bien') $item->coincidencia = 'Bien';
+            }
+            return $item;
+        });
 
         return response()->json($escrituras);
     }
+
 
     /**
      * Show the form for creating a new resource.

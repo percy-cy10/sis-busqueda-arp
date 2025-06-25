@@ -22,13 +22,17 @@ class StorePagoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'solicitud_id'=>'required',
-            'pago_busqueda'=>'required',
-            // 'pago_verificacion'=>'required',
-            'cantidad_folio'=>'required',
-            'pago_folio'=>'required',
-            'cantidad_fotocopia'=>'required',
-            'pago_fotocopia'=>'required',
-        ];
+        'solicitud_id'    => 'nullable|exists:solicituds,id',
+        'tipo_documento'  => 'required|string',
+        'num_documento'   => 'required|string',
+        'nombre_completo' => 'required|string',
+        'total'           => 'required|numeric',
+        'user_id'         => 'nullable|exists:users,id',
+        'tipo_copia'      => 'nullable|string',
+        'tupas'           => 'required|array|min:1',
+        'tupas.*.tupa_id' => 'required|exists:tupas,id',
+        'tupas.*.cantidad'=> 'required|integer|min:1',
+        'tupas.*.Subtotal'=> 'required|numeric|min:0',
+    ];
     }
 }

@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
-
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
@@ -25,15 +23,14 @@ class User extends Authenticatable
         'email',
         'password',
         'area_id',
-        'estado', // Nuevo campo
+        'estado',
+        'dni',        // ✅ Nuevo campo agregado
+        'nivel',      // ✅ Nuevo campo agregado
     ];
+
     protected $guard_name = 'api';
     protected $with = ['area'];
 
-    // public function validateForPassportPasswordGrant($password)
-    // {
-    //     return Hash::check($password, $this->password);
-    // }
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -59,12 +56,11 @@ class User extends Authenticatable
         return $this->belongsTo(Area::class);
     }
 
-    //Funcion de estado
+    // Para Passport (solo usuarios activos)
     public function findForPassport($username)
     {
         return $this->where('email', $username)
-                    ->where('estado', 1) // Solo usuarios activos
+                    ->where('estado', 1)
                     ->first();
     }
-
 }

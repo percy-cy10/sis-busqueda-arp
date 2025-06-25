@@ -147,6 +147,7 @@ function VerificaDatos(){
       direccion: props.datosSolicitudRow.solicitante?props.datosSolicitudRow.solicitante.direccion:'',
       correo: props.datosSolicitudRow.solicitante?props.datosSolicitudRow.solicitante.correo:'',
       celular: props.datosSolicitudRow.solicitante?props.datosSolicitudRow.solicitante.celular:'',
+      // ubigeo_soli: props.datosSolicitudRow?.ubigeo ? props.datosSolicitudRow.ubigeo.nombre : '',
       ubigeo_pers:props.datosSolicitudRow.solicitante?props.datosSolicitudRow.solicitante.ubigeo?props.datosSolicitudRow.solicitante.ubigeo.nombre:'':'',
 
       id: props.datosSolicitudRow.id,

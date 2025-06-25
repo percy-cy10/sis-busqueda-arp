@@ -104,5 +104,12 @@ class TupaSeeder extends Seeder
             'derecho_pago' => '0.0',
             'costo' => '5350.00',
         ]);
+        Tupa::updateOrCreate([
+            'code' => '03',
+            'sub_code' => '0311',
+            'denominacion' => 'Calificacion de Documentos',
+            'derecho_pago' => '0.187',
+            'costo' => '10.0',
+        ]);
     }
 }

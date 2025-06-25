@@ -1,0 +1,315 @@
+<template>
+  <!-- content -->
+  <q-card class="my-card">
+    <q-card-section class="bg-primary text-white">
+      <div class="text-h6">{{ title }}</div>
+      <!-- <div class="text-subtitle2">Usuario</div> -->
+    </q-card-section>
+    <q-form @submit.prevent="submit">
+      <q-card-section class="q-pa-md">
+
+                <!-- DNI -->
+        <q-input
+          dense
+          outlined
+          v-model="form.dni"
+          label="DNI *"
+          maxlength="15"
+          @change="form.validate('dni')"
+          :error="form.invalid('dni')"
+          :class="form.invalid('dni') ? 'q-mb-sm' : ''"
+        >
+          <template v-slot:prepend>
+            <q-icon name="badge" />
+          </template>
+          <template v-slot:error>
+            <div>
+              {{ form.errors.dni }}
+            </div>
+          </template>
+        </q-input>
+
+        <q-input
+          dense
+          outlined
+          v-model="form.name"
+          :loading="form.validating"
+          label="Nombre *"
+          @update:model-value="form.validate('name')"
+          :error="form.invalid('name')"
+          :class="form.invalid('name') ? 'q-mb-sm' : ''"
+          ><template v-slot:prepend>
+            <q-icon name="mdi-account" />
+          </template>
+          <template v-slot:error>
+            <div>
+              {{ form.errors.name }}
+            </div>
+          </template>
+        </q-input>
+        <q-input
+          dense
+          outlined
+          v-model="form.email"
+          label="Email *"
+          type="email"
+          @change="form.validate('email')"
+          :error="form.invalid('email')"
+          :class="form.invalid('email') ? 'q-mb-sm' : ''"
+        >
+          <template v-slot:prepend>
+            <q-icon name="mail" />
+          </template>
+          <template v-slot:error>
+            <div>
+              {{ form.errors.email }}
+            </div>
+          </template>
+        </q-input>
+        <q-input
+          dense
+          outlined
+          v-model="form.password"
+          :type="isPwd ? 'password' : 'text'"
+          label="Constraseña *"
+          @change="form.validate('password')"
+          :error="form.invalid('password')"
+          :class="form.invalid('password') ? 'q-mb-sm' : ''"
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPwd = !isPwd"
+            />
+          </template>
+          <template v-slot:prepend>
+            <q-icon name="lock" />
+          </template>
+          <template v-slot:error>
+            <div>
+              {{ form.errors.password }}
+            </div>
+          </template>
+        </q-input>
+
+
+
+        <!-- Nivel -->
+        <q-select
+          dense
+          outlined
+          v-model="form.nivel"
+          :options="nivelOptions"
+          label="Nivel *"
+          emit-value
+          map-options
+          class="q-mb-sm"
+          :rules="[val => val !== null || 'Seleccione nivel']"
+        >
+          <template v-slot:prepend>
+            <q-icon name="mdi-account-star" />
+          </template>
+        </q-select>
+
+
+        <!-- estado -->
+
+        <q-select
+          dense
+          outlined
+          v-model="form.estado"
+          :options="estadoOptions"
+          label="Estado *"
+          emit-value
+          map-options
+          class="q-mb-sm"
+          :rules="[val => val !== null || 'Seleccione estado']"
+        >
+          <template v-slot:prepend>
+            <q-icon name="mdi-state-machine" />
+          </template>
+        </q-select>
+        <!-- estado -->
+
+        <SelectArea ref="areaSelectRef"
+          class="q-mb-md"
+          label="Area de Trabajo"
+          :id="form.area_id||idSelectArea"
+          @selectedItem="updateArea($event)"
+        ></SelectArea>
+        <div class="q-gutter-y-sm column">
+          <q-list bordered separator>
+            <template v-for="(p, i) in roles" :key="i">
+              <q-item clickable v-ripple>
+                <q-item-section>
+                  <q-toggle
+                    keep-color
+                    v-model="form.rolesSelected"
+                    :label="`${p.name}`"
+                    color="secondary"
+                    :val="p.id"
+                    hide-details
+                  >
+                  </q-toggle
+                ></q-item-section>
+              </q-item>
+            </template>
+          </q-list>
+        </div>
+      </q-card-section>
+      <q-separator />
+
+      <q-card-actions align="right">
+        <q-btn label="Cancelar" flat v-close-popup></q-btn>
+        <q-btn
+          label="Guardar"
+          :loading="form.processing"
+          type="submit"
+          color="positive"
+        ></q-btn>
+      </q-card-actions>
+    </q-form>
+  </q-card>
+</template>
+
+<script setup>
+import { useForm } from "laravel-precognition-vue";
+import { onMounted, ref } from "vue";
+import RoleService from "src/services/RoleService";
+import SelectArea from "src/components/SelectArea.vue";
+// import AreaService from "src/services/AreaService";
+
+const isPwd = ref(true);
+const roles = ref([]);
+const emits = defineEmits(["save"]);
+
+const idSelectArea = ref(null);
+
+// async function data(){
+//   const data1 = await AreaService.getData()
+//   console.log(data1);
+// };
+
+const nivelOptions = [
+  { label: "Archivo Central", value: "central" },
+  { label: "Archivo Historico", value: "historico" },
+  { label: "Archivo Intermedio", value: "intermedio" },
+];
+
+
+//Estado
+
+
+const estadoOptions = [
+  { label: "Activo", value: true },
+  { label: "Inactivo", value: false },
+];
+
+// data();
+
+const props = defineProps({
+  title: String,
+  id: Number,
+  edit: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+let form;
+if (props.edit) {
+  form = useForm("put", "api/usuarios/" + props.id, {
+    id: "",
+    name: "",
+    email: "",
+    password: "",
+    area_id: null,
+    rolesSelected: [],
+    dni: "",
+    nivel: "",
+  });
+} else {
+  form = useForm("post", "api/usuarios", {
+    id: "",
+    name: "",
+    email: "",
+    password: "",
+    area_id: "",
+    rolesSelected: [],
+    dni: "",
+    nivel: "",
+  });
+}
+async function cargar() {
+  const { data } = await RoleService.getData({
+    params: { rowsPerPage: 0, order_by: "id" },
+  });
+  roles.value = data;
+  console.log(roles.value);
+}
+
+function updateArea(event) {
+  // console.log("gaaaa");
+  if (event) {
+    form.area_id = event.id;
+    idSelectArea.value = event.id;
+  } else {
+    idSelectArea.value = null;
+    form.area_id = null;
+  }
+}
+
+ const areaSelectRef = ref("");
+
+  function setValue(values) {
+      // Convertir el estado a booleano si no lo es
+      values.estado = Boolean(values.estado);
+
+      form.value = values;
+      areaSelectRef.value.get(form.value.area_id);
+  }
+
+
+
+const submit = () => {
+  if (form.password === "") {
+    // Si la contraseña está vacía, eliminar el campo de contraseña del objeto de solicitud
+    delete form.password;
+  }
+  form
+    .submit()
+    .then((response) => {
+      form.reset();
+      // form.setData()
+
+      emits("save");
+    })
+    .catch((error) => {
+      // alert("An error occurred.");
+    });
+};
+
+onMounted(() => {
+  // setData();
+  console.log(props.edit);
+  cargar();
+  // console.log(form);
+  // console.log(form);
+});
+
+defineExpose({
+  // setData,
+  setValue,
+  form,
+});
+</script>
+<style lang="sass" scoped>
+p
+  font-size: 12px
+  line-height: 1
+
+.my-card
+  width: 100%
+  max-width: 80vw
+</style>

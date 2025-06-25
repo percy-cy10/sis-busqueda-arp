@@ -93,11 +93,12 @@ const routes = [
         name: "Areas",
         component: () => import("pages/Admin/Areas/AreasList.vue"),
       },
-      {
-        path: "escrituras/:id",
-        name: "Escrituras",
-        component: () => import("pages/Libros/ShowEcriturastoList.vue"),
-      },
+      // {
+      //   path: "escrituras/:id",
+      //   name: "Escrituras",
+      //   component: () => import("pages/Libros/EscrituraList.vue"),
+      //   // component: () => import("pages/Libros/ShowEcriturastoList.vue"),
+      // },
 
       {
         path: "test",
@@ -164,9 +165,15 @@ const routes = [
         // meta: { requiresAuth: true },
       },
       {
-        path: "Caja",
-        name: "Caja",
-        component: () => import("pages/Admin/Caja/CajaForm.vue"),
+        path: "pagos",
+        name: "Pagos",
+        component: () => import("pages/Admin/Pagos/PagosList.vue"),
+        //component: () => import("components/ShowVerificacion.vue"),
+      },
+      {
+        path: "reportes",
+        name: "Reportes",
+        component: () => import("pages/Admin/Reportes/Reportes.vue"),
         //component: () => import("components/ShowVerificacion.vue"),
       },
     ],

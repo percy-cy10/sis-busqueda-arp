@@ -8,13 +8,13 @@
       </q-card-section>
       <q-form @submit.prevent="submit">
         <div class="row">
-          <q-card-section class="col-12 col-lg-7 row q-pl-md">
+          <!-- <q-card-section class="col-12 col-lg-7 row q-pl-md">
             <q-btn-toggle v-model="opcionVista" spread no-caps toggle-color="primary" color="white" text-color="grey" class="col-12"
               :options="[ {label: 'Datos', value: 1}, {label: 'Ver en PDF', value: 2}]" />
             <div v-if="opcionVista === 1" class="full-width row">
               <template v-for="(item) in [
                   { label: 'SOLICITANTE', value: D_solicitud?.solicitante.tipo_documento === 'DNI' ? 'Nombres:' : 'Asunto:', data: D_solicitud?.solicitante.tipo_documento === 'DNI' ? D_solicitud?.solicitante.nombre_completo : D_solicitud?.solicitante.asunto },
-                  { label: 'DATOS DEL DOCUMENTO', value: 'Escritura Pública:', data: D_solicitud?.sub_serie.nombre },
+                  { label: 'DATOS DEL DOCUMENTO', value: 'Escritura Pública:', data: D_solicitud?.sub_serie?.nombre || '' },
                   { label: null, value: 'Notario:', data: D_solicitud?.notario.nombre_completo },
                   { label: null, value: 'Otorgantes:', data: D_solicitud?.otorgantes },
                   { label: null, value: 'Favorecidos:', data: D_solicitud?.favorecidos },
@@ -22,6 +22,30 @@
                   { label: null, value: 'Bien:', data: D_solicitud?.bien },
                   { label: null, value: 'Otros Datos:', data: D_solicitud?.mas_datos }
                 ]" :key="item">
+                <div v-if="item.label" class="col-12 q-py-sm text-weight-bold text-subtitle2">{{ item.label }}</div>
+                <div class="col-12 col-sm-3 items-center row q-py-sm q-pl-sm text-weight-bold">{{ item.value }}</div>
+                <div class="col-12 col-sm-9 items-center row q-py-sm q-pl-sm">{{ item.data }}</div>
+              </template>
+            </div>
+            <div v-else class="full-width">
+              <GenerarPDFSolicitud :datosSolicitudRow="D_solicitud" :ver="true" height="450px"/>
+            </div>
+          </q-card-section> -->
+
+          <q-card-section class="col-12 col-lg-7 row q-pl-md">
+            <q-btn-toggle v-model="opcionVista" spread no-caps toggle-color="primary" color="white" text-color="grey" class="col-12"
+              :options="[ {label: 'Datos', value: 1}, {label: 'Ver en PDF', value: 2}]" />
+            <div v-if="opcionVista === 1" class="full-width row">
+              <template v-for="(item) in [
+                { label: 'SOLICITANTE', value: D_solicitud?.solicitante?.tipo_documento === 'DNI' ? 'Nombres:' : 'Asunto:', data: D_solicitud?.solicitante?.tipo_documento === 'DNI' ? (D_solicitud?.solicitante?.nombre_completo || '') : (D_solicitud?.solicitante?.asunto || '') },
+                { label: 'DATOS DEL DOCUMENTO', value: 'Escritura Pública:', data: D_solicitud?.sub_serie?.nombre || '' },
+                { label: null, value: 'Notario:', data: D_solicitud?.notario?.nombre_completo || '' },
+                { label: null, value: 'Otorgantes:', data: D_solicitud?.otorgantes || '' },
+                { label: null, value: 'Favorecidos:', data: D_solicitud?.favorecidos || '' },
+                { label: null, value: 'Lugar y Fecha:', data: `${D_solicitud?.ubigeo?.nombre || ''}, Año:${D_solicitud?.anio || ''} Mes:${D_solicitud?.mes || ''} Día:${D_solicitud?.dia || ''}` },
+                { label: null, value: 'Bien:', data: D_solicitud?.bien || '' },
+                { label: null, value: 'Otros Datos:', data: D_solicitud?.mas_datos || '' }
+              ]" :key="item.value">
                 <div v-if="item.label" class="col-12 q-py-sm text-weight-bold text-subtitle2">{{ item.label }}</div>
                 <div class="col-12 col-sm-3 items-center row q-py-sm q-pl-sm text-weight-bold">{{ item.value }}</div>
                 <div class="col-12 col-sm-9 items-center row q-py-sm q-pl-sm">{{ item.data }}</div>
@@ -52,8 +76,8 @@
                   v-model="form.cod_folioInicial" label="Codigo Folio Inicial" mask="F-######" :loading="form.validating"
                   @change="form.validate('cod_folioInicial')" :error="form.invalid('cod_folioInicial')">
                   <template v-slot:label> Folio Inicial <span class="text-red-7 text-weight-bold">(*)</span></template>
-                  <template v-slot:append> 
-                    <q-toggle v-model="vueltaFI" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FI" /> 
+                  <template v-slot:append>
+                    <q-toggle v-model="vueltaFI" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FI" />
                     <div class="text-caption">Vuelta</div>
                   </template>
                   <template v-slot:error> {{ form.errors.cod_folioInicial }} </template>
@@ -62,8 +86,8 @@
                   v-model="form.cod_folioFinal" label="Codigo Folio Final" mask="F-######" :loading="form.validating"
                   @change="form.validate('cod_folioFinal')" :error="form.invalid('cod_folioFinal')">
                   <template v-slot:label> Folio Final <span class="text-red-7 text-weight-bold">(*)</span></template>
-                  <template v-slot:append> 
-                    <q-toggle v-model="vueltaFF" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FF" /> 
+                  <template v-slot:append>
+                    <q-toggle v-model="vueltaFF" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FF" />
                     <div class="text-caption">Vuelta</div>
                   </template>
                   <template v-slot:error> {{ form.errors.cod_folioFinal }} </template>
@@ -162,4 +186,3 @@ defineExpose({
     max-width: 80vw;
   }
 </style>
-  

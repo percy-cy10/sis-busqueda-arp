@@ -23,8 +23,9 @@ class A_de_factoriesSeeder extends Seeder
     public function run(): void
     {
         // php artisan db:seed --class=A_de_factoriesSeeder
-        // Notario::factory(10)->create();
-        $archivoJson = 'C:\Users\himka\Downloads\Notarios_Arp.json';
+        // Notario::factory(100)->create();
+        // $jsonPath = public_path('Notarios_Arp.json');
+        $archivoJson = public_path('Notarios_Arp.json');
 
         // Obtener el contenido del archivo JSON
         $jsonContenido = file_get_contents($archivoJson);
@@ -37,7 +38,7 @@ class A_de_factoriesSeeder extends Seeder
                 Notario::create([
                     'nombres'=> $value['nombres'],
                     'apellido_paterno'=> $value['apellido_paterno'],
-                    'apellido_materno'=> $value['materno'],
+                    'apellido_materno'=> $value['apellido_materno'],
                     'nombre_completo'=> $value['nombre_completo'],
                     'año_inicio'=> $value['año_inicio'],
                     'año_final'=> $value['año_final'],
@@ -45,17 +46,18 @@ class A_de_factoriesSeeder extends Seeder
                 ]);
             }
         }
-        Libro::factory(30)->create();
-        // $this->call(TransSubserieSeeder::class);
-        SubSerie::factory(10)->create();
-        Escritura::factory(100)->create();
-        Favorecido::factory(60)->create();
-        Otorgante::factory(60)->create();
+        // Libro::factory(30)->create();
+        // // $this->call(TransSubserieSeeder::class);
+        // SubSerie::factory(10)->create();
+        // Escritura::factory(100)->create();
+        // Favorecido::factory(60)->create();
+        // Otorgante::factory(60)->create();
 
         // DB::table('precios')->insert(['monto'=> 9.00 ,'vigente'=>1]);
-        Solicitante::factory(100)->create();
-        Solicitud::factory(50)->create();
-        RegistroBusqueda::factory(50)->create();
-        RegistroVerificacion::factory(50)->create();
+        // Solicitante::factory(100)->create();
+        // Solicitud::factory(50)->create();
+        // RegistroBusqueda::factory(50)->create();
+        // RegistroVerificacion::factory(50)->create();
     }
 }
+

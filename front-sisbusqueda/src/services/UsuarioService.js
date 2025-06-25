@@ -1,8 +1,9 @@
 import { api } from "src/boot/axios";
 
 class UsuarioService {
+  // ✅ CORREGIDO: Enviar los params correctamente
   static async getData(params) {
-    return (await api.get("api/usuarios", params)).data;
+    return (await api.get("api/usuarios", { params })).data;
   }
 
   static async get(id, permisos) {
@@ -41,7 +42,7 @@ class UsuarioService {
       throw error;
     }
   }
-
 }
 
 export default UsuarioService;
+
