@@ -9,16 +9,7 @@ use Illuminate\Http\Request;
 class NotarioController extends Controller
 {
 
-    // public function index(Request $request)
-    // {
-    //     return $this->generateViewSetList(
-    //         $request,
-    //         Notario::query(),
-    //         [],
-    //         ['id', 'nombre_completo'],
-    //         ['id', 'nombre_completo']
-    //     );
-    // }
+
     public function index(Request $request)
     {
         $rowsPerPage = (int) $request->input('rowsPerPage', 15);
@@ -41,24 +32,6 @@ class NotarioController extends Controller
             ['id', 'nombre_completo']
         );
     }
-    // public function index(Request $request)
-    // {
-    //     $query = Notario::query();
-    //     $rowsPerPage = (int) $request->input('rowsPerPage', 15);
-
-    //     if ($rowsPerPage === 0) {
-    //         // Sin límite: obtener todos los registros
-    //         $data = $query->get(['id', 'nombre_completo']);
-    //         return response()->json([
-    //             'data' => $data,
-    //             'total' => $data->count(),
-    //         ]);
-    //     }
-
-    //     // Paginado normal
-    //     $data = $query->paginate($rowsPerPage, ['id', 'nombre_completo']);
-    //     return response()->json($data);
-    // }
 
 
     public function store(StoreNotarioRequest $request)

@@ -30,7 +30,12 @@ return new class extends Migration
             $table->string('bien')->nullable();
             $table->text('mas_datos')->nullable();
             $table->string('tipo_copia')->nullable();
-            $table->decimal('pago_busqueda',8,2);
+
+            // $table->decimal('pago_busqueda',8,2);
+            // $table->foreignId('pago_busqueda')->nullable()->constrained('pagos')->nullOnDelete();
+            // $table->foreignId('segundo_pago')->nullable()->constrained('pagos')->nullOnDelete();
+            // $table->foreignId('orden_pago')->nullable()->constrained('pagos')->nullOnDelete();
+
             $table->foreignId('area_id')->constrained();
             // $table->unsignedBigInteger('area_id')->nullable();
             // $table->foreign('area_id')->references('id')->on('areas')->nullOnDelete();
@@ -50,6 +55,24 @@ return new class extends Migration
 
     public function down(): void
     {
+        // if (Schema::hasTable('solicituds')) {
+        //     Schema::table('solicituds', function (Blueprint $table) {
+        //         // Solo elimina si existe la columna
+        //         if (Schema::hasColumn('solicituds', 'pago_busqueda')) {
+        //             $table->dropForeign(['pago_busqueda']);
+        //             $table->dropColumn('pago_busqueda');
+        //         }
+        //         if (Schema::hasColumn('solicituds', 'segundo_pago')) {
+        //             $table->dropForeign(['segundo_pago']);
+        //             $table->dropColumn('segundo_pago');
+        //         }
+        //         if (Schema::hasColumn('solicituds', 'orden_pago')) {
+        //             $table->dropForeign(['orden_pago']);
+        //             $table->dropColumn('orden_pago');
+        //         }
+        //     });
+        //     Schema::dropIfExists('solicituds');
+        // }
         Schema::dropIfExists('solicituds');
     }
 };

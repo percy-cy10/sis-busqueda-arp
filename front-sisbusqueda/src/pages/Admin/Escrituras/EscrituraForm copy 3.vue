@@ -1,217 +1,228 @@
 <template>
   <q-card class="my-card">
-    <!-- Título + Botón Cerrar -->
-    <q-card-section class="row items-center justify-between bg-primary text-white">
+    <!-- Título -->
+    <q-card-section class="bg-primary text-white">
       <div class="text-h6">{{ title }}</div>
-      <q-btn icon="close" color="negative" round v-close-popup />
     </q-card-section>
 
     <q-form @submit.prevent="submit">
       <q-card-section class="q-pa-md">
 
-        <!-- ================= Sección 1 ================= -->
-        <q-form ref="formStep1">
-          <div v-if="step === 1">
-            <!-- Fila 1: Fechas | Bien – Código de Escritura -->
-            <q-card flat bordered class="q-pa-md q-mb-md">
-              <div class="row q-col-gutter-md">
-                <div class="col-6">
-                  <q-badge class="q-mb-xs text-subtitle2">Bien y Código de Escritura</q-badge>
-                  <div class="row input-group">
-                    <q-input dense outlined v-model="form.bien" label="Bien *" :error="!!form.errors.bien" class="col" :rules="[val => !!val || 'Campo obligatorio']"/>
-                    <q-dialog v-model="dialogSubserie" persistent>
-                      <SubSeriesForm :title="'Nueva Subserie'" @save="handleSaveSubserie" />
-                    </q-dialog>
-                    <q-input dense outlined v-model="form.cod_escritura" label="Código de Escritura" mask="E-######" :error="!!form.errors.cod_escritura" class="col" :rules="[val => !!val || 'Campo obligatorio']"/>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <q-badge class="q-mb-xs text-subtitle2">Fecha</q-badge>
-                  <div class="row input-group">
-                    <InputAnio :requerido="true" class="col" dense outlined v-model="form.anio" :error="!!form.errors.anio" :rules="[val => !!val || 'Campo obligatorio']"/>
-                    <InputMes :readonly="!form.anio" class="col" dense outlined v-model="form.mes" :modelAnio="form.anio" :error="!!form.errors.mes"/>
-                    <InputDia :readonly="!form.anio || !form.mes" class="col" dense outlined v-model="form.dia" v-model:modelAnio="form.anio" v-model:modelMes="form.mes" :error="!!form.errors.dia" />
-                  </div>
-                </div>
-              </div>
-            </q-card>
 
-            <!-- Fila 2: Subserie – Libro | Folios -->
-            <q-card flat bordered class="q-pa-md q-mb-md">
-              <div class="row q-col-gutter-md">
-                <div class="col-6">
-                  <q-badge class="q-mb-xs text-subtitle2">Subserie y Libro</q-badge>
-                  <div class="row q-gutter-sm">
-                    <q-select class="col" v-model="form.subserie_id" :options="subseries" label="Subserie *" :error="!!form.errors.subserie_id" option-label="nombre" option-value="id" dense outlined emit-value map-options :rules="[val => !!val || 'Campo obligatorio']" />
-                    <q-btn class="btn-alto" dense icon="person_add" color="primary" @click="dialogSubserie = true" size="md" />
-                    <q-select class="col" v-model="form.libro_id" :options="libros" label="Libro *" :error="!!form.errors.libro_id" option-label="protocolo" option-value="id" dense outlined emit-value map-options :rules="[val => !!val || 'Campo obligatorio']"/>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <q-badge class="q-mb-xs text-subtitle2">Folios</q-badge>
-                  <div class="row input-group">
-                    <q-input class="col" dense outlined v-model="form.cod_folioInicial" label="Folio Inicial *" mask="F-######" :loading="form.validating" @change="form.validate('cod_folioInicial')" :error="form.invalid('cod_folioInicial')" :rules="[val => !!val || 'Campo obligatorio']">
-                      <template v-slot:append>
-                        <q-toggle v-model="form.vueltaFI" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FI" />
-                        <div class="text-caption">Vuelta</div>
-                      </template>
-                    </q-input>
-                    <q-input class="col" dense outlined v-model="form.cod_folioFinal" label="Folio Final *" mask="F-######" :loading="form.validating" @change="form.validate('cod_folioFinal')" :error="form.invalid('cod_folioFinal')" :rules="[val => !!val || 'Campo obligatorio']">
-                      <template v-slot:append>
-                        <q-toggle v-model="form.vueltaFF" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FF" />
-                        <div class="text-caption">Vuelta</div>
-                      </template>
-                    </q-input>
-                  </div>
-                </div>
-              </div>
-            </q-card>
-          </div>
-        </q-form>
-
-        <!-- ================= Sección 2 ================= -->
-        <q-form ref="formStep2">
-          <div v-if="step === 2">
-            <!-- Otorgante/Favorecido -->
-            <q-card flat bordered class="q-pa-md q-mb-md">
-              <q-badge class="q-mb-sm text-subtitle2">Datos de Otorgante y Favorecido</q-badge>
-              <div class="row q-col-gutter-md">
-                <div class="col-6">
-                  <div class="row items-start q-gutter-sm">
-                    <q-select class="col" v-model="form.otorgantes" :options="otorgantesOptions" label="Otorgantes *" option-label="nombre_completo" option-value="id" dense outlined emit-value map-options multiple use-chips @filter="buscarOtorgantes" :rules="[val => val && val.length > 0 || 'Seleccione al menos un otorgante']"/>
-                    <q-btn class="btn-alto" dense icon="person_add" color="primary" @click="dialogOtorgante = true" size="md"/>
-                  </div>
-                </div>
-                <q-dialog v-model="dialogOtorgante" persistent>
-                  <OtorganteForm :title="'Nuevo Otorgante'" @save="handleSaveOtorgante" />
+        <!-- Fila 1: Fechas | Bien – Código de Escritura -->
+        <div class="row q-col-gutter-md q-mb-md">
+            <div class="col-6">
+            <q-badge class="q-mb-xs text-subtitle2">Bien y Código de Escritura</q-badge>
+            <div class="row input-group">
+              <q-input dense outlined v-model="form.bien" label="Bien *" :error="!!form.errors.bien" class="col" />
+              <!-- Diálogo para el formulario de Subserie -->
+                <q-dialog v-model="dialogSubserie" persistent>
+                  <SubSeriesForm
+                    :title="'Nueva Subserie'"
+                    @save="handleSaveSubserie"
+                  />
                 </q-dialog>
-
-                <div class="col-6">
-                  <div class="row items-start q-gutter-sm">
-                    <q-select class="col" v-model="form.favorecidos" :options="favorecidosOptions" label="Favorecidos *" option-label="nombre_completo" option-value="id" dense outlined emit-value map-options multiple use-chips @filter="buscarFavorecidos" :rules="[val => val && val.length > 0 || 'Seleccione al menos un favorecido']"/>
-                    <q-btn class="btn-alto" dense icon="person_add" color="primary" @click="dialogFavorecido = true" size="md"/>
-                  </div>
-                </div>
-                <q-dialog v-model="dialogFavorecido" persistent>
-                  <FavorecidoForm :title="'Nuevo Favorecido'" @save="handleSaveFavorecido" />
-                </q-dialog>
-              </div>
-            </q-card>
-
-            <!-- Archivo -->
-            <q-card flat bordered class="q-pa-md q-mb-md">
-              <div class="row q-col-gutter-md">
-                <div class="col-6">
-                  <q-badge class="q-mb-xs text-subtitle2">Archivo (PDF)</q-badge>
-                  <div>
-                    <div v-if="file || (edit && form.file_name)">
-                      <q-chip removable color="primary" text-color="white" icon="attach_file" @remove="removerArchivo">
-                        {{ file ? file.name : obtenerNombreArchivo(form.file_name) }}
-                      </q-chip>
-                    </div>
-                    <div v-else>
-                      <input type="file" @change="handleFileUpload" accept=".pdf,image/*" class="q-mb-sm"/>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-6 flex items-center">
-                  <q-badge class="q-mb-xs text-subtitle2">Acciones</q-badge>
-                  <div>
-                    <q-btn round dense flat icon="visibility" @click="verArchivo" v-if="edit && form.file_name && !file" class="q-ml-sm"/>
-                  </div>
-                </div>
-              </div>
-            </q-card>
-
-            <!-- Observaciones -->
-            <q-card flat bordered class="q-pa-md q-mb-md">
-              <q-badge class="q-mb-sm text-subtitle2">Observaciones</q-badge>
-              <q-input dense outlined v-model="form.observaciones" label="Observaciones" type="textarea" class="q-mb-s" />
-            </q-card>
+              <q-input dense outlined v-model="form.cod_escritura" label="Código de Escritura" mask="E-######" :error="!!form.errors.cod_escritura" class="col" />
+            </div>
           </div>
-        </q-form>
-
-      </q-card-section>
-      <!-- <q-card-actions align="between" class="items-center">
-        <q-btn
-          v-if="step > 1"
-          label="Regresar"
-          color="secondary"
-          @click="step--"
-        />
-
-        <div>
-          <q-btn
-            v-if="step < 2"
-            label="Siguiente"
-            color="primary"
-            @click="async () => { if (await validarStep()) step++ }"
-          />
-          <q-btn
-            v-else
-            label="Enviar (Guardar)"
-            :loading="form.processing"
-            type="submit"
-            color="positive"
-            @click="async (e) => { e.preventDefault(); if (await validarStep()) submit() }"
-          />
-        </div>
-      </q-card-actions> -->
-      <q-card-section>
-        <q-card-actions align="between">
-          <div>
-            <q-btn
-              v-if="step > 1"
-              label="Regresar"
-              color="secondary"
-              @click="step--"
-            />
+          <div class="col-6">
+            <q-badge class="q-mb-xs text-subtitle2">Fecha</q-badge>
+            <div class="row input-group">
+              <InputAnio :requerido="true" class="col" dense outlined v-model="form.anio" :error="!!form.errors.anio"/>
+              <InputMes :readonly="!form.anio" class="col" dense outlined v-model="form.mes" :modelAnio="form.anio" :error="!!form.errors.mes"/>
+              <InputDia :readonly="!form.anio || !form.mes" class="col" dense outlined v-model="form.dia" v-model:modelAnio="form.anio" v-model:modelMes="form.mes" :error="!!form.errors.dia" />
+            </div>
           </div>
 
-          <q-btn
-            v-if="step < 2"
-            label="Siguiente"
-            color="primary"
-            @click="async () => { if (await validarStep()) step++ }"
-          />
+        </div>
 
-          <q-btn
-            v-else
-            label="Enviar (Guardar)"
-            :loading="form.processing"
-            type="submit"
-            color="positive"
-            @click="async (e) => { e.preventDefault(); if (await validarStep()) submit() }"
-          />
-        </q-card-actions>
+        <!-- Fila 2: Subserie – Libro | Folios -->
+        <div class="row q-col-gutter-md q-mb-md">
+          <div class="col-6">
+            <q-badge class="q-mb-xs text-subtitle2">Subserie y Libro</q-badge>
+            <div class="row q-gutter-sm">
+              <q-select class="col" v-model="form.subserie_id" :options="subseries" label="Subserie *" :error="!!form.errors.subserie_id" option-label="nombre" option-value="id" dense outlined emit-value map-options />
+              <q-btn class="btn-alto" dense icon="person_add" color="primary" @click="dialogSubserie = true" size="md" />
+              <q-select class="col" v-model="form.libro_id" :options="libros" label="Libro *" :error="!!form.errors.libro_id" option-label="protocolo" option-value="id" dense outlined emit-value map-options />
+            </div>
+          </div>
+          <div class="col-6">
+            <q-badge class="q-mb-xs text-subtitle2">Folios</q-badge>
+            <div class="row input-group">
+              <q-input class="col" dense outlined v-model="form.cod_folioInicial" label="Folio Inicial *" mask="F-######" :loading="form.validating" @change="form.validate('cod_folioInicial')" :error="form.invalid('cod_folioInicial')">
+                <template v-slot:append>
+                  <q-toggle v-model="form.vueltaFI" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FI" />
+                  <div class="text-caption">Vuelta</div>
+                </template>
+              </q-input>
+              <q-input class="col" dense outlined v-model="form.cod_folioFinal" label="Folio Final *" mask="F-######" :loading="form.validating" @change="form.validate('cod_folioFinal')" :error="form.invalid('cod_folioFinal')">
+                <template v-slot:append>
+                  <q-toggle v-model="form.vueltaFF" size="xm" dense checked-icon="check" color="blue" unchecked-icon="clear" :disable="deshabili_FF" />
+                  <div class="text-caption">Vuelta</div>
+                </template>
+              </q-input>
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <!-- Sección de Otorgante y Favorecido -->
+        <q-separator color="primary" class="q-my-s" />
+        <q-badge class="q-mb-sm text-subtitle2">Datos de Otorgante y Favorecido</q-badge>
+
+        <div class="col-12">
+          <div class="row q-col-gutter-md">
+            <!-- Grupo Otorgante -->
+            <div class="col-6">
+              <div class="row items-start q-gutter-sm">
+                <q-select
+                  class="col"
+                  v-model="form.otorgantes"
+                  :options="otorgantesOptions"
+                  label="Otorgantes *"
+                  option-label="nombre_completo"
+                  option-value="id"
+                  dense
+                  outlined
+                  emit-value
+                  map-options
+                  multiple
+                  use-chips
+                  @filter="buscarOtorgantes"
+                  :rules="[val => val && val.length > 0 || 'Seleccione al menos un otorgante']"
+                />
+                <q-btn
+                  class="btn-alto"
+                  dense
+                  icon="person_add"
+                  color="primary"
+                  @click="dialogOtorgante = true"
+                  size="md"
+                />
+              </div>
+            </div>
+
+            <!-- Diálogo para el formulario de Otorgante -->
+            <q-dialog v-model="dialogOtorgante" persistent>
+              <OtorganteForm
+                :title="'Nuevo Otorgante'"
+                @save="handleSaveOtorgante"
+              />
+            </q-dialog>
+
+            <!-- Grupo Favorecido -->
+            <div class="col-6">
+              <div class="row items-start q-gutter-sm">
+                <q-select
+                  class="col"
+                  v-model="form.favorecidos"
+                  :options="favorecidosOptions"
+                  label="Favorecidos *"
+                  option-label="nombre_completo"
+                  option-value="id"
+                  dense
+                  outlined
+                  emit-value
+                  map-options
+                  multiple
+                  use-chips
+                  @filter="buscarFavorecidos"
+                  :rules="[val => val && val.length > 0 || 'Seleccione al menos un favorecido']"
+                />
+                <q-btn
+                  class="btn-alto"
+                  densed
+                  icon="person_add"
+                  color="primary"
+                  @click="dialogFavorecido = true"
+                  size="md"
+                />
+              </div>
+            </div>
+
+            <!-- Diálogo para el formulario de Favorecido -->
+            <q-dialog v-model="dialogFavorecido" persistent>
+              <FavorecidoForm
+                :title="'Nuevo Favorecido'"
+                @save="handleSaveFavorecido"
+              />
+            </q-dialog>
+
+          </div>
+        </div>
+
+
+
+        <q-separator color="primary" class="q-my-s" />
+
+        <!-- Fila: Archivo adjunto | Acciones -->
+        <div class="row q-col-gutter-md q-mb-md">
+          <!-- Archivo -->
+          <div class="col-6">
+            <q-badge class="q-mb-xs text-subtitle2">Archivo adjunto (PDF)</q-badge>
+            
+            <div>
+              <!-- Si ya hay archivo cargado o en BD -->
+              <div v-if="file || (edit && form.file_name)">
+                <q-chip
+                  removable
+                  color="primary"
+                  text-color="white"
+                  icon="attach_file"
+                  @remove="removerArchivo"
+                >
+                  {{ file ? file.name : obtenerNombreArchivo(form.file_name) }}
+                </q-chip>
+              </div>
+
+              <!-- Si no hay archivo -->
+              <div v-else>
+                <input
+                  type="file"
+                  @change="handleFileUpload"
+                  accept=".pdf,image/*"
+                  class="q-mb-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="col-6 flex items-center">
+            <q-badge class="q-mb-xs text-subtitle2">Acciones</q-badge>
+            <div>
+              <q-btn
+                round dense flat
+                icon="visibility"
+                @click="verArchivo"
+                v-if="edit && form.file_name && !file"
+                class="q-ml-sm"
+              />
+              <!-- Aquí puedes agregar más acciones -->
+            </div>
+          </div>
+        </div>
+
+
+
+      <q-separator color="primary" class="q-my-s" />
+      <q-badge class="q-mb-sm text-subtitle2">Observaciones</q-badge>
+
+
+      <q-input dense outlined v-model="form.observaciones" label="Observaciones" type="textarea" class="q-mb-s" />
       </q-card-section>
 
-
-
-
-      <!-- <q-card-actions align="between">
-        <div>
-          <q-btn v-if="step > 1" label="Regresar" color="secondary" @click="step--" />
-        </div>
-        <q-btn
-          v-if="step < 2"
-          label="Siguiente"
-          color="primary"
-          @click="async () => { if (await validarStep()) step++ }"
-        />
-        <q-btn
-          v-else
-          label="Enviar (Guardar)"
-          :loading="form.processing"
-          type="submit"
-          color="positive"
-          @click="async (e) => { e.preventDefault(); if (await validarStep()) submit() }"
-        />
-      </q-card-actions> -->
-
+      <!-- Botones de Acción -->
+      <q-card-actions align="right">
+        <q-btn label="Cancelar" flat v-close-popup />
+        <q-btn label="Guardar" :loading="form.processing" type="submit" color="positive" />
+      </q-card-actions>
     </q-form>
   </q-card>
 </template>
+
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
@@ -244,16 +255,12 @@ import SubSeriesForm from 'src/pages/Admin/SubSeries/SubSeriesForm.vue';
 // Nuevas variables y métodos
 const otorgantesOptions = ref([]);
 const favorecidosOptions = ref([]);
-const step = ref(1) // controla secciones
 
 const file = ref(null);
 
 const dialogOtorgante = ref(false);
 const dialogFavorecido = ref(false);
 const dialogSubserie = ref(false);
-
-const formStep1 = ref(null)
-const formStep2 = ref(null)
 
 
 // const emits = defineEmits(['save']);
@@ -272,35 +279,6 @@ const abrirFormulario = (tipo) => {
   tipoFormulario.value = tipo;
   dialog.value = true;
 };
-
-const validarStep = async () => {
-  if (step.value === 1) {
-    return await formStep1.value.validate()
-  }
-  if (step.value === 2) {
-    return await formStep2.value.validate()
-  }
-  return true
-}
-// const validarStep = () => {
-//   if (step.value === 1) {
-//     if (!form.bien || !form.cod_escritura || !form.anio || !form.mes || !form.dia || !form.subserie_id || !form.libro_id || !form.cod_folioInicial || !form.cod_folioFinal) {
-//       $q.notify({ type: "negative", message: "Complete todos los campos obligatorios de esta sección." });
-//       return false;
-//     }
-//   }
-//   if (step.value === 2) {
-//     if (!form.otorgantes.length || !form.favorecidos.length) {
-//       $q.notify({ type: "negative", message: "Debe registrar al menos un otorgante y un favorecido." });
-//       return false;
-//     }
-//     // if (!file.value && !form.file_name) {
-//     //   $q.notify({ type: "negative", message: "Debe adjuntar un archivo PDF." });
-//     //   return false;
-//     // }
-//   }
-//   return true;
-// };
 
 //cargar archivo pdf
 

@@ -9,7 +9,7 @@ use GuzzleHttp\Client;
 
 class SolicitanteController extends Controller
 {
-   
+
     public function index(Request $request)
     {
         return $this->generateViewSetList(
@@ -20,18 +20,18 @@ class SolicitanteController extends Controller
             ['id', 'nombre']
         );
     }
-    
+
     public function store(StoreSolicitanteRequest $request)
     {
         return response(Solicitante::create($request->all()), 201);
 
     }
-   
+
     public function show(Int $id)
     {
         return response()->json(Solicitante::find($id));
     }
-   
+
     public function update(Request $request, Solicitante $solicitude)
     {
         $solicitude->update($request->all());
@@ -39,7 +39,7 @@ class SolicitanteController extends Controller
         return response()->json([$request, $solicitude]);
     }
 
-   
+
     public function destroy(Solicitante $solicitude)
     {
         return response()->json($solicitude->delete());
@@ -72,5 +72,29 @@ class SolicitanteController extends Controller
 
             return response()->json($response);
         }
+    }
+
+
+    public function solicitudesPorDni($dni)
+    {
+        $solicitante = Solicitante::where('num_documento', $dni)->first();
+
+        if (!$solicitante) {
+            return response()->json([
+                'message' => 'Solicitante no encontrado',
+                'dni' => $dni,
+                'solicitudes_count' => 0,
+                'solicitudes_ids' => []
+            ], 404);
+        }
+
+        $solicitudes = $solicitante->solicitudes()->get();
+
+        return response()->json([
+            'dni' => $dni,
+            'solicitante' => $solicitante,
+            'solicitudes_count' => $solicitudes->count(),
+            'solicitudes' => $solicitudes
+        ]);
     }
 }

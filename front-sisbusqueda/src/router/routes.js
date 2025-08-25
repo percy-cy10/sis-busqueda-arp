@@ -176,6 +176,13 @@ const routes = [
         component: () => import("pages/Admin/Reportes/Reportes.vue"),
         //component: () => import("components/ShowVerificacion.vue"),
       },
+      {
+        path: 'niveles',
+        name: 'niveles',
+        component: () => import('src/pages/Admin/Niveles/NivelesList.vue'),
+        meta: { requiresAuth: true }
+      },
+
     ],
   },
 

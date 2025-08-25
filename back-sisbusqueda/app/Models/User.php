@@ -25,7 +25,7 @@ class User extends Authenticatable
         'area_id',
         'estado',
         'dni',        // ✅ Nuevo campo agregado
-        'nivel',      // ✅ Nuevo campo agregado
+        'nivel_id',      // ✅ Nuevo campo agregado
     ];
 
     protected $guard_name = 'api';
@@ -55,6 +55,12 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Area::class);
     }
+
+    public function nivel()
+{
+    return $this->belongsTo(Nivel::class);
+}
+
 
     // Para Passport (solo usuarios activos)
     public function findForPassport($username)

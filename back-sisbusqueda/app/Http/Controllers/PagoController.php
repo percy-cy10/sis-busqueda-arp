@@ -332,6 +332,16 @@ class PagoController extends Controller
                     'estado' => 0,
                     'boleta_id' => $nuevoBoletaId
                 ]);
+
+                // ACTUALIZAR LA SOLICITUD RELACIONADA
+                $solicitud = Solicitud::find($pago->solicitud_id);
+                if ($solicitud) {
+                    $solicitud->estado = 'Buscando';
+                    $solicitud->area_id = 2;
+                    $solicitud->pago_busqueda = $pago->id; // Guarda el id de la boleta/pago
+                    $solicitud->save();
+                }
+                
             } else { // Cambiar de pagado a pendiente
                 $pago->update([
                     'estado' => 1,

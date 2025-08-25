@@ -9,12 +9,18 @@
         </q-toolbar-title>
 
         <q-btn-group flat class="q-ml-lg">
-          <q-btn flat label="Inicio" to="/" color="primary" />
+          <!-- <q-btn flat label="Inicio" to="/" color="primary" />
           <q-btn flat label="Nosotros" to="#nosotros" color="primary" />
           <q-btn flat label="SEGUIMIENTO" to="#seguimiento" color="primary" />
           <q-btn flat label="BUSQUEDA" to="#busqueda" color="primary" />
           <q-btn flat label="Comunicados" to="#comunicados" color="primary" />
-          <q-btn flat label="Contacto" to="#contacto" color="primary" />
+          <q-btn flat label="Contacto" to="#contacto" color="primary" /> -->
+          <q-btn flat label="Inicio" @click="goToSection('inicio')" color="primary" />
+          <q-btn flat label="Nosotros" @click="goToSection('nosotros')" color="primary" />
+          <q-btn flat label="SEGUIMIENTO" @click="goToSection('seguimiento')" color="primary" />
+          <q-btn flat label="BUSQUEDA" @click="goToSection('busqueda')" color="primary" />
+          <q-btn flat label="Comunicados" @click="goToSection('comunicados')" color="primary" />
+          <q-btn flat label="Contacto" @click="goToSection('contacto')" color="primary" />
 
         </q-btn-group>
 
@@ -26,7 +32,62 @@
     <!-- Contenido principal -->
     <q-page-container class="bg-dark text-light q-pa-md bg-white ">
       <div class="full-height flex flex-center">
-        <img :src="fondoSrc" alt="Foto" class="responsive-img" />
+        <!-- <img :src="fondoSrc" alt="Foto" class="responsive-img" /> -->
+        <!-- INICIO -->
+        <div v-if="currentSection === 'inicio'" class="full-height flex flex-center">
+          <img :src="fondoSrc" alt="Foto" class="responsive-img" />
+        </div>
+
+        <!-- COMUNICADOS -->
+        <div v-else-if="currentSection === 'comunicados'" class="row q-col-gutter-md">
+          <q-card v-for="n in 3" :key="n" class="col-12 col-md-4 q-pa-sm">
+            <q-card-section>
+              <div class="text-h6">Comunicado {{ n }}</div>
+              <div class="text-body2">Este es el detalle del comunicado {{ n }}.</div>
+            </q-card-section>
+          </q-card>
+        </div>
+
+        <!-- SEGUIMIENTO -->
+        <div v-else-if="currentSection === 'seguimiento'" class="q-pa-md" style="width: 100%; max-width: 600px;">
+          <q-form @submit.prevent="enviar">
+            <q-input filled label="Número de trámite" class="q-mb-md" />
+            <q-input filled label="DNI del solicitante" class="q-mb-md" />
+            <q-btn label="Consultar" type="submit" color="primary" class="full-width" />
+          </q-form>
+        </div>
+
+        <!-- NOSOTROS -->
+        <div v-else-if="currentSection === 'nosotros'" class="q-pa-md">
+          <h5 class="text-blue">Misión</h5>
+          <p>Conservar, custodiar y difundir el patrimonio documental de la región.</p>
+          <h5 class="text-blue">Visión</h5>
+          <p>Ser referente nacional en la preservación de la memoria histórica.</p>
+          <h5 class="text-blue">Servicios</h5>
+          <ul>
+            <li>Atención al ciudadano</li>
+            <li>Acceso a la información</li>
+            <li>Gestión documental</li>
+          </ul>
+        </div>
+
+        <!-- BÚSQUEDA -->
+        <div v-else-if="currentSection === 'busqueda'" class="q-pa-md" style="width: 100%; max-width: 600px;">
+          <q-form @submit.prevent="enviar">
+            <q-input filled label="Otorgante" class="q-mb-md" />
+            <q-input filled label="Favorecido" class="q-mb-md" />
+            <q-input filled label="Notario" class="q-mb-md" />
+            <q-btn label="Buscar" type="submit" color="primary" class="full-width" />
+          </q-form>
+        </div>
+
+        <!-- CONTACTO / OTROS -->
+        <div v-else class="q-pa-md text-center">
+          <q-icon name="info" size="48px" color="blue" />
+          <div class="text-subtitle1 q-mt-md">Sección en construcción...</div>
+        </div>
+
+
       </div>
 
       <!-- Sección de tres columnas -->
@@ -135,22 +196,19 @@ import { useQuasar } from 'quasar'
 import LoginForm from 'pages/Auth/LoginForm.vue'
 import carousel1 from 'assets/img/carousel1.jpg'
 import carousel2 from 'assets/img/carousel2.jpg'
-// Importación de imágenes como módulos
 import logo from 'assets/img/logo_ARP.png'
 import fondo from 'assets/img/fondo.jpg'
 import logoAGN from 'assets/img/logo-agn.png'
 
-
-// Utilidades
 const $q = useQuasar()
 const router = useRouter()
 
 // Estado
 const showLogin = ref(false)
+const step = ref(1)
+const loading = ref(false)
 
 // Imágenes
-// Imágenes
-
 const fondoSrc = fondo
 const logoSrc = logo
 const images = [{ src: carousel1 }, { src: carousel2 }]
@@ -162,6 +220,16 @@ function onLogued() {
   $q.notify({ type: 'positive', message: '¡Bienvenido!' })
 }
 
+
+// Estado de la sección actual
+const currentSection = ref('inicio')
+
+// Función para cambiar la sección desde el menú
+function goToSection(section) {
+  currentSection.value = section
+}
+
+
 function onForgotPassword() {
   $q.dialog({
     title: 'Recuperar contraseña',
@@ -171,6 +239,14 @@ function onForgotPassword() {
   }).onOk(() => {
     $q.notify({ type: 'info', message: 'Enlace de recuperación enviado.' })
   })
+}
+
+function enviar() {
+  loading.value = true
+  setTimeout(() => {
+    $q.notify({ type: 'positive', message: 'Formulario enviado con éxito 🎉' })
+    loading.value = false
+  }, 1500)
 }
 </script>
 

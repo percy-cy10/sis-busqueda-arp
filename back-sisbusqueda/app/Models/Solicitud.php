@@ -27,8 +27,12 @@ class Solicitud extends Model
         'mas_datos',
         'tipo_copia',
         'estado',
+        // 'pago_busqueda',
         'pago_busqueda',
+        'segundo_pago',
+        'orden_pago',
         'area_id',
+        'nivel_id',
         'user_id',
         'created_at',
         'updated_at'
@@ -75,5 +79,9 @@ class Solicitud extends Model
     public function pagos()
     {
         return $this->hasOne(Pago::class, 'solicitud_id');
+    }
+    public function nivel()
+    {
+        return $this->belongsTo(Nivel::class);
     }
 }

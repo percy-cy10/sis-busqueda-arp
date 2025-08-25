@@ -28,6 +28,7 @@ use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\SubSerieController;
 use App\Http\Controllers\TupaController;
 use App\Http\Controllers\UbigeoController;
+use App\Http\Controllers\NivelController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
@@ -92,6 +93,8 @@ Route::apiResource('/favorecidos', FavorecidoController::class)->middleware([Han
 
 Route::apiResource('/solicitantes', SolicitanteController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/solicitantes/dni/{dni}', [SolicitanteController::class, 'getSolicitanteDni']);
+Route::get('/solicitantes/solicitud_dni/{dni}', [SolicitanteController::class, 'solicitudesPorDni']);
+
 
 Route::apiResource('/tupas', TupaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/solicitudes', SolicitudController::class)->middleware([HandlePrecognitiveRequests::class]);
@@ -100,6 +103,10 @@ Route::apiResource('/registro_verificaciones', RegistroVerificacionController::c
 Route::apiResource('/pagos', PagoController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::patch('pagos/{pago}/toggle-estado', [PagoController::class, 'toggleEstado']);
 Route::put('pagos/{pago}/anular', [PagoController::class, 'anular']);
+
+//Route::apiResource('/niveles', NivelController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::apiResource('niveles', NivelController::class)->parameters(['niveles' => 'nivel'])->middleware([HandlePrecognitiveRequests::class]);
+
 
 
 

@@ -2,60 +2,50 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreNivelRequest;
 use App\Models\Nivel;
 use Illuminate\Http\Request;
 
 class NivelController extends Controller
 {
-    /**
-     * Display a listing of the niveles.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $niveles = Nivel::with(['users', 'solicitudes'])->get();
-        return response()->json($niveles);
-    }
+        $rowsPerPage = (int) $request->input('rowsPerPage', 15);
 
-    /**
-     * Store a newly created nivel in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
+        if ($rowsPerPage === 0) {
+            $data = Nivel::all(['id', 'nombre']);
+            return response()->json([
+                'data' => $data,
+                'total' => $data->count(),
+            ]);
+        }
+
+        $niveles = Nivel::select(['id', 'nombre'])->paginate($rowsPerPage);
+        return response()->json([
+            'data' => $niveles->items(),
+            'total' => $niveles->total(),
         ]);
-
-        $nivel = Nivel::create($request->only('nombre'));
-        return response()->json($nivel, 201);
     }
 
-    /**
-     * Display the specified nivel.
-     */
+    public function store(StoreNivelRequest $request)
+    {
+        return response(Nivel::create($request->all()), 201);
+    }
+
     public function show(Nivel $nivel)
     {
-        return response()->json($nivel->load(['users', 'solicitudes']));
-    }
-
-    /**
-     * Update the specified nivel in storage.
-     */
-    public function update(Request $request, Nivel $nivel)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-        ]);
-
-        $nivel->update($request->only('nombre'));
         return response()->json($nivel);
     }
 
-    /**
-     * Remove the specified nivel from storage.
-     */
+
+    public function update(StoreNivelRequest $request, Nivel $nivel)
+    {
+        $nivel->update($request->all());
+        return response()->json($nivel);
+    }
+
     public function destroy(Nivel $nivel)
     {
-        $nivel->delete();
-        return response()->json(null, 204);
+        return response()->json($nivel->delete());
     }
 }

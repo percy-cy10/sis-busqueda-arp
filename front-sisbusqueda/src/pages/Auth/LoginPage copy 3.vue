@@ -9,6 +9,12 @@
         </q-toolbar-title>
 
         <q-btn-group flat class="q-ml-lg">
+          <!-- <q-btn flat label="Inicio" to="/" color="primary" />
+          <q-btn flat label="Nosotros" to="#nosotros" color="primary" />
+          <q-btn flat label="SEGUIMIENTO" to="#seguimiento" color="primary" />
+          <q-btn flat label="BUSQUEDA" to="#busqueda" color="primary" />
+          <q-btn flat label="Comunicados" to="#comunicados" color="primary" />
+          <q-btn flat label="Contacto" to="#contacto" color="primary" /> -->
           <q-btn flat label="Inicio" @click="goToSection('inicio')" color="primary" />
           <q-btn flat label="Nosotros" @click="goToSection('nosotros')" color="primary" />
           <q-btn flat label="SEGUIMIENTO" @click="goToSection('seguimiento')" color="primary" />
@@ -26,89 +32,125 @@
     <!-- Contenido principal -->
     <q-page-container class="bg-dark text-light q-pa-md bg-white ">
       <div class="full-height flex flex-center">
-
+        <!-- <img :src="fondoSrc" alt="Foto" class="responsive-img" /> -->
         <!-- INICIO -->
-
         <div v-if="currentSection === 'inicio'" class="full-height flex flex-center q-pa-lg">
-          <!-- <q-card class="q-pa-md shadow-4" style="width: 80%; max-width: 1200px;"> -->
-            <!-- <q-card-section>
-              <div class="text-h6 text-center q-mb-md">Bienvenido</div>
-            </q-card-section> -->
-
-            <q-card-section>
-              <q-carousel
-                v-model="slide"
-                animated
-                arrows
-                navigation
-                infinite
-                height="500px"
-                class="rounded-borders shadow-2"
-                style="width: 1200px;"
-              >
-                <q-carousel-slide
-                  v-for="(img, index) in images"
-                  :key="index"
-                  :name="index"
-                  :img-src="img.src"
-                />
-              </q-carousel>
-            </q-card-section>
-          <!-- </q-card> -->
+          <img :src="fondoSrc" alt="Foto" class="responsive-img" />
         </div>
 
         <!-- COMUNICADOS -->
-        <div v-else-if="currentSection === 'comunicados'" class="q-pa-md">
-          <div class="row justify-center q-col-gutter-md q-pa-md">
+        <!-- <div v-else-if="currentSection === 'comunicados'" class="row q-col-gutter-md q-pa-md">
+          <q-card
+            v-for="n in 3"
+            :key="n"
+            class="col-12 col-md-4 q-pa-sm shadow-2 rounded-borders"
+          >
+            <q-img :src="logoAGN" ratio="16/9" class="q-mb-sm" />
+            <q-card-section>
+              <div class="text-h6 text-blue">Comunicado {{ n }}</div>
+              <div class="text-caption text-grey-7 q-mt-xs">
+                Fecha: {{ new Date().toLocaleDateString() }}
+              </div>
+              <q-separator class="q-my-sm" />
+              <div class="text-body2">
+                Este es el detalle del comunicado {{ n }}. Aquí se puede incluir una descripción más extensa o información relevante.
+              </div>
+            </q-card-section>
+          </q-card>
+        </div> -->
+        <div v-else-if="currentSection === 'comunicados1'" class="q-pa-md">
+          <q-img
+            :src="logoAgn"
+            contain
+            style="max-height: 80px; max-width: 40%;"
+            class="q-mb-md"
+          />
+
+          <!-- Grid de comunicados -->
+          <div class="row q-col-gutter-md">
             <q-card
-              v-for="comunicado in paginatedComunicados"
-              :key="comunicado.id"
-              class="col-12 col-sm-6 col-md-4 col-lg-3 my-card shadow-3"
+              v-for="(item, index) in paginatedComunicados"
+              :key="index"
+              class="col-12 col-md-4 shadow-2 rounded-borders q-pa-md"
             >
-              <!-- Imagen -->
-              <q-img :src="logoAGN" contain style="max-height: 100px;" class="q-pa-sm" />
-
-              <q-card-section class="q-pa-sm">
-                <!-- Título -->
-                <div class="text-h6 text-blue text-bold">
-                  {{ comunicado.titulo }}
+              <q-img :src="logoAGN" ratio="16/9" class="q-mb-sm" />
+              <q-card-section>
+                <div class="text-h6 text-blue">Comunicado {{ item.id }}</div>
+                <div class="text-caption text-grey-7 q-mt-xs">
+                  Fecha: {{ new Date().toLocaleDateString() }}
                 </div>
-
-                <!-- Asunto -->
-                <div class="text-subtitle2 text-grey-8 q-mt-xs">
-                  {{ comunicado.asunto }}
-                </div>
-
-                <!-- Fecha -->
-                <div class="text-caption text-grey q-mt-xs">
-                  📅 {{ comunicado.fecha }}
-                </div>
-              </q-card-section>
-
-              <q-separator />
-
-              <q-card-section class="q-pa-sm">
-                <!-- Cuerpo -->
+                <q-separator class="q-my-sm" />
                 <div class="text-body2">
-                  {{ comunicado.cuerpo }}
+                  {{ item.detalle }}
                 </div>
               </q-card-section>
             </q-card>
           </div>
 
-
-
-          <!-- Paginación SOLO aquí -->
+          <!-- Paginación solo para esta sección -->
           <div class="row justify-center q-mt-md">
             <q-pagination
-              v-model="paginaActual"
-              :max="totalPaginas"
+              v-model="page"
+              :max="pagesNumber"
               color="primary"
               boundary-numbers
-              direction-links
+              size="md"
             />
           </div>
         </div>
+
+        <div v-else-if="currentSection === 'comunicados'" class="q-pa-md">
+  <q-img
+    :src="logoAgn"
+    contain
+    style="max-height: 80px; max-width: 40%;"
+    class="q-mb-md"
+  />
+
+  <!-- Grid de comunicados -->
+  <div class="row q-col-gutter-lg">
+    <q-card
+      v-for="(item, index) in paginatedComunicados"
+      :key="index"
+      class="col-12 col-md-4 shadow-2 rounded-borders q-pa-md q-mb-lg"
+    >
+      <!-- Imagen dentro del comunicado -->
+      <q-img
+        :src="item.imagen || logoAGN"
+        ratio="16/9"
+        class="q-mb-md rounded-borders"
+      />
+
+      <q-card-section>
+        <div class="text-h6 text-blue">
+          Comunicado {{ item.id }}
+        </div>
+        <div class="text-caption text-grey-7 q-mt-xs">
+          Fecha: {{ new Date().toLocaleDateString() }}
+        </div>
+        <q-separator class="q-my-sm" />
+        <div class="text-body2">
+          {{ item.detalle }}
+        </div>
+      </q-card-section>
+    </q-card>
+  </div>
+
+  <!-- Paginación solo para esta sección -->
+  <div class="row justify-center q-mt-md">
+    <q-pagination
+      v-model="page"
+      :max="pagesNumber"
+      color="primary"
+      boundary-numbers
+      size="md"
+    />
+  </div>
+</div>
+
+
+
+
 
         <!-- SEGUIMIENTO -->
         <div v-else-if="currentSection === 'seguimiento'" class="q-pa-xl flex flex-center">
@@ -125,55 +167,59 @@
         </div>
 
         <!-- NOSOTROS -->
+        <!-- <div v-else-if="currentSection === 'nosotros'" class="q-pa-xl">
+          <q-card flat bordered class="q-pa-lg shadow-1">
+            <q-card-section>
+              <h5 class="text-blue">Misión</h5>
+              <p>Conservar, custodiar y difundir el patrimonio documental de la región.</p>
+              <h5 class="text-blue">Visión</h5>
+              <p>Ser referente nacional en la preservación de la memoria histórica.</p>
+              <h5 class="text-blue">Servicios</h5>
+              <ul>
+                <li>Atención al ciudadano</li>
+                <li>Acceso a la información</li>
+                <li>Gestión documental</li>
+              </ul>
+            </q-card-section>
+          </q-card>
+        </div> -->
+
+        <!-- NOSOTROS -->
         <div v-else-if="currentSection === 'nosotros'" class="q-pa-xl">
 
           <!-- Primera fila: Misión y Visión -->
-          <div class="row justify-center q-col-gutter-md q-mb-lg">
-            <div class="col-12 col-md-5">
-              <q-card class="shadow-3 rounded-borders q-pa-md">
+          <div class="row q-col-gutter-md q-mb-lg">
+            <div class="col-12 col-md-6">
+              <q-card flat bordered class="q-pa-lg shadow-1">
                 <q-card-section>
-                  <div class="text-h6 text-blue text-center">Misión</div>
-                  <q-separator class="q-my-sm" />
-                  <div class="text-body2 text-justify">
+                  <h5 class="text-blue">Misión</h5>
+                  <p>
                     Conservar, custodiar y difundir el patrimonio documental de la región,
                     garantizando el acceso a la información pública y preservando la memoria histórica.
-                  </div>
+                  </p>
                 </q-card-section>
               </q-card>
             </div>
-            <div class="col-12 col-md-5">
-              <q-card class="shadow-3 rounded-borders q-pa-md">
+            <div class="col-12 col-md-6">
+              <q-card flat bordered class="q-pa-lg shadow-1">
                 <q-card-section>
-                  <div class="text-h6 text-blue text-center">Visión</div>
-                  <q-separator class="q-my-sm" />
-                  <div class="text-body2 text-justify">
+                  <h5 class="text-blue">Visión</h5>
+                  <p>
                     Ser un referente nacional en la preservación documental,
                     con innovación tecnológica y calidad en el servicio.
-                  </div>
+                  </p>
                 </q-card-section>
               </q-card>
             </div>
           </div>
 
-          <!-- Segunda fila: Servicios y Logo -->
-
-          <div class="row justify-center q-col-gutter-md q-mb-lg">
-            <!-- Card con lista y logo -->
-            <div class="col-12 col-md-5">
-              <q-card class="shadow-3 rounded-borders q-pa-md text-center">
-                <!-- Logo arriba -->
-                <!-- <q-img
-                  :src="logoAGN"
-                  contain
-                  style="max-height: 80px; max-width: 100px;"
-                  class="q-mb-sm"
-                /> -->
-                <!-- Título -->
+          <!-- Segunda fila: Servicios y Foto -->
+          <div class="row q-col-gutter-md q-mb-lg">
+            <div class="col-12 col-md-6">
+              <q-card flat bordered class="q-pa-lg shadow-1">
                 <q-card-section>
-                  <div class="text-h6 text-blue">Servicios</div>
-                  <q-separator class="q-my-sm" />
-                  <!-- Lista -->
-                  <ul class="text-body2 text-left q-pl-md">
+                  <h5 class="text-blue">Servicios</h5>
+                  <ul>
                     <li>Atención al ciudadano</li>
                     <li>Acceso a la información</li>
                     <li>Gestión documental</li>
@@ -183,75 +229,46 @@
                 </q-card-section>
               </q-card>
             </div>
-
-            <!-- Otra Card con lista y logo -->
-            <div class="col-12 col-md-5">
-              <q-card class="shadow-3 rounded-borders q-pa-md text-center">
-                <!-- <q-img
-                  :src="logoAGN"
-                  contain
-                  style="max-height: 80px; max-width: 100px;"
-                  class="q-mb-sm"
-                /> -->
-                <q-card-section>
-                  <div class="text-h6 text-blue">Normativas</div>
-                  <q-separator class="q-my-sm" />
-                  <ul class="text-body2 text-left q-pl-md">
-                    <li>Ley de Archivos</li>
-                    <li>Directivas de Gestión Documental</li>
-                    <li>Reglamentos internos</li>
-                    <li>Protocolos de conservación</li>
-                  </ul>
+            <div class="col-12 col-md-6 flex flex-center">
+              <q-card flat bordered class="shadow-1 q-pa-md" style="max-width: 400px;">
+                <q-img :src="logoAgn" ratio="16/9" class="rounded-borders" />
+                <q-card-section class="text-center text-blue">
+                  <div class="text-subtitle1">Archivo General de la Nación</div>
                 </q-card-section>
               </q-card>
             </div>
           </div>
 
           <!-- Tercera fila: Tipos de archivos -->
-          <div class="row justify-center q-col-gutter-md">
-            <div class="col-12 col-sm-6 col-md-4">
-              <q-card class="shadow-3 rounded-borders q-pa-md text-center">
-                <!-- Logo -->
-                <q-img
-                  :src="logoAGN"
-                  contain
-                  class="q-mb-sm"
-                />
+          <div class="row q-col-gutter-md">
+            <div class="col-12 col-md-4">
+              <q-card flat bordered class="q-pa-md shadow-2">
+                <q-img :src="logoAgn" ratio="16/9" class="rounded-borders q-mb-sm" />
                 <q-card-section>
                   <div class="text-h6 text-blue">Archivo Histórico</div>
-                  <div class="text-body2 text-justify">
+                  <div class="text-body2">
                     Documentos antiguos que forman parte del patrimonio cultural e histórico de la región.
                   </div>
                 </q-card-section>
               </q-card>
             </div>
-
-            <div class="col-12 col-sm-6 col-md-4">
-              <q-card class="shadow-3 rounded-borders q-pa-md text-center">
-                <q-img
-                  :src="logoAGN"
-                  contain
-                  class="q-mb-sm"
-                />
+            <div class="col-12 col-md-4">
+              <q-card flat bordered class="q-pa-md shadow-2">
+                <q-img :src="logoAgn" ratio="16/9" class="rounded-borders q-mb-sm" />
                 <q-card-section>
                   <div class="text-h6 text-blue">Archivo Administrativo</div>
-                  <div class="text-body2 text-justify">
+                  <div class="text-body2">
                     Documentación de gestión pública generada por entidades de la administración estatal.
                   </div>
                 </q-card-section>
               </q-card>
             </div>
-
-            <div class="col-12 col-sm-6 col-md-4">
-              <q-card class="shadow-3 rounded-borders q-pa-md text-center">
-                <q-img
-                  :src="logoAGN"
-                  contain
-                  class="q-mb-sm"
-                />
+            <div class="col-12 col-md-4">
+              <q-card flat bordered class="q-pa-md shadow-2">
+                <q-img :src="logoAgn" ratio="16/9" class="rounded-borders q-mb-sm" />
                 <q-card-section>
                   <div class="text-h6 text-blue">Archivo Intermedio</div>
-                  <div class="text-body2 text-justify">
+                  <div class="text-body2">
                     Documentos en trámite o con valor administrativo temporal, en proceso de clasificación.
                   </div>
                 </q-card-section>
@@ -259,8 +276,8 @@
             </div>
           </div>
 
-
         </div>
+
 
         <!-- BÚSQUEDA -->
         <div v-else-if="currentSection === 'busqueda'" class="q-pa-xl flex flex-center">
@@ -286,6 +303,8 @@
             </q-card-section>
           </q-card>
         </div>
+
+
 
       </div>
 
@@ -393,7 +412,7 @@ import { ref, computed  } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import LoginForm from 'pages/Auth/LoginForm.vue'
-import carousel3 from 'assets/img/carousel3.png'
+import carousel1 from 'assets/img/carousel1.jpg'
 import carousel2 from 'assets/img/carousel2.jpg'
 import logo from 'assets/img/logo_ARP.png'
 import fondo from 'assets/img/fondo.jpg'
@@ -411,19 +430,9 @@ const loading = ref(false)
 const fondoSrc = fondo
 
 const logoSrc = logo
-// const images = [{ src: fondoSrc }, { src: fondoSrc }, { src: fondoSrc }]
+const images = [{ src: carousel1 }, { src: carousel2 }]
 
 const logoAgn = logoAGN
-
-// Carrusel
-const images = [
-  { src: carousel3 },
-  { src: carousel2 },
-  { src: fondoSrc }
-]
-
-const slide = ref(0) // Slide inicial
-
 
 // Eventos
 function onLogued() {
@@ -443,62 +452,21 @@ function goToSection(section) {
 
 
 // Lista de comunicados simulada (puedes reemplazarla por tu data real)
-const comunicados = ref([
-  {
-    id: 1,
-    titulo: "Comunicado 1",
-    asunto: "Suspensión de clases",
-    fecha: "23/08/2025",
-    cuerpo: "Las clases se suspenderán por mantenimiento de la institución."
-  },
-  {
-    id: 2,
-    titulo: "Comunicado 2",
-    asunto: "Nueva normativa",
-    fecha: "24/08/2025",
-    cuerpo: "Se informa a la comunidad educativa sobre la nueva normativa aplicada desde septiembre. Se informa a la comunidad educativa sobre la nueva normativa aplicada desde septiembre.Se informa a la comunidad educativa sobre la nueva normativa aplicada desde septiembre."
-  },
-  {
-    id: 3,
-    titulo: "Comunicado 3",
-    asunto: "Evento cultural",
-    fecha: "25/08/2025",
-    cuerpo: "Invitamos a todos al evento cultural que se realizará en la plaza principal."
-  },
-    {
-    id: 3,
-    titulo: "Comunicado 3",
-    asunto: "Evento cultural",
-    fecha: "25/08/2025",
-    cuerpo: "Invitamos a todos al evento cultural que se realizará en la plaza principal."
-  },  {
-    id: 3,
-    titulo: "Comunicado 3",
-    asunto: "Evento cultural",
-    fecha: "25/08/2025",
-    cuerpo: "Invitamos a todos al evento cultural que se realizará en la plaza principal."
-  },  {
-    id: 3,
-    titulo: "Comunicado 3",
-    asunto: "Evento cultural",
-    fecha: "25/08/2025",
-    cuerpo: "Invitamos a todos al evento cultural que se realizará en la plaza principal."
-  },
-  // ... más comunicados
-])
-
+const comunicados = Array.from({ length: 12 }, (_, i) => ({
+  id: i + 1,
+  detalle: `Este es el detalle del comunicado ${i + 1}.`
+}))
 
 // Paginación
-const paginaActual = ref(1)
-const porPagina = 3
+const page = ref(1)
+const perPage = 3
 
-const totalPaginas = computed(() => Math.ceil(comunicados.value.length / porPagina))
+const pagesNumber = computed(() => Math.ceil(comunicados.length / perPage))
 
 const paginatedComunicados = computed(() => {
-  const start = (paginaActual.value - 1) * porPagina
-  return comunicados.value.slice(start, start + porPagina)
+  const start = (page.value - 1) * perPage
+  return comunicados.slice(start, start + perPage)
 })
-
 
 function onForgotPassword() {
   $q.dialog({
@@ -556,10 +524,4 @@ function enviar() {
 .text-underline {
   text-decoration: underline;
 }
-.my-card {
-  margin: 12px;
-  border-radius: 12px;
-  align-items: center;
-}
-
 </style>

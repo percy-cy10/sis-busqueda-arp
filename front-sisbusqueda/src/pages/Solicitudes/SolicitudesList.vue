@@ -42,7 +42,7 @@
       >
         <template v-slot:top-right>
           <q-input  active-class="text-white" standout="bg-primary" color="white" dense debounce="500"
-              v-model="filter" placeholder="Buscar" >
+              v-model="filter" placeholder="Buscar DNI, RUC, nombre o asunto" >
             <template v-slot:append>
               <q-icon name="search" />
             </template>
@@ -105,6 +105,13 @@ const columns = [
     align: "left",
     sortable_: true
   },
+  {
+    field: (row) => row.solicitante.num_documento,
+    name: "num_documento",
+    label: "DNI/RUC",
+    align: "left",
+    sortable: true
+  },
   { field: (row) => row.estado, name: "estado", label: "Estado", align: "center", sortable_: true, },
   { field: (row) => row.updated_at , name: "updated_at", label: "Fecha actualizacion", align: "center", sortable_: true, },
   { field: '' , name: "acciones", label: "Acciones", align: "center" },
@@ -141,7 +148,8 @@ async function onRequest(props) {
       estado: "",
       rowsPerPage: fetchCount,
       page,
-      search: filter,
+      filter,
+      // search: filter,
       order_by,
     },
   });

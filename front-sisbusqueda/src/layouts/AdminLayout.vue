@@ -70,6 +70,8 @@
             <q-item-section> Roles </q-item-section>
           </q-item>
 
+
+
           <q-item
             v-if="userStore.hasPermission('admin-usuarios')"
             :to="{ name: 'Usuarios' }"
@@ -87,6 +89,8 @@
             <q-item-section> Usuarios </q-item-section>
           </q-item>
 
+
+
           <q-item
             v-if="userStore.hasPermission('admin-areas')"
             :to="{ name: 'Areas' }"
@@ -103,6 +107,27 @@
 
             <q-item-section> Areas </q-item-section>
           </q-item>
+
+
+          <q-item
+           
+            :to="{ name: 'niveles' }"
+            :active="link === 'niveles'"
+            @click="link = 'niveles'"
+            clickable
+            v-ripple
+            class="q-ma-xs rounded-borders"
+            active-class="my-menu-link"
+          >
+            <q-item-section avatar>
+              <q-icon name="mdi-file-tree" />
+            </q-item-section>
+
+            <q-item-section>Niveles</q-item-section>
+          </q-item>
+
+
+
 
           <q-item
             v-if="userStore.hasPermission('admin-busquedas')"
@@ -138,23 +163,7 @@
             <q-item-section> Verificaciones </q-item-section>
           </q-item>
 
-          <!--  CAJA -->
-          <q-item
 
-            :to="{ name: 'Pagos' }"
-            :active="link === 'Pagos'"
-            @click="link = 'pagos'"
-            clickable
-            v-ripple
-            class="q-ma-xs rounded-borders"
-            active-class="my-menu-link"
-          >
-            <q-item-section avatar>
-              <q-icon name="inventory" />
-            </q-item-section>
-
-            <q-item-section> Pagos </q-item-section>
-          </q-item>
 
 
 
@@ -302,22 +311,51 @@
           <!-- Pante de Tablas Anteriores  **************************************************** -->
 
           <!--  CAJA -->
-          <q-item
+          <q-expansion-item
 
-            :to="{ name: 'Reportes' }"
-            :active="link === 'Reportes'"
-            @click="link = 'reportes'"
-            clickable
-            v-ripple
-            class="q-ma-xs rounded-borders"
-            active-class="my-menu-link"
+
+            expand-separator
+            icon="collections_bookmark"
+            label="Panel de CAJA"
+            default-opened
+            header-class="bg-blue-6 text-white"
+            expand-icon-class="text-white"
           >
-            <q-item-section avatar>
-              <q-icon name="assessment" />
-            </q-item-section>
+            <q-item
+              clickable
+              v-ripple
+              class="q-ma-xs rounded-borders"
+              active-class="my-menu-link"
 
-            <q-item-section> Reportes </q-item-section>
-          </q-item>
+              :to="{ name: 'Pagos' }"
+              :active="link === 'Pagos'"
+              @click="link = 'pagos'"
+
+            >
+              <q-item-section avatar>
+                <q-icon name="inventory" />
+              </q-item-section>
+
+              <q-item-section> Pagos </q-item-section>
+            </q-item>
+            <q-item
+
+              :to="{ name: 'Reportes' }"
+              :active="link === 'Reportes'"
+              @click="link = 'reportes'"
+              clickable
+              v-ripple
+              class="q-ma-xs rounded-borders"
+              active-class="my-menu-link"
+            >
+              <q-item-section avatar>
+                <q-icon name="assessment" />
+              </q-item-section>
+
+              <q-item-section> Reportes </q-item-section>
+            </q-item>
+
+          </q-expansion-item>
 
           <q-expansion-item
             expand-separator

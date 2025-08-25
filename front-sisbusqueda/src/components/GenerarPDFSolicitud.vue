@@ -10,11 +10,14 @@
 
 <script setup>
 import html2canvas from "html2canvas";
+import QRCode from 'qrcode'
+
 import jsPDF from "jspdf";
 import { convertDate } from "src/utils/ConvertDate";
 import { formatNumberToSoles } from "src/utils/ConvertMoney";
 import { useQuasar } from "quasar";
 import { onMounted, ref } from "vue";
+import PagoService from "src/services/PagoService";
 const $q = useQuasar();
 const emits = defineEmits(["clickPDF"]);
 
@@ -29,9 +32,9 @@ const props = defineProps({
 });
 const data = ref(null);
 const loading = ref(false);
-onMounted(()=>{
+onMounted(async ()=>{
   if (props.ver) {
-    VerificaDatos();
+    await VerificaDatos();
   }
 });
 function limitarLineas(Doc,Text,maxWidth,num_lineas){
@@ -45,8 +48,33 @@ function limitarLineas(Doc,Text,maxWidth,num_lineas){
   }
   return lin;
 }
-function generarPDF(datos) {
+async function generarPDF(datos) {
+  // loading.value = false;
+  // let montoBusqueda = '';
+  // if (datos.pago_busqueda) {
+  //   // Consultar el pago por ID
+  //   const pago = await PagoService.get(datos.pago_busqueda);
+  //   montoBusqueda = pago?.data?.total ? formatNumberToSoles(pago.data.total) : '';
+  // }
+
   loading.value = false;
+  let montoBusqueda = '';
+  let boletaPago = '';
+  let estadoPago = '';
+
+  if (datos.pago_busqueda) {
+    // Consultar el pago por ID
+    const pago = await PagoService.get(datos.pago_busqueda);
+    const pagoData = pago?.data || pago;
+    montoBusqueda = pagoData?.total ? formatNumberToSoles(pagoData.total) : '';
+    boletaPago = pagoData?.boleta_id ? pagoData.boleta_id : '';
+    if (pagoData?.estado === 1) estadoPago = 'Pendiente';
+    else if (pagoData?.estado === 0) estadoPago = 'Cancelado';
+    else if (pagoData?.estado == null) estadoPago = 'Anulado';
+    else estadoPago = '';
+  }
+
+
   const nombrePDF = "mi_pdf_nombre.pdf";
   // Crear un nuevo documento PDF
   const doc = new jsPDF("p", "mm", "a4");
@@ -107,7 +135,43 @@ function generarPDF(datos) {
 
   doc.line(40, 180, 90, 180); // firma del solicitante
   doc.text('FIRMA DEL SOLICITANTE', 40, 184);
-  doc.text('IMPORTE BUSQUEDA: '+formatNumberToSoles(datos.pago_busqueda), 120, 175);
+  // doc.text('IMPORTE BUSQUEDA: ' + montoBusqueda, 120, 175);
+
+  // doc.text('IMPORTE BUSQUEDA: ' + montoBusqueda, 120, 175);
+  // doc.text('Boleta de Pago: ' + boletaPago, 120, 180);
+  // doc.text('Estado Pago: ' + estadoPago, 120, 185);
+  // Configuración del cuadro
+    doc.setDrawColor(0, 0, 0); // Borde negro
+    doc.setLineWidth(0.3);
+
+    // Posición y tamaño del cuadro
+    let x = 118; // Posición X inicial
+    let y = 169; // Posición Y inicial
+    let width = 78; // Ancho del cuadro
+    let height = 10; // Alto del cuadro
+
+    // Dibujar el cuadro
+    doc.rect(x, y, width, height);
+
+    // Escribir los textos dentro
+    doc.setFontSize(12);
+    doc.setFont("times", "normal");
+    doc.text('IMPORTE BUSQUEDA: ' + montoBusqueda, 120, 173);
+
+    doc.setFontSize(9);
+    doc.text('N° Boleta: ' + (boletaPago || '__________'), 120, 177);
+    doc.text('Estado del pago: ' + (estadoPago || '__________'), 150, 177);
+
+
+    // doc.setFontSize(12);
+    // doc.setFont("times", "normal");
+    // doc.text('IMPORTE BUSQUEDA: ' + montoBusqueda, 120, 173);
+    // doc.setFontSize(9);
+    // doc.text('N° Boleta: ' + (boletaPago || '__________'), 120, 177);
+    // doc.text('Estado del pago: ' + (estadoPago || '__________'), 150, 177);
+
+  doc.setFontSize(12);
+  // doc.text('IMPORTE BUSQUEDA: '+formatNumberToSoles(datos.pago_busqueda), 120, 175);
   doc.text('Puno, '+convertDate(datos?.created_at?datos.created_at:new Date,"EEEE d 'de' MMMM y"), 120, 183);
   /*** SECCION DE BUSQUEDA ****************************************************************************************************************************************************************************************** */
   doc.text("FASE DE BUSQUEDA:", 20, 190);
@@ -125,13 +189,95 @@ function generarPDF(datos) {
   doc.text("Verificación:_________________________________", 25, 255);    doc.text("s/: "+(datos?.pago_verificacion?datos.pago_verificacion:'_____________'), 135, 255);
   doc.text("N° de copias: "+(datos?.cantidad_hojas?datos.cantidad_hojas:'_____________'), 80, 262);    doc.text("s/: "+(datos?.pago_fotocopia?datos.pago_fotocopia:'_________'), 135, 262);
   doc.text("Observaciones: "+(datos?.observacionesVeri?datos.observacionesVeri:'____________________________________________________________________________________________________________'), 25, 269,{align: "justify" , maxWidth: maxWidth-10});
+
+
+  // ---- PIE DE PÁGINA EN TODAS LAS PÁGINAS ----
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+
+    const pageHeight = doc.internal.pageSize.height;
+    const marginBottom = 10;
+
+    // Texto principal
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Archivo Regional de Puno - ", 20, pageHeight - marginBottom +4);
+
+    // Texto de reglamentos (letra más pequeña)
+    // doc.setFontSize(7);
+    // doc.text("Esta es una representación impresa cuya autenticidad puede ser contrastada con la representación"+
+    //   "imprimible localizada en la sede digital del Gobierno Regional Puno, aplicando lo dispuesto por el"+
+    //   "Art. 25 de D.S. 070–2013-PCM y la Tercera Disposición Complementaria Final del D.S. 026-2016-PCM."+
+    //   "Su autenticidad e integridad pueden ser contrastadas a través de la siguiente dirección web:", 20, pageHeight - marginBottom - 5);
+
+    doc.setFontSize(9);
+    let startX = 20;
+    let startY = pageHeight - marginBottom - 5;
+
+    doc.text("Esta es una representación impresa cuya autenticidad puede ser contrastada con la representación imprimible localizada en la ", startX, startY);
+    doc.text("sede digital del Gobierno Regional, aplicando lo dispuesto por el Art. 25 de D.S. 070–2013-PCM y la Tercera Disposición", startX, startY + 3);
+    doc.text("Complementaria Final del D.S. 026-2016-PCM. Su autenticidad e integridad pueden ser contrastadas a través de la siguiente :", startX, startY + 6);
+    doc.text("", startX, startY + 9);
+    // Consulta de seguimiento
+    const codigoSolicitud = "S-" + datos.id.toString().padStart(5, '0');
+    const urlSeguimiento = `www.archivoregional.gob.pe/reguimiento?codigo=${codigoSolicitud}`;
+    doc.setFontSize(9);
+    doc.text(`CONSULTA DE SEGUIMIENTO: ${urlSeguimiento}`, 56, pageHeight - marginBottom +4);
+
+    doc.setLineWidth(1); // Ajusta el grosor aquí (puedes usar 1, 1.5, 2, etc.)
+    let x = 183;
+    let yStart = 279;          // Posición inicial vertical
+    let yEnd = yStart + 13;   // Altura de 13 unidades
+
+    doc.line(x, yStart, x, yEnd); // Dibuja línea vertical desde (183, yStart) hasta (183, yEnd)
+
+
+    // Generar QR (con tamaño pequeño)
+    const qrCanvas = document.createElement("canvas");
+    await QRCode.toCanvas(qrCanvas, urlSeguimiento, { width: 20, margin: 0 });
+    const qrDataURL = qrCanvas.toDataURL("image/png");
+    doc.addImage(qrDataURL, "PNG", 185, pageHeight - 18, 13, 13);
+
+    // // URL de seguimiento
+    // const urlSeguimiento = `www.archivoregional.gob.pe/seguimiento?codigo=${codigoSolicitud}`;
+
+    // // Texto principal del pie de página
+    // doc.setFontSize(10);
+    // doc.setTextColor(0, 0, 0);
+    // doc.text("Archivo Regional de Puno", 20, pageHeight - marginBottom - 20);
+
+    // // Texto legal (letra más pequeña y multilínea)
+    // doc.setFontSize(6);
+    // doc.text(
+    //   [
+    //     "Esta es una representación impresa cuya autenticidad puede ser contrastada con la representación",
+    //     "imprimible localizada en la sede digital del Gobierno Regional Puno, aplicando lo dispuesto por el",
+    //     "Art. 25 de D.S. 070–2013-PCM y la Tercera Disposición Complementaria Final del D.S. 026-2016-PCM.",
+    //     "Su autenticidad e integridad pueden ser contrastadas a través de la siguiente dirección web:",
+    //     urlSeguimiento
+    //   ],
+    //   20,
+    //   pageHeight - marginBottom - 12
+    // );
+
+    // // Generar QR (con tamaño pequeño)
+    // const qrCanvas = document.createElement("canvas");
+    // await QRCode.toCanvas(qrCanvas, urlSeguimiento, { width: 20, margin: 0 });
+    // const qrDataURL = qrCanvas.toDataURL("image/png");
+    // doc.addImage(qrDataURL, "PNG", 190, pageHeight - 22, 13, 13);
+
+  }
+
+
+
   if (props.ver)
     data.value = URL.createObjectURL(new Blob([doc.output("blob")], { type: "application/pdf" })); //doc.output("datauristring");
   else
     window.open(doc.output("bloburl"), "_blank");
 }
 
-function VerificaDatos(){
+async function VerificaDatos(){
   let datosEnPDF = null;
   if(props.datosSolicitudRow){
     const listMes = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -191,7 +337,7 @@ function VerificaDatos(){
     datosEnPDF.pago_fotocopia = props.datosPagos.pago_fotocopia;
   }
   if(datosEnPDF)
-    generarPDF(datosEnPDF);
+    await generarPDF(datosEnPDF);
 }
 class eventos{
   activarCargar(){

@@ -15,5 +15,6 @@ class NivelSeeder extends Seeder
         Nivel::create(['nombre' => 'Archivo Central']);
         Nivel::create(['nombre' => 'Archivo Intermedio']);
         Nivel::create(['nombre' => 'Archivo Histórico']);
+        Nivel::create(['nombre' => 'Area Administrativa']);
     }
 }

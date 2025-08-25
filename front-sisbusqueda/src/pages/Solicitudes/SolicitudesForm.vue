@@ -180,9 +180,27 @@
                   dense
                   outlined
                   clearable
+
                   v-model="solicitudForm.celular"
                   mask="### ### ###"
-                />
+
+                  :loading="loading"
+                  :requerido="true"
+
+                  lazy-rules
+                    :rules="[
+                      (val) =>
+                        (val && val !== '') || 'Por favor ingrese su celular',
+                    ]"
+                >
+                  <template v-slot:label>
+                    Celular
+                    <span class="text-red-7 text-weight-bold">(*)</span>
+                  </template>
+
+                </q-input>
+
+
                 <q-input
                   class="col-12 col-md-4 q-pa-sm"
                   label="Correo Electrónico"
@@ -205,7 +223,21 @@
                   outlined
                   clearable
                   v-model="solicitudForm.direccion"
-                />
+                  :loading="loading"
+                  :requerido="true"
+
+                  lazy-rules
+                    :rules="[
+                      (val) =>
+                        (val && val !== '') || 'Por favor ingrese su Direccion - Domicilio',
+                    ]"
+                >
+                  <template v-slot:label>
+                    Direccion - Domicilio
+                    <span class="text-red-7 text-weight-bold">(*)</span>
+                  </template>
+
+                </q-input>
               </div>
             </q-step>
 
@@ -701,14 +733,13 @@ function asignarUbigeoNotario() {
 const onSubmit = async () => {};
 
 
+
 // async function ValidaSuccess(event, step) {
 //   if (step === 3) {
-
+//     // Asignar nombre completo correctamente
 //     if (solicitudForm.value.tipo_documento === 'DNI') {
 //       solicitudForm.value.nombre_completo =
-//         solicitudForm.value.apellido_paterno + ' ' +
-//         solicitudForm.value.apellido_materno + ' ' +
-//         solicitudForm.value.nombres;
+//         `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
 //     } else {
 //       solicitudForm.value.nombre_completo = solicitudForm.value.asunto;
 //     }
@@ -716,38 +747,15 @@ const onSubmit = async () => {};
 //     solicitudForm.value.mas_datos = masDatos.value;
 //     asignarUbigeoNotario();
 
-//     // Mostrar los valores de ubigeo antes de guardar
-//     console.log("Ubigeo principal (ubigeo_cod):", solicitudForm.value.ubigeo_cod);
-//     console.log("Ubigeo del notario (ubigeo_cod_soli):", solicitudForm.value.ubigeo_cod_soli);
-
-
-
 //     try {
-
-
-
-//       // const notarioSeleccionado = notarios.value.find(
-//       //   n => n.id === solicitudForm.value.notario_id
-//       // );
-//       // if (notarioSeleccionado?.ubigeo_cod) {
-//       //   solicitudForm.value.ubigeo_cod_soli = notarioSeleccionado.ubigeo_cod;
-//       // }
-
-//       // Mostrar datos de la solicitud antes de guardar
-//       console.log("Datos enviados de la solicitud:", solicitudForm.value);
-
-//       // 1. Guardar la solicitud y obtener el ID generado
+//       // Guardar la solicitud
 //       const request = await SolicitudService.save(solicitudForm.value);
-//       console.log("Respuesta del backend al guardar solicitud:", request);
-
 //       let solicitudId = request?.data?.id || request?.id;
 
-//       // Si no se obtuvo el ID, buscar el mayor ID de la lista de solicitudes
 //       if (!solicitudId) {
 //         try {
 //           const listaSolicitudes = await SolicitudService.getData();
 //           if (Array.isArray(listaSolicitudes.data)) {
-//             // Ordenar de mayor a menor por id
 //             const ordenadas = listaSolicitudes.data.sort((a, b) => b.id - a.id);
 //             if (ordenadas.length > 0) {
 //               solicitudId = ordenadas[0].id;
@@ -758,7 +766,6 @@ const onSubmit = async () => {};
 //         }
 //       }
 
-//       // Validar que el ID exista
 //       if (!solicitudId) {
 //         $q.notify({
 //           type: "negative",
@@ -767,13 +774,13 @@ const onSubmit = async () => {};
 //         return;
 //       }
 
-//       // 2. Buscar el TUPA de búsqueda de documentos (sub_code 0101)
+//       // Buscar el TUPA de búsqueda de documentos (sub_code 0101)
 //       const tupaBusquedaResp = await TupaService.getData({ params: { sub_code: "0101" } });
 //       const tupaBusqueda = Array.isArray(tupaBusquedaResp.data)
 //         ? tupaBusquedaResp.data[0]
 //         : tupaBusquedaResp.data;
 
-//       // 3. Obtener el user_id del usuario logueado
+//       // Obtener el user_id del usuario logueado
 //       let userId = null;
 //       try {
 //         const user = JSON.parse(localStorage.getItem('user'));
@@ -782,55 +789,53 @@ const onSubmit = async () => {};
 //         userId = null;
 //       }
 
-//       // 4. Construir el objeto de pago
-//       const costo = Number(tupaBusqueda.costo);
-//       const denominacion = tupaBusqueda.denominacion;
+//       // Generar nombre completo correctamente para el pago
+//       let nombreCompletoPago = "";
+//       if (solicitudForm.value.tipo_documento === 'DNI') {
+//         nombreCompletoPago = `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
+//       } else {
+//         nombreCompletoPago = solicitudForm.value.asunto;
+//       }
 
-//       // Generar nombre completo correctamente
-//       const nombreCompletoPago = [
-//         solicitudForm.value.nombres,
-//         solicitudForm.value.apellido_paterno,
-//         solicitudForm.value.apellido_materno
-//       ].filter(Boolean).join(' ').trim();
-
+//       // Crear el pago con estado 0 y flags correctos
 //       const pagoPayload = {
 //         solicitud_id: solicitudId,
 //         tipo_documento: solicitudForm.value.tipo_documento,
 //         num_documento: solicitudForm.value.num_documento,
 //         nombre_completo: nombreCompletoPago,
-//         total: costo,
+//         total: Number(tupaBusqueda.costo),
 //         user_id: userId,
 //         estado: 0,
 //         tupas: [
 //           {
 //             tupa_id: tupaBusqueda.id,
 //             cantidad: 1,
-//             Subtotal: costo,
-//             precio: costo,
-//             denominacion: denominacion
+//             Subtotal: Number(tupaBusqueda.costo),
+//             precio: Number(tupaBusqueda.costo),
+//             denominacion: tupaBusqueda.denominacion
 //           }
 //         ],
-//         desde_solicitud: true // <--- AGREGADO
+//         desde_solicitud: true,
+//         con_pago: true // <--- IMPORTANTE: aquí indicas que es CON pago
 //       };
 
-//       // Mostrar datos del pago antes de guardar
-//       console.log("Datos enviados en el pago:", pagoPayload);
+//       // Guardar el pago y obtener el ID
+//       const pagoResponse = await PagoService.save(pagoPayload);
+//       const pagoId = pagoResponse?.data?.id || pagoResponse?.id;
 
-//       await PagoService.save(pagoPayload);
+//       // Asignar el ID del pago al campo pago_busqueda de la solicitud
+//       if (pagoId && solicitudId) {
+//         await SolicitudService.update(solicitudId, { pago_busqueda: pagoId });
+//       }
 
 //       emit("save", "solicitud");
 //     } catch (error) {
 //       if (error.response && error.response.data && error.response.data.errors) {
-//         console.error("Errores de validación:", error.response.data.errors);
 //         $q.notify({
 //           type: "negative",
 //           message: Object.values(error.response.data.errors).flat().join('\n')
 //         });
 //       } else {
-//         console.error("Error en ValidaSuccess:", error);
-//         if (error.response && error.response.data) {
-//           console.error("Respuesta del backend:", error.response.data);
-//         }
 //         $q.notify({
 //           type: "negative",
 //           message: "Error al guardar el pago"
@@ -844,113 +849,149 @@ const onSubmit = async () => {};
 //   }
 // }
 
+
 async function ValidaSuccess(event, step) {
-  if (step === 3) {
-    // Asignar nombre completo correctamente
-    if (solicitudForm.value.tipo_documento === 'DNI') {
-      solicitudForm.value.nombre_completo =
-        `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
-    } else {
-      solicitudForm.value.nombre_completo = solicitudForm.value.asunto;
-    }
-
-    solicitudForm.value.mas_datos = masDatos.value;
-    asignarUbigeoNotario();
-
-    try {
-      // Guardar la solicitud
-      const request = await SolicitudService.save(solicitudForm.value);
-      let solicitudId = request?.data?.id || request?.id;
-
-      if (!solicitudId) {
-        try {
-          const listaSolicitudes = await SolicitudService.getData();
-          if (Array.isArray(listaSolicitudes.data)) {
-            const ordenadas = listaSolicitudes.data.sort((a, b) => b.id - a.id);
-            if (ordenadas.length > 0) {
-              solicitudId = ordenadas[0].id;
-            }
-          }
-        } catch (e) {
-          solicitudId = null;
-        }
-      }
-
-      if (!solicitudId) {
-        $q.notify({
-          type: "negative",
-          message: "No se pudo obtener el ID de la solicitud. El pago no se guardará."
-        });
-        return;
-      }
-
-      // Buscar el TUPA de búsqueda de documentos (sub_code 0101)
-      const tupaBusquedaResp = await TupaService.getData({ params: { sub_code: "0101" } });
-      const tupaBusqueda = Array.isArray(tupaBusquedaResp.data)
-        ? tupaBusquedaResp.data[0]
-        : tupaBusquedaResp.data;
-
-      // Obtener el user_id del usuario logueado
-      let userId = null;
-      try {
-        const user = JSON.parse(localStorage.getItem('user'));
-        userId = user?.id || user?.user?.id || null;
-      } catch (e) {
-        userId = null;
-      }
-
-      // Generar nombre completo correctamente para el pago
-      let nombreCompletoPago = "";
+  try {
+    if (step === 3) {
+      // Asignar nombre completo correctamente
       if (solicitudForm.value.tipo_documento === 'DNI') {
-        nombreCompletoPago = `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
+        solicitudForm.value.nombre_completo =
+          `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
       } else {
-        nombreCompletoPago = solicitudForm.value.asunto;
+        solicitudForm.value.nombre_completo = solicitudForm.value.asunto;
       }
 
-      // Crear el pago con estado 0 y flags correctos
-      const pagoPayload = {
-        solicitud_id: solicitudId,
-        tipo_documento: solicitudForm.value.tipo_documento,
-        num_documento: solicitudForm.value.num_documento,
-        nombre_completo: nombreCompletoPago,
-        total: Number(tupaBusqueda.costo),
-        user_id: userId,
-        estado: 0,
-        tupas: [
-          {
-            tupa_id: tupaBusqueda.id,
-            cantidad: 1,
-            Subtotal: Number(tupaBusqueda.costo),
-            precio: Number(tupaBusqueda.costo),
-            denominacion: tupaBusqueda.denominacion
+      solicitudForm.value.mas_datos = masDatos.value;
+      asignarUbigeoNotario();
+
+      try {
+        // Guardar la solicitud
+        const request = await SolicitudService.save(solicitudForm.value);
+        let solicitudId = request?.data?.id || request?.id;
+
+        // Si no se obtuvo el ID, buscar el mayor ID de la lista de solicitudes
+        if (!solicitudId) {
+          try {
+            const listaSolicitudes = await SolicitudService.getData();
+            if (Array.isArray(listaSolicitudes.data)) {
+              const ordenadas = listaSolicitudes.data.sort((a, b) => b.id - a.id);
+              if (ordenadas.length > 0) {
+                solicitudId = ordenadas[0].id;
+              }
+            }
+          } catch (e) {
+            solicitudId = null;
           }
-        ],
-        desde_solicitud: true,
-        con_pago: true // <--- IMPORTANTE: aquí indicas que es CON pago
-      };
+        }
 
-      await PagoService.save(pagoPayload);
+        if (!solicitudId) {
+          $q.notify({
+            type: "negative",
+            message: "No se pudo obtener el ID de la solicitud. El pago no se guardará."
+          });
+          return;
+        }
 
-      emit("save", "solicitud");
-    } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        $q.notify({
-          type: "negative",
-          message: Object.values(error.response.data.errors).flat().join('\n')
-        });
-      } else {
-        $q.notify({
-          type: "negative",
-          message: "Error al guardar el pago"
-        });
+        // Buscar el TUPA de búsqueda de documentos (sub_code 0101)
+        const tupaBusquedaResp = await TupaService.getData({ params: { sub_code: "0101" } });
+        const tupaBusqueda = Array.isArray(tupaBusquedaResp.data)
+          ? tupaBusquedaResp.data[0]
+          : tupaBusquedaResp.data;
+
+        // Obtener el user_id del usuario logueado
+        let userId = null;
+        try {
+          const user = JSON.parse(localStorage.getItem('user'));
+          userId = user?.id || user?.user?.id || null;
+        } catch (e) {
+          userId = null;
+        }
+
+        // Generar nombre completo correctamente para el pago
+        let nombreCompletoPago = "";
+        if (solicitudForm.value.tipo_documento === 'DNI') {
+          nombreCompletoPago = `${solicitudForm.value.apellido_paterno} ${solicitudForm.value.apellido_materno} ${solicitudForm.value.nombres}`.trim();
+        } else {
+          nombreCompletoPago = solicitudForm.value.asunto;
+        }
+
+        // Crear el pago con estado 0 y flags correctos
+        const pagoPayload = {
+          solicitud_id: solicitudId,
+          tipo_documento: solicitudForm.value.tipo_documento,
+          num_documento: solicitudForm.value.num_documento,
+          nombre_completo: nombreCompletoPago,
+          total: Number(tupaBusqueda.costo),
+          user_id: userId,
+          estado: 0,
+          tupas: [
+            {
+              tupa_id: tupaBusqueda.id,
+              cantidad: 1,
+              Subtotal: Number(tupaBusqueda.costo),
+              precio: Number(tupaBusqueda.costo),
+              denominacion: tupaBusqueda.denominacion
+            }
+          ],
+          desde_solicitud: true,
+          con_pago: true // <--- IMPORTANTE: aquí indicas que es CON pago
+        };
+
+        // Guardar el pago y obtener el ID
+        const pagoResponse = await PagoService.save(pagoPayload);
+        const pagoId = pagoResponse?.data?.id || pagoResponse?.id;
+
+        // Asignar el ID del pago al campo pago_busqueda de la solicitud
+        if (pagoId && solicitudId) {
+          await SolicitudService.update(solicitudId, { pago_busqueda: pagoId, estado: 'Buscando', area_id: 2 });
+        }
+        console.log("Payload de pago:", pagoPayload);
+
+
+
+        emit("save", "solicitud");
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.errors) {
+          $q.notify({
+            type: "negative",
+            message: Object.values(error.response.data.errors).flat().join('\n')
+          });
+        } else {
+          $q.notify({
+            type: "negative",
+            message: "Error al guardar el pago"
+          });
+        }
+
+        console.error("Error al guardar el pago:", error);
       }
+    } else if (step === 2) {
+      event.next();
+    } else {
+      event.next();
     }
-  } else if (step === 2) {
-    event.next();
-  } else {
-    event.next();
+  } catch (error) {
+    console.error(error); // <-- Agrega esto para ver el error completo en consola
+    if (error.response && error.response.data && error.response.data.errors) {
+      $q.notify({
+        type: "negative",
+        message: Object.values(error.response.data.errors).flat().join('\n')
+      });
+    } else if (error.response && error.response.data && error.response.data.message) {
+      $q.notify({
+        type: "negative",
+        message: error.response.data.message
+      });
+    } else {
+      $q.notify({
+        type: "negative",
+        message: "Error al guardar el pago"
+      });
+    }
   }
 }
+
+
 
 async function enviarSinPago() {
   try {

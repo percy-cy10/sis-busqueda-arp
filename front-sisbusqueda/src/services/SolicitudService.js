@@ -14,6 +14,10 @@ class SolicitudService {
     return (await api.get(`/api/solicitudes/${id}`)).data;
   }
 
+  static async update(id, reg) {
+    return await api.put(`/api/solicitudes/${id}`, reg);
+  }
+
   static async delete(id) {
     return await api.delete(`/api/solicitudes/${id}`);
   }
