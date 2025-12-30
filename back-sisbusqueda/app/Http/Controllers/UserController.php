@@ -25,7 +25,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'dni' => $request->dni,               // ✅ Nuevo
-            'nivel_id' => $request->nivel,           // ✅ Nuevo
+            'nivel_id' => $request->nivel_id,           // ✅ Nuevo
             'area_id' => $request->area_id,
             'password' => bcrypt($request->password),
             'estado' => $request->estado ?? 1,
@@ -53,7 +53,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'dni' => $request->dni,               // ✅ Nuevo
-            'nivel_id' => $request->nivel,           // ✅ Nuevo
+            'nivel_id' => $request->nivel_id,           // ✅ Nuevo
             'area_id' => $request->area_id,
             'password' => $request->password ? bcrypt($request->password) : $usuario->password,
             'estado' => $request->estado ?? $usuario->estado,

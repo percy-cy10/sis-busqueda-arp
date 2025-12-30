@@ -13,26 +13,60 @@ class LibroController extends Controller
      * Mostrar una lista de los recursos.
      * GET /libros
      */
+    // public function index(Request $request)
+    // {
+    //     // Consulta base para obtener los libros
+    //     $query = Libro::query();
+
+    //     // Filtrar por estado si se proporciona en la solicitud
+    //     if ($request->filled('estado')) {
+    //         $query->where('estado', $request->estado);
+    //     }
+
+    //     // Ordenar por estado (descendente) y fecha de actualización (descendente)
+    //     $query->orderBy('estado', 'desc')->orderBy('updated_at', 'desc');
+
+    //     // Paginación: se puede personalizar el número de resultados por página con 'per_page'
+    //     $perPage = $request->get('per_page', 10); // Por defecto, 10 resultados por página
+    //     $libros = $query->paginate($perPage);
+
+    //     // Retornar los resultados en formato JSON
+    //     return response()->json($libros, 200);
+    // }
     public function index(Request $request)
     {
-        // Consulta base para obtener los libros
         $query = Libro::query();
 
-        // Filtrar por estado si se proporciona en la solicitud
+        // Filtrar por estado si se proporciona
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
 
-        // Ordenar por estado (descendente) y fecha de actualización (descendente)
-        $query->orderBy('estado', 'desc')->orderBy('updated_at', 'desc');
+        // 🔍 Filtro de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('protocolo', 'LIKE', "%{$search}%")
+                ->orWhereHas('notario', function ($sub) use ($search) {
+                    $sub->where('nombre_completo', 'LIKE', "%{$search}%");
+                });
+            });
+        }
 
-        // Paginación: se puede personalizar el número de resultados por página con 'per_page'
-        $perPage = $request->get('per_page', 10); // Por defecto, 10 resultados por página
+        // Ordenar (si viene en request)
+        if ($request->filled('sortBy')) {
+            $query->orderBy($request->sortBy, $request->boolean('descending') ? 'desc' : 'asc');
+        } else {
+            $query->orderBy('estado', 'desc')->orderBy('updated_at', 'desc');
+        }
+
+        // Paginación
+        $perPage = $request->get('per_page', 10);
         $libros = $query->paginate($perPage);
 
-        // Retornar los resultados en formato JSON
         return response()->json($libros, 200);
     }
+
 
     /**
      * Almacenar un nuevo recurso en la base de datos.

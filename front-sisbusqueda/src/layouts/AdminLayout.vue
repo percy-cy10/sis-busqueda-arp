@@ -110,7 +110,8 @@
 
 
           <q-item
-           
+          v-if="userStore.hasPermission('admin-niveles')"
+
             :to="{ name: 'niveles' }"
             :active="link === 'niveles'"
             @click="link = 'niveles'"
@@ -235,6 +236,8 @@
               <!-- escrituras v-if="userStore.hasPermission('admin-escrituras')"-->
 
               <q-item
+                v-if="userStore.hasPermission('admin-escrituras')"
+
 
                 clickable
                 v-ripple
@@ -253,6 +256,7 @@
               <!-- Favorecidos v-if="userStore.hasPermission('admin-favorecido')"-->
 
               <q-item
+                v-if="userStore.hasPermission('admin-favorecido')"
 
                 clickable
                 v-ripple
@@ -268,9 +272,10 @@
                 <q-item-section> Favorecido </q-item-section>
               </q-item>
 
-              <!-- Otorgante v-if="userStore.hasPermission('admin-otorgante')"-->
+              <!-- Otorgante v-if="userStore.hasPermission('admin-caja')"-->
 
               <q-item
+                v-if="userStore.hasPermission('admin-otorgante')"
 
                 clickable
                 v-ripple
@@ -312,6 +317,8 @@
 
           <!--  CAJA -->
           <q-expansion-item
+            v-if="userStore.hasPermission('admin-caja')"
+
 
 
             expand-separator
@@ -339,6 +346,7 @@
               <q-item-section> Pagos </q-item-section>
             </q-item>
             <q-item
+            v-if="userStore.hasPermission('admin-reportes')"
 
               :to="{ name: 'Reportes' }"
               :active="link === 'Reportes'"

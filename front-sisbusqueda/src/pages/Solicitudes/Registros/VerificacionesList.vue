@@ -134,7 +134,8 @@ const columns = [
     search: true,
   },
   {
-    field: (row) => row.registro_busqueda.solicitud.id.toString().padStart(5, "0"),
+    field: (row) =>
+      row.registro_busqueda.solicitud.id.toString().padStart(5, "0"),
     name: "registro_busqueda.solicitud.id",
     label: "Numero de Solicitud - Busqueda",
     align: "center",

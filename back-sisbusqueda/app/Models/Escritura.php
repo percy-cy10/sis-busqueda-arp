@@ -22,6 +22,8 @@ class Escritura extends Model
         'libro_id',
         'observaciones',
         'file_name',
+        'user_id',     // 👈 nuevo campo
+        'updated_by',  // 👈 nuevo campo
     ];
     public function subSerie()
     {
@@ -39,5 +41,16 @@ class Escritura extends Model
     public function otorgantes()
     {
         return $this->belongsToMany(Otorgante::class, 'escritura_otorgante');
+    }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

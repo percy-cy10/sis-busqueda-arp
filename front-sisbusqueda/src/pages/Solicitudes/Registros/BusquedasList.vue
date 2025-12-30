@@ -13,7 +13,10 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" />
 
-        <q-breadcrumbs-el label="Historial de Registro de Busqueda" icon="mdi-key" />
+        <q-breadcrumbs-el
+          label="Historial de Registro de Busqueda"
+          icon="mdi-key"
+        />
       </q-breadcrumbs>
     </div>
     <q-separator />
@@ -33,7 +36,7 @@
       /> -->
     </div>
     <div class="q-gutter-xs q-pa-sm">
-    <!-- <div class="row">
+      <!-- <div class="row">
       <SelectInput dense clearable outlined
       class="col-4 q-px-xs"
       label="Usuario Registrado"
@@ -140,7 +143,7 @@ const columns = [
     search: true,
   },
   {
-    field: (row) => row.solicitud.id.toString().padStart(5, '0'),
+    field: (row) => row.solicitud.id.toString().padStart(5, "0"),
     name: "solicitud.id",
     label: "Numero de solicitud",
     align: "center",
@@ -204,13 +207,13 @@ const columns = [
 
 const form = ref({
   solicitud: {
-        sub_serie: {},
-        notario: {},
-        solicitante: {},
-        user: {},
-    },
+    sub_serie: {},
+    notario: {},
+    solicitante: {},
     user: {},
-  });
+  },
+  user: {},
+});
 const usarioregistrado = ref();
 const tableRef = ref();
 const formPermisos = ref(false);
@@ -237,7 +240,13 @@ async function onRequest(props) {
   const fetchCount = rowsPerPage === 0 ? 0 : rowsPerPage;
   const order_by = descending ? "-" + sortBy : sortBy;
   const { data, total = 0 } = await BusquedaService.getData({
-    params: { rowsPerPage: fetchCount, page, search: filter, order_by, estado: "Buscando"},
+    params: {
+      rowsPerPage: fetchCount,
+      page,
+      search: filter,
+      order_by,
+      estado: "Buscando",
+    },
   });
   // console.log(data);
   // clear out existing data and add new

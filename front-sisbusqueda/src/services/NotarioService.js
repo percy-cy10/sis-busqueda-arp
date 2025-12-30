@@ -1,9 +1,7 @@
 import { api } from "src/boot/axios";
 
 class NotarioService {
-    // static async getData(params) {
-    //     return (await api.get('/api/notarios',params)).data;
-    // }
+
     static async getData(params) {
       try {
           const response = await api.get('/api/notarios', params);
@@ -13,6 +11,19 @@ class NotarioService {
           throw error; // Lanza el error para manejarlo en el componente
       }
     }
+
+  // Todos (sin paginación)
+static async getAll() {
+  try {
+    const response = await api.get("/api/notarios", { params: { rowsPerPage: 0 } });
+    return response.data.data; // 👈 devuelve directamente el array
+  } catch (error) {
+    console.error("Error al obtener todos los notarios:", error);
+    throw error;
+  }
+}
+
+
 
     static async get(id) {
         return (await api.get(`/api/notarios/${id}`)).data;

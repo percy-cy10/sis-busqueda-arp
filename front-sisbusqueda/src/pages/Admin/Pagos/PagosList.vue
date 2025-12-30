@@ -1,5 +1,4 @@
 <template>
-  <!-- Diálogo para formulario de pagos -->
   <q-dialog v-model="formPagos" persistent>
     <PagosForm
       :title="title"
@@ -8,25 +7,22 @@
       @save="handleSave"
       @close="formPagos = false"
     />
-
   </q-dialog>
+
   <q-dialog v-model="showPagoModal" persistent>
     <ModelPago
       :items="pagoItems"
       :total="pagoTotal"
       :showModal="showPagoModal"
+      :cargando="cargandoPago"
       @close="showPagoModal = false"
       @confirm="onConfirmPago"
     />
   </q-dialog>
 
-
-  <!-- Diálogo para mostrar la boleta PDF del pago seleccionado -->
-   <PagoBoletaPDF ref="boletaPdfRef" style="display:none" />
-
+  <PagoBoletaPDF ref="boletaPdfRef" style="display:none" />
 
   <q-page class="q-pa-md">
-    <!-- Breadcrumbs y separador -->
     <div class="q-mb-md">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" to="/" />
@@ -35,7 +31,6 @@
       <q-separator class="q-my-sm" />
     </div>
 
-    <!-- Barra de acciones: agregar y buscar -->
     <div class="row justify-between items-center q-mb-md">
       <q-btn
         color="primary"
@@ -58,11 +53,10 @@
       </q-input>
     </div>
 
-    <!-- Tabla de pagos -->
     <q-table
       :rows-per-page-options="[7, 10, 15]"
       class="my-sticky-header-table htable q-ma-sm"
-      title="Pagos"
+      title="Todos los Pagos"
       ref="tableRef"
       :rows="rows"
       :columns="columns"
@@ -73,28 +67,53 @@
       binary-state-sort
       @request="onRequest"
     >
-      <!-- Columnas personalizadas -->
+      <!-- Columna Solicitud -->
       <template v-slot:body-cell-solicitud="props">
         <q-td :props="props">
           <div>
             <div>
-              <strong>N°{{ props.row.solicitud?.id }}</strong>
-              <!-- <span v-if="props.row.solicitud?.bien"> - {{ props.row.solicitud.bien}}</span> -->
+              <strong>N°{{ props.row.solicitud?.solicitud_code }}</strong>
             </div>
-            <!-- <div class="text-caption text-grey">
-              Solicitante: {{ props.row.solicitud?.solicitante?.nombre_completo || '-' }}
-            </div> -->
           </div>
         </q-td>
       </template>
+
+      <!-- Columna Usuario -->
       <template v-slot:body-cell-user="props">
         <q-td :props="props">
           <div>
             <div>{{ props.row.user?.name || 'Sin usuario' }}</div>
-            <!-- <div class="text-caption text-grey">{{ props.row.user?.email }}</div> -->
           </div>
         </q-td>
       </template>
+
+      <!-- Columna Documento (Tipo y Número combinados) -->
+      <template v-slot:body-cell-documento="props">
+        <q-td :props="props">
+          <div>
+            <div>{{ props.row.tipo_documento }}</div>
+            <div class="text-caption text-grey">{{ props.row.num_documento }}</div>
+          </div>
+        </q-td>
+      </template>
+
+      <!-- Columna Auditoría (Creado y Actualizado combinados) -->
+      <template v-slot:body-cell-auditoria="props">
+        <q-td :props="props">
+          <div class="q-mb-xs">
+            <div class="text-caption text-weight-medium">Creado:
+            {{ props.row.creador?.name || 'Sistema' }}</div>
+            <div class="text-caption text-grey">{{ formatFecha(props.row.created_at) }}</div>
+          </div>
+          <div>
+            <div class="text-caption text-weight-medium">Actualizado:
+            {{ props.row.actualizador?.name || 'Sistema' }}</div>
+            <div class="text-caption text-grey">{{ formatFecha(props.row.updated_at) }}</div>
+          </div>
+        </q-td>
+      </template>
+
+      <!-- Columna Tupas -->
       <template v-slot:body-cell-tupas="props">
         <q-td :props="props">
           <div v-if="props.row.tupas && props.row.tupas.length">
@@ -112,11 +131,10 @@
           <span v-else>-</span>
         </q-td>
       </template>
+
+      <!-- Columna Estado -->
       <template v-slot:body-cell-estado="props">
         <q-td :props="props">
-          <!-- <q-badge :color="props.row.estado === 1 ? 'orange' : 'green'" outline>
-            {{ props.row.estado === 1 ? 'Pendiente' : 'Pagado' }}
-          </q-badge> -->
           <template v-if="props.row.estado === null">
             <q-badge color="red" outline>Anulado</q-badge>
           </template>
@@ -127,117 +145,10 @@
           </template>
         </q-td>
       </template>
-      <!-- Columna de acciones -->
-      <!-- <template v-slot:body-cell-actions="props">
-        <q-td auto-width class="q-gutter-x-sm">
-          <q-btn
-            size="sm"
-            outline
-            round
-            color="blue"
-            icon="edit"
-            @click="editarPago(props.row)"
-            :disable="loading"
-          >
-            <q-tooltip>Editar</q-tooltip>
-          </q-btn>
-          <q-btn
-            size="sm"
-            outline
-            round
-            color="red"
-            icon="delete"
-            @click="confirmarEliminar(props.row.id)"
-            :disable="loading"
-          >
-            <q-tooltip>Eliminar</q-tooltip>
-          </q-btn>
-          <q-btn
-            size="sm"
-            outline
-            round
-            color="green"
-            icon="payments"
-            @click="pagarPago(props.row)"
-            :disable="loading"
-          >
-            <q-tooltip>Pagar</q-tooltip>
-          </q-btn>
-          <q-btn
-            size="sm"
-            outline
-            round
-            color="orange"
-            icon="picture_as_pdf"
-            @click="generarBoletaPDF(props.row)"
-            :disable="loading"
-          >
-            <q-tooltip>Boleta</q-tooltip>
-          </q-btn>
-        </q-td>
-      </template> -->
+
+      <!-- Columna Acciones -->
       <template v-slot:body-cell-actions="props">
         <q-td auto-width class="q-gutter-x-sm">
-          <!-- <q-btn
-            v-if="props.row.estado === 1"
-            size="sm"
-            outline
-            round
-            color="blue"
-            icon="edit"
-            @click="editarPago(props.row)"
-            :disable="loading"
-          >
-            <q-tooltip>Editar</q-tooltip>
-          </q-btn>
-          <q-btn
-            v-if="props.row.estado === 1"
-            size="sm"
-            outline
-            round
-            color="red"
-            icon="delete"
-            @click="confirmarEliminar(props.row.id)"
-            :disable="loading"
-          >
-            <q-tooltip>Eliminar</q-tooltip>
-          </q-btn>
-          <q-btn
-            v-if="props.row.estado === 1"
-            size="sm"
-            outline
-            round
-            color="green"
-            icon="payments"
-            @click="pagarPago(props.row)"
-            :disable="loading"
-          >
-            <q-tooltip>Pagar</q-tooltip>
-          </q-btn>
-          <q-btn
-            v-if="props.row.estado !== 1"
-            size="sm"
-            outline
-            round
-            color="orange"
-            icon="picture_as_pdf"
-            @click="generarBoletaPDF(props.row)"
-            :disable="loading"
-          >
-            <q-tooltip>Boleta</q-tooltip>
-          </q-btn>
-          <q-btn
-            v-if="props.row.estado !== null"
-            size="sm"
-            outline
-            round
-            color="grey"
-            icon="cancel"
-            @click="confirmarAnular(props.row)"
-            :disable="loading"
-          >
-            <q-tooltip>Anular</q-tooltip>
-          </q-btn> -->
           <q-btn
             v-if="props.row.estado === 1"
             size="sm"
@@ -275,7 +186,7 @@
             <q-tooltip>Pagar</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="props.row.estado !== 1 && props.row.estado !== null"
+            v-if="props.row.estado === 0"
             size="sm"
             outline
             round
@@ -287,7 +198,7 @@
             <q-tooltip>Boleta</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="props.row.estado !== null && props.row.estado !== 1 && props.row.estado !== O"
+            v-if="props.row.estado !== null && props.row.estado !== 1"
             size="sm"
             outline
             round
@@ -298,11 +209,9 @@
           >
             <q-tooltip>Anular</q-tooltip>
           </q-btn>
-
         </q-td>
       </template>
 
-      <!-- Mensaje cuando no hay datos -->
       <template v-slot:no-data>
         <div class="full-width row flex-center text-grey q-gutter-sm">
           <q-icon name="warning" size="2em" />
@@ -315,39 +224,32 @@
 </template>
 
 <script setup>
-// Importaciones principales
 import { ref, onMounted, nextTick } from 'vue'
-import axios from 'axios'
 import { useQuasar } from 'quasar'
 import PagoService from 'src/services/PagoService'
 import PagosForm from './PagosForm.vue'
-
 import ModelPago from 'src/components/ModelPago.vue'
+import PagoBoletaPDF from 'src/components/PagoBoletaPDF.vue'
 
-import PagoBoletaPDF from 'src/components/PagoBoletaPDF.vue' // Solo importa el componente
-
+import { redondearConDecimales } from "src/utils/ConvertMoney";
 
 const $q = useQuasar()
 
-// Columnas de la tabla
+// Columnas actualizadas con documento combinado y auditoría
 const columns = [
   { name: 'id', label: 'ID', align: 'left', field: row => row.id, sortable: true, style: 'width: 50px' },
-  { name: 'boleta_id', label: 'ID Boleta', align: 'left', field: row => row.boleta_id, sortable: true,  style: 'font-weight: bold'},
-  // { name: 'nombre_completo', label: 'Nombre', align: 'left', field: 'nombre_completo', sortable: true class:'wrap-nombre' },
-  { name: 'nombre_completo', label: 'Nombre', align: 'left', field: row => row.nombre_completo,
-    sortable: true, style: 'max-width: 150px; white-space: normal; word-break: break-word;', // <-- Cambia aquí
-    classes: 'wrap-nombre'  },
-  { name: 'tipo_documento', label: 'Tipo Doc', align: 'left', field: 'tipo_documento', sortable: true, style: 'max-width: 10px; white-space: normal; word-break: break-word;' },
-  { name: 'num_documento', label: 'N° Doc', align: 'left', field: 'num_documento', sortable: true },
+  { name: 'boleta_id', label: 'ID Boleta', align: 'left', field: row => row.boleta_id, sortable: true, style: 'font-weight: bold'},
+  { name: 'nombre_completo', label: 'Nombre', align: 'left', field: row => row.nombre_completo, sortable: true, style: 'max-width: 150px; white-space: normal; word-break: break-word;', classes: 'wrap-nombre' },
+  { name: 'documento', label: 'Documento', align: 'left' }, // Columna combinada para tipo y número
   { name: 'total', label: 'Total', align: 'right', field: 'total', sortable: true },
   { name: 'solicitud', label: 'Solicitud', align: 'left' },
-  { name: 'user', label: 'Usuario', align: 'left' },
+  { name: 'auditoria', label: 'Auditoría', align: 'left' }, // Columna combinada para creado y actualizado
   { name: 'tupas', label: 'Concepto / Denominación', align: 'left' },
-  { name: 'estado', label: 'Estado', align: 'left', field: row => row.estado, sortable: true }, // <-- NUEVA COLUMNA
+  { name: 'estado', label: 'Estado', align: 'left', field: row => row.estado, sortable: true },
   { name: 'actions', label: 'Acciones', align: 'center', style: 'min-width: 180px' }
 ]
 
-// Variables reactivas
+const cargandoPago = ref(false)
 const rows = ref([])
 const loading = ref(false)
 const filter = ref('')
@@ -364,16 +266,23 @@ const pagination = ref({
   rowsNumber: 10,
 })
 
-
-
-// Para mostrar la boleta PDF
-const showBoleta = ref(false)
-const pagoSeleccionado = ref(null)
 const showPagoModal = ref(false)
 const pagoItems = ref([])
 const pagoTotal = ref(0)
+const pagoSeleccionado = ref(null)
 
-// Carga inicial de datos
+// Función para formatear fecha
+function formatFecha(fecha) {
+  if (!fecha) return '-';
+  return new Date(fecha).toLocaleDateString('es-PE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
 onMounted(() => {
   loadInitialData()
 })
@@ -390,36 +299,12 @@ const loadInitialData = async () => {
   }
 }
 
-// Petición de datos de la tabla
-// const onRequest = async (props) => {
-//   loading.value = true
-//   try {
-//     pagination.value = props.pagination
-//     const pagos = await PagoService.getData()
-//     rows.value = pagos
-//     pagination.value.rowsNumber = pagos.length
-//   } catch (error) {
-//     $q.notify({
-//       type: 'negative',
-//       message: 'Error al cargar datos',
-//       caption: error.message,
-//       position: 'top'
-//     })
-//     rows.value = []
-//     pagination.value.rowsNumber = 0
-//   } finally {
-//     loading.value = false
-//   }
-// }
-
 const onRequest = async (props) => {
   loading.value = true
   try {
-    // Extrae los parámetros de paginación y filtro
     const { page, rowsPerPage, sortBy, descending } = props.pagination
     const filterValue = props.filter
 
-    // Llama al backend con los parámetros correctos
     const response = await PagoService.getData({
       page,
       rowsPerPage,
@@ -428,23 +313,6 @@ const onRequest = async (props) => {
       filter: filterValue
     })
 
-    // Si tu backend retorna un objeto paginado tipo Laravel:
-    // {
-    //   current_page: 1,
-    //   data: [...],
-    //   per_page: 7,
-    //   total: 100,
-    //   ...
-    // }
-    // rows.value = response.data
-    // pagination.value = {
-    //   ...pagination.value,
-    //   page: response.current_page,
-    //   rowsPerPage: response.per_page,
-    //   rowsNumber: response.total,
-    //   sortBy,
-    //   descending
-    // }
     rows.value = response.data
     pagination.value = {
       ...pagination.value,
@@ -467,43 +335,7 @@ const onRequest = async (props) => {
     loading.value = false
   }
 }
-// ...anular..
-const confirmarAnular = (pago) => {
-  $q.dialog({
-    title: 'Confirmar Anulación',
-    message: '¿Está seguro de anular este recibo? Esta acción no se puede deshacer.',
-    cancel: true,
-    persistent: true
-  }).onOk(() => {
-    anularPago(pago.id)
-  })
-}
 
-const anularPago = async (id) => {
-  try {
-    loading.value = true
-    await PagoService.anular(id)
-    $q.notify({
-      type: 'positive',
-      message: 'Pago anulado correctamente',
-      position: 'top-right'
-    })
-    await onRequest({
-      pagination: pagination.value,
-      filter: filter.value
-    })
-  } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Error al anular pago',
-      caption: error.message,
-      position: 'top-right'
-    })
-  } finally {
-    loading.value = false
-  }
-}
-// ...existing code...
 // Abrir formulario de nuevo pago
 const openForm = () => {
   formPagos.value = true
@@ -580,7 +412,6 @@ function generarBoletaPDF(pago) {
     $q.notify({ type: 'warning', message: 'Este pago no tiene detalles para mostrar.' })
     return
   }
-  // Llama al método expuesto usando la ref
   boletaPdfRef.value.generarPDFPago(pago)
 }
 
@@ -591,55 +422,29 @@ function pagarPago(pago) {
     cantidad: tupa.pivot?.cantidad || 1,
     subtotal: tupa.pivot?.Subtotal || 0
   }))
-  pagoTotal.value = Number(pago.total) // <-- Asegura que sea Number
+  pagoTotal.value = Number(pago.total)
   pagoSeleccionado.value = pago
   showPagoModal.value = true
 }
 
-
-// async function onConfirmPago({ amount, change }) {
-//   if (!pagoSeleccionado.value) return;
-
-//   try {
-//     const response = await PagoService.toggleEstado(pagoSeleccionado.value.id);
-
-//     $q.notify({
-//       type: 'positive',
-//       message: `Pago registrado. Boleta #${response.boleta_id}`,
-//       caption: `Monto: S/ ${amount} | Vuelto: S/ ${change}`,
-//       position: 'top',
-//       timeout: 3000
-//     });
-
-//     await onRequest({
-//       pagination: pagination.value,
-//       filter: filter.value
-//     });
-
-//   } catch (error) {
-//     $q.notify({
-//       type: 'negative',
-//       message: 'Error al procesar el pago',
-//       caption: error.message,
-//       position: 'top',
-//       timeout: 5000
-//     });
-//   } finally {
-//     showPagoModal.value = false;
-//   }
-// }
-
-
 async function onConfirmPago({ amount, change }) {
   if (!pagoSeleccionado.value) return;
 
+  cargandoPago.value = true;
+
   try {
-    const response = await PagoService.toggleEstado(pagoSeleccionado.value.id);
+    const montoRedondeado = redondearConDecimales(amount);
+    const vueltoRedondeado = redondearConDecimales(change);
+
+    const response = await PagoService.toggleEstado(pagoSeleccionado.value.id, {
+      monto_pagado: montoRedondeado,
+      vuelto: vueltoRedondeado
+    });
 
     $q.notify({
       type: 'positive',
       message: `Pago registrado. Boleta #${response.boleta_id}`,
-      caption: `Monto: S/ ${amount} | Vuelto: S/ ${change}`,
+      caption: `Monto: S/ ${montoRedondeado} | Vuelto: S/ ${vueltoRedondeado}`,
       position: 'top',
       timeout: 3000
     });
@@ -658,11 +463,46 @@ async function onConfirmPago({ amount, change }) {
       timeout: 5000
     });
   } finally {
+    cargandoPago.value = false;
     showPagoModal.value = false;
   }
 }
 
+const confirmarAnular = (pago) => {
+  $q.dialog({
+    title: 'Confirmar Anulación',
+    message: '¿Está seguro de anular este recibo? Esta acción no se puede deshacer.',
+    cancel: true,
+    persistent: true
+  }).onOk(() => {
+    anularPago(pago.id)
+  })
+}
 
+const anularPago = async (id) => {
+  try {
+    loading.value = true
+    await PagoService.anular(id)
+    $q.notify({
+      type: 'positive',
+      message: 'Pago anulado correctamente',
+      position: 'top-right'
+    })
+    await onRequest({
+      pagination: pagination.value,
+      filter: filter.value
+    })
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Error al anular pago',
+      caption: error.message,
+      position: 'top-right'
+    })
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -673,10 +513,9 @@ async function onConfirmPago({ amount, change }) {
   width: 100%;
   max-width: 80vw;
 }
-/* .wrap-nombre {
+.wrap-nombre {
   white-space: normal;
   word-break: break-word;
   max-width: 200px;
-} */
-
+}
 </style>

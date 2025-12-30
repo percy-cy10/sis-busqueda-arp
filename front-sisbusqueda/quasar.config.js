@@ -21,6 +21,22 @@ export default configure(function (/* ctx */) {
       errors: true,
     },
 
+
+    build: {
+      target: {
+        browser: ["es2019", "edge88", "firefox78", "chrome87", "safari13.1"],
+        node: "node16",
+      },
+      vueRouterMode: "history",
+      extendViteConf(viteConf) {
+        viteConf.resolve = viteConf.resolve || {};
+        viteConf.resolve.alias = {
+          ...(viteConf.resolve.alias || {}),
+          "@": path.resolve(__dirname, "src"),
+        };
+      },
+    },
+
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
 
@@ -68,7 +84,6 @@ export default configure(function (/* ctx */) {
       // minify: false,
       // polyfillModulePreload: true,
       // distDir
-
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 

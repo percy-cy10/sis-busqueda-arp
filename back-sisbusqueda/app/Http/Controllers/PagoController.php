@@ -13,84 +13,64 @@ class PagoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function index(Request $request)
-    // {
-    //     $query = Pago::with(['tupas', 'user', 'solicitud']);
 
-    //     // Búsqueda por filtro general (id, boleta_id, nombre, etc)
-    //     if ($request->filled('filter')) {
-    //         $filter = $request->input('filter');
-    //         $query->where(function($q) use ($filter) {
-    //             $q->orWhere('id', 'like', "%$filter%")
-    //             ->orWhere('boleta_id', 'like', "%$filter%")
-    //             ->orWhere('nombre_completo', 'like', "%$filter%")
-    //             ->orWhere('num_documento', 'like', "%$filter%");
-    //         });
-    //     }
-    //     if (is_numeric($filter)) {
-    //         $q->orWhere('id', $filter);
-    //     }
 
-    //     // Ordenamiento
-    //     // $sortBy = $request->input('sortBy', 'id');
-    //     // $descending = $request->boolean('descending', true); // Por defecto descendente
-    //     // $direction = $descending ? 'desc' : 'asc';
-    //     // $query->orderBy($sortBy, $direction);
-    //     $sortBy = $request->input('sortBy', 'id');
-    //     if (!in_array($sortBy, ['id', 'boleta_id', 'nombre_completo', 'num_documento', 'total', 'estado'])) {
-    //         $sortBy = 'id';
-    //     }
-    //     $descending = $request->boolean('descending', true);
-    //     $direction = $descending ? 'desc' : 'asc';
-    //     $query->orderBy($sortBy, $direction);
-
-    //     // Paginación
-    //     $perPage = $request->input('rowsPerPage', 7);
-    //     $paginated = $query->paginate($perPage);
-
-    //     // return response()->json($paginated);
-    //     return response()->json([
-    //         'data' => $paginated->items(),
-    //         'total' => $paginated->total(),
-    //         'current_page' => $paginated->currentPage(),
-    //         'per_page' => $paginated->perPage(),
-    //     ]);
-    // }
 
     public function index(Request $request)
     {
-        $query = Pago::with(['tupas', 'user', 'solicitud']);
+        // Cargar las relaciones necesarias incluyendo creador y actualizador
+        $query = Pago::with(['tupas', 'user', 'solicitud', 'creador', 'actualizador']);
 
-
-        // FILTRO POR USUARIO AUTENTICADO
+        // FILTRO POR USUARIO AUTENTICADO (para reportes)
         if ($request->has('solo_mios') && $request->boolean('solo_mios')) {
             $query->where('user_id', auth()->id());
         }
 
-        // Búsqueda por filtro general (id, boleta_id, nombre, etc)
+        // NUEVO FILTRO: Solo pagos actualizados por el usuario logueado (para reportes)
+        if ($request->has('solo_actualizados_por_mi') && $request->boolean('solo_actualizados_por_mi')) {
+            $user = auth()->user();
+
+            // Si es administrador (user_id = 1), ver todos los pagos
+            if ($user->id != 1) {
+                // Para usuarios no administradores, solo ver los pagos que ellos actualizaron
+                $query->where('updated_by', $user->id);
+            }
+            // Si es administrador, no aplica filtro - ve todos los pagos
+        }
+
+        // NUEVO FILTRO: Por usuario específico (para administrador en reportes)
+        if ($request->filled('user_id')) {
+            $query->where('updated_by', $request->user_id);
+        }
+
+
+        // Búsqueda por filtro general
         if ($request->filled('filter')) {
             $filter = $request->input('filter');
             $query->where(function($q) use ($filter) {
                 if (is_numeric($filter)) {
-                    $q->orWhere('id', $filter);
+                    $q->orWhere('id', $filter)
+                      ->orWhere('boleta_id', $filter);
                 }
-                $q->orWhere('boleta_id', 'like', "%$filter%")
-                ->orWhere('nombre_completo', 'like', "%$filter%")
-                ->orWhere('solicitud_id', 'like', "%$filter%")
-                ->orWhere('num_documento', 'like', "%$filter%");
+                $q->orWhere('nombre_completo', 'like', "%$filter%")
+                  ->orWhere('solicitud_id', 'like', "%$filter%")
+                  ->orWhere('num_documento', 'like', "%$filter%")
+                    ->orWhereHas('solicitud', function ($sq) use ($filter) {
+                        $sq->where('solicitud_code', 'like', "%$filter%");
+                    });
             });
         }
 
         // Ordenamiento seguro
         $sortBy = $request->input('sortBy', 'id');
-        if (!in_array($sortBy, ['id', 'boleta_id', 'nombre_completo', 'num_documento', 'total', 'estado'])) {
+        if (!in_array($sortBy, ['id', 'boleta_id', 'nombre_completo', 'num_documento', 'total', 'estado', 'created_at', 'updated_at'])) {
             $sortBy = 'id';
         }
         $descending = $request->boolean('descending', true);
-        $direction = $descending ? 'asc' : 'desc';
+        $direction = $descending ? 'desc' : 'asc';
         $query->orderBy($sortBy, $direction);
 
-        // --- CAMBIO CLAVE: Si rowsPerPage = -1, devuelve todo ---
+        // Si rowsPerPage = -1, devuelve todo
         $perPage = $request->input('rowsPerPage', 7);
         if ($perPage == -1) {
             $data = $query->get();
@@ -103,7 +83,6 @@ class PagoController extends Controller
         }
 
         // Paginación
-        $perPage = $request->input('rowsPerPage', 7);
         $paginated = $query->paginate($perPage);
 
         return response()->json([
@@ -117,48 +96,7 @@ class PagoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    // public function store(StorePagoRequest $request)
-    // {
-    //     // Actualiza la solicitud relacionada
-    //     Solicitud::find($request->solicitud_id)->update([
-    //         "estado" => "Finalizado",
-    //         'updated_at'=> now(),
-    //         'area_id' => 4,
-    //     ]);
 
-    //     // Si quieres forzar el user_id del usuario autenticado (opcional)
-    //     $userId = auth()->id();
-
-
-    //     // Crea el pago
-    //     $pago = Pago::create([
-    //         'solicitud_id'    => $request->solicitud_id,
-    //         'tipo_documento'  => $request->tipo_documento,
-    //         'num_documento'   => $request->num_documento,
-    //         'nombre_completo' => $request->nombre_completo,
-    //         'total'           => $request->total,
-    //         'user_id'         => $userId,
-    //         'estado'          => $request->has('estado') ? $request->estado : 1,
-    //         'created_at'      => now(),
-    //         'updated_at'      => now(),
-    //     ]);
-
-    //     // Inserta en la tabla pivote pagos_tupa
-    //     if ($request->has('tupas') && is_array($request->tupas)) {
-    //         foreach ($request->tupas as $tupa) {
-    //             \DB::table('pagos_tupa')->insert([
-    //                 'pagos_id' => $pago->id,
-    //                 'tupa_id' => $tupa['tupa_id'],
-    //                 'cantidad' => $tupa['cantidad'],
-    //                 'Subtotal' => $tupa['Subtotal'],
-    //                 'created_at' => now(),
-    //                 'updated_at' => now(),
-    //             ]);
-    //         }
-    //     }
-
-    //     return response($pago, 201);
-    // }
 
 
     public function store(StorePagoRequest $request)
@@ -166,18 +104,6 @@ class PagoController extends Controller
         // Solo obtenemos el user_id autenticado
         $userId = auth()->id();
 
-        // Crea el pago solo con el ID de la solicitud y los datos enviados
-        // $pago = Pago::create([
-        //     'solicitud_id'    => $request->solicitud_id,
-        //     'tipo_documento'  => $request->tipo_documento,
-        //     'num_documento'   => $request->num_documento,
-        //     'nombre_completo' => $request->nombre_completo,
-        //     'total'           => $request->total,
-        //     'user_id'         => $userId,
-        //     'estado'          => $request->has('estado') ? $request->estado : 1,
-        //     'created_at'      => now(),
-        //     'updated_at'      => now(),
-        // ]);
 
         $data = [
             'solicitud_id'    => $request->solicitud_id,
@@ -186,17 +112,17 @@ class PagoController extends Controller
             'nombre_completo' => $request->nombre_completo,
             'total'           => $request->total,
             'user_id'         => $userId,
+            'created_by' => $userId,
+            'updated_by' => $userId,
             'estado'          => $request->has('estado') ? $request->estado : 1,
+            'monto_pagado'    => $request->monto_pagado,     // nuevo
+            'vuelto'          => $request->vuelto,           // nuevo
+            'forma_pago_id'   => $request->forma_pago_id,    // nuevo
+            'condicion_pago_id' => $request->condicion_pago_id, // nuevo
             'created_at'      => now(),
             'updated_at'      => now(),
         ];
 
-        // // Solo asigna boleta_id si viene desde SolicitudesForm
-        // if ($request->has('desde_solicitud') && $request->desde_solicitud) {
-        //     $ultimoBoletaId = Pago::whereNotNull('boleta_id')->max('boleta_id');
-        //     $nuevoBoletaId = $ultimoBoletaId ? $ultimoBoletaId + 1 : 1;
-        //     $data['boleta_id'] = $nuevoBoletaId;
-        // }
 
         // $pago = Pago::create($data);
         $desdeSolicitud = $request->has('desde_solicitud') && $request->desde_solicitud;
@@ -260,16 +186,23 @@ class PagoController extends Controller
      */
     public function update(Request $request, Pago $pago)
     {
-        // Actualiza los campos principales
-        $pago->update($request->only([
+
+        // Actualiza los campos principales incluyendo updated_by
+        $pago->update(array_merge($request->only([
             'tipo_documento',
             'num_documento',
             'nombre_completo',
             'total',
-            'user_id'
+            'user_id',
+            'monto_pagado',      // nuevo
+            'vuelto',           // nuevo
+            'forma_pago_id',    // nuevo
+            'condicion_pago_id' // nuevo
+        ]), [
+            'updated_by' => auth()->id() // Actualizar con el usuario logueado
         ]));
 
-        // --- ACTUALIZAR LA TABLA PIVOTE pagos_tupa ---
+
         // 1. Eliminar las relaciones actuales
         \DB::table('pagos_tupa')->where('pagos_id', $pago->id)->delete();
 
@@ -299,28 +232,18 @@ class PagoController extends Controller
         return response()->json(['message' => 'Pago eliminado']);
     }
 
-    // public function toggleEstado(Pago $pago)
-    // {
-    //     try {
-    //         // Alterna entre 1 (pendiente) y 0 (pagado)
-    //         $nuevoEstado = $pago->estado == 1 ? 0 : 1;
-    //         $pago->updateQuietly(['estado' => $nuevoEstado]);
 
-    //         return response()->json([
-    //             'message' => 'Estado de pago actualizado correctamente',
-    //             'pago' => $pago,
-    //         ], 200);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'message' => 'Error al actualizar el estado del pago',
-    //             'error' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
 
-    public function toggleEstado(Pago $pago)
+
+    public function toggleEstado(Request $request, Pago $pago)
     {
         try {
+            \Log::info('ToggleEstado iniciado', [
+                'pago_id' => $pago->id,
+                'estado_actual' => $pago->estado,
+                'request_data' => $request->all()
+            ]);
+
             DB::beginTransaction();
 
             if ($pago->estado == 1) { // Cambiar de pendiente a pagado
@@ -328,36 +251,63 @@ class PagoController extends Controller
                 $ultimoBoletaId = Pago::whereNotNull('boleta_id')->max('boleta_id');
                 $nuevoBoletaId = $ultimoBoletaId ? $ultimoBoletaId + 1 : 1;
 
-                $pago->update([
+                $updateData = [
                     'estado' => 0,
-                    'boleta_id' => $nuevoBoletaId
-                ]);
+                    'boleta_id' => $nuevoBoletaId,
+                    'updated_by' => auth()->id()
+                ];
+
+                // CAPTURAR MONTO PAGADO Y VUELTO DEL REQUEST
+                if ($request->has('monto_pagado')) {
+                    $updateData['monto_pagado'] = $request->monto_pagado;
+                }
+                if ($request->has('vuelto')) {
+                    $updateData['vuelto'] = $request->vuelto;
+                }
+
+                \Log::info('Actualizando pago', $updateData);
+
+                $pago->update($updateData);
 
                 // ACTUALIZAR LA SOLICITUD RELACIONADA
-                $solicitud = Solicitud::find($pago->solicitud_id);
-                if ($solicitud) {
-                    $solicitud->estado = 'Buscando';
-                    $solicitud->area_id = 2;
-                    $solicitud->pago_busqueda = $pago->id; // Guarda el id de la boleta/pago
-                    $solicitud->save();
+                if ($pago->solicitud_id) {
+                    $solicitud = Solicitud::find($pago->solicitud_id);
+                    if ($solicitud) {
+                        $solicitud->estado = 'Buscando';
+                        $solicitud->area_id = 2;
+                        $solicitud->pago_busqueda = $pago->id;
+                        $solicitud->save();
+                        \Log::info('Solicitud actualizada', ['solicitud_id' => $solicitud->id]);
+                    }
                 }
-                
+
             } else { // Cambiar de pagado a pendiente
                 $pago->update([
                     'estado' => 1,
-                    'boleta_id' => null
+                    'boleta_id' => null,
+                    'monto_pagado' => null,
+                    'vuelto' => null,
+                    'updated_by' => auth()->id()
                 ]);
             }
 
             DB::commit();
 
+            \Log::info('ToggleEstado completado exitosamente', ['pago_id' => $pago->id]);
+
             return response()->json([
                 'message' => 'Estado de pago actualizado correctamente',
                 'pago' => $pago,
-                'boleta_id' => $pago->boleta_id // Devuelve el nuevo boleta_id
+                'boleta_id' => $pago->boleta_id
             ], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error en toggleEstado: ' . $e->getMessage(), [
+                'pago_id' => $pago->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'message' => 'Error al actualizar el estado del pago',
                 'error' => $e->getMessage(),
@@ -372,7 +322,7 @@ class PagoController extends Controller
             if (!$pago) {
                 return response()->json(['message' => 'Pago no encontrado'], 404);
             }
-            $pago->update(['estado' => null]);
+            $pago->update(['estado' => null, 'updated_by' => auth()->id() ]);
             return response()->json(['pago' => $pago], 200);
         } catch (\Exception $e) {
             \Log::error('Error al anular pago: ' . $e->getMessage());

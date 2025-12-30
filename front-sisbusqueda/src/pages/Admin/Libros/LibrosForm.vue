@@ -117,8 +117,11 @@ const notarios = ref([]);
 // Carga inicial de datos
 onMounted(async () => {
   try {
-    const response = await NotarioService.getData({ params: {} });
-    notarios.value = response.data;
+    // const response = await NotarioService.getData({ params: {} });
+    // notarios.value = response.data;
+    const notariosList = await NotarioService.getAll();
+    notarios.value = notariosList;
+
 
     if (props.edit) {
       const libro = await LibroService.get(props.id);

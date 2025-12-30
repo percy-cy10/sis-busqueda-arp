@@ -81,7 +81,15 @@
             {{ col.value }}
           </q-td> -->
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="['favorecidos', 'otorgantes'].includes(col.name)" v-html="col.value"></div>
+            <div
+              v-if="
+                ['favorecidos', 'otorgantes', 'bien', 'subserie'].includes(
+                  col.name
+                )
+              "
+              v-html="col.value"
+              class="col-ancho"
+            ></div>
             <div v-else>{{ col.value }}</div>
           </q-td>
           <q-td auto-width>
@@ -110,7 +118,6 @@
 </template>
 
 <script setup>
-
 import { ref, onMounted } from "vue";
 import EscrituraService from "src/services/EscrituraService";
 import { useQuasar } from "quasar";
@@ -153,7 +160,7 @@ const columns = [
     label: "Folio Inicial",
     align: "center",
     field: (row) => row.cod_folioInicial,
-    sortable: true
+    sortable: true,
   },
   // {
   //   name: "cod_folioFinal",
@@ -196,23 +203,23 @@ const columns = [
     name: "favorecidos",
     label: "Favorecidos",
     align: "center",
-    field: row => {
-      const list = row.favorecidos.map(f => f.nombre_completo);
-      return list.length === 1 ? list[0] : list.join('<br>');
+    field: (row) => {
+      const list = row.favorecidos.map((f) => f.nombre_completo);
+      return list.length === 1 ? list[0] : list.join("<br>");
     },
     sortable: false,
-    format: val => val,
+    format: (val) => val,
   },
   {
     name: "otorgantes",
     label: "Otorgantes",
     align: "center",
-    field: row => {
-      const list = row.otorgantes.map(o => o.nombre_completo);
-      return list.length === 1 ? list[0] : list.join('<br>');
+    field: (row) => {
+      const list = row.otorgantes.map((o) => o.nombre_completo);
+      return list.length === 1 ? list[0] : list.join("<br>");
     },
     sortable: false,
-    format: val => val,
+    format: (val) => val,
   },
 
   {
@@ -230,8 +237,7 @@ const columns = [
   //   sortable: true,
   // },
 
-
-    // NUEVO (Seguro) -------------------------------------------------------------
+  // NUEVO (Seguro) -------------------------------------------------------------
   // {
   //   name: "subserie",
   //   label: "Subserie",
@@ -244,15 +250,15 @@ const columns = [
     label: "Subserie",
     align: "center",
     field: (row) => row.sub_serie?.nombre || "Sin especificar", // Operador opcional
-    sortable: true
+    sortable: true,
   },
 
   {
     name: "libro",
     label: "Libro",
-    field: (row) => row.libro?.protocolo || "Sin libro",    // Fallback claro
-    sortable: true
-  }
+    field: (row) => row.libro?.protocolo || "Sin libro", // Fallback claro
+    sortable: true,
+  },
 ];
 
 // Variables reactivas
@@ -270,67 +276,53 @@ const pagination = ref({
   descending: false,
   page: 1,
   rowsPerPage: 7,
-  rowsNumber: 10,
+  rowsNumber: 0,
+});
+
+const filtros = ref({
+  otorgante: "",
+  favorecido: "",
+  notario: "",
+  bien: "",
+  fecha: "",
 });
 
 // Función que se ejecuta en cada request de la tabla
 
-
-// NUEVO (Corregido):
-async function onRequest(props) {
-  const { page, rowsPerPage, sortBy, descending } = props.pagination;
-  const currentFilter = props.filter;
+const onRequest = async (props) => {
   loading.value = true;
+  const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
   try {
     const response = await EscrituraService.getData({
-      params: {
-        page: page,
-        perPage: rowsPerPage, // Nombre estándar
-        search: currentFilter,
-        sortBy: descending ? `-${sortBy}` : sortBy
-      }
+      page,
+      per_page: rowsPerPage,
+      sortBy,
+      sortOrder: descending ? "desc" : "asc",
+      search: filter.value,
+      ...filtros.value,
     });
 
-    // Manejo de diferentes estructuras de respuesta
-    const datos = response.data?.data?.rows ||
-                response.data?.rows ||
-                response.data ||
-                [];
+    const datos = Array.isArray(response.data)
+      ? response.data
+      : response.data?.data || [];
 
-    // Actualización completa de paginación
+    rows.value = datos;
+
     pagination.value = {
       ...props.pagination,
-      rowsNumber: response.data?.total ||
-      response.data?.data?.total ||
-      datos.length,
-      page: page,
-      rowsPerPage: rowsPerPage,
-      sortBy: sortBy,
-      descending: descending
+      rowsNumber: response.total || 0, // 🔹 usa el total que devuelve Laravel
+      page: response.current_page || page, // 🔹 página actual
+      rowsPerPage,
+      sortBy,
+      descending,
     };
-
-    // Asignación segura de datos
-    rows.value = datos.map(item => ({
-      ...item,
-      subserie: item.sub_serie || { nombre: 'N/A' },
-      libro: item.libro || { protocolo: 'N/A' }
-    }));
-
   } catch (error) {
-    console.error("Error cargando datos:", error);
-    $q.notify({
-      type: "negative",
-      message: error.response?.data?.message || "Error cargando escrituras",
-      position: "top-right",
-      timeout: 5000
-    });
+    console.error("Error al obtener datos:", error);
   } finally {
     loading.value = false;
   }
-}
-
-
+};
 
 onMounted(() => {
   tableRef.value.requestServerInteraction();
@@ -350,7 +342,7 @@ const save = () => {
 };
 
 async function editar(id) {
-  title.value = 'Editar Escritura';
+  title.value = "Editar Escritura";
 
   formEscritura.value = true;
   edit.value = true;
@@ -359,7 +351,7 @@ async function editar(id) {
   try {
     const response = await EscrituraService.get(id);
     // Validar la estructura de la respuesta
-    if (!response ) {
+    if (!response) {
       throw new Error("Respuesta de API inválida");
     }
 
@@ -376,19 +368,18 @@ async function editar(id) {
       dia: data.dia ? Number(data.dia) : 1,
       subserie_id: data.subserie_id ? Number(data.subserie_id) : null,
       libro_id: data.libro_id ? Number(data.libro_id) : null,
-      favorecidos: response.favorecidos.map(f => f.id), // Asegurar que sean IDs
-      otorgantes: response.otorgantes.map(o => o.id),  // Asegurar que sean IDs
+      favorecidos: response.favorecidos.map((f) => f.id), // Asegurar que sean IDs
+      otorgantes: response.otorgantes.map((o) => o.id), // Asegurar que sean IDs
     });
   } catch (error) {
     console.error("Error cargando escritura:", error);
     $q.notify({
       type: "negative",
       message: "Datos corruptos en la respuesta",
-      position: "top-right"
+      position: "top-right",
     });
   }
 }
-
 
 async function eliminar(id) {
   $q.dialog({
@@ -417,6 +408,17 @@ async function eliminar(id) {
     }
   });
 }
-
-
 </script>
+
+<style scoped>
+.col-ancho {
+  max-width: 250px; /* 🔹 ancho fijo de la celda */
+  white-space: normal; /* permite saltos de línea */
+  word-wrap: break-word; /* corta palabras largas */
+  overflow-wrap: break-word;
+}
+
+.justificado {
+  text-align: justify; /* 🔹 para los notarios */
+}
+</style>

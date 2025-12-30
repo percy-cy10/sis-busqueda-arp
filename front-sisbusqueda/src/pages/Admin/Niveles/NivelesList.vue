@@ -64,8 +64,23 @@
             {{ col.value }}
           </q-td>
           <q-td auto-width>
-            <q-btn size="sm" outline color="green" round icon="edit" class="q-mr-xs" @click="editar(props.row)" />
-            <q-btn size="sm" outline color="red" round icon="delete" @click="eliminar(props.row.id)" />
+            <q-btn
+              size="sm"
+              outline
+              color="green"
+              round
+              icon="edit"
+              class="q-mr-xs"
+              @click="editar(props.row)"
+            />
+            <q-btn
+              size="sm"
+              outline
+              color="red"
+              round
+              icon="delete"
+              @click="eliminar(props.row.id)"
+            />
           </q-td>
         </q-tr>
       </template>
@@ -179,8 +194,20 @@ import NivelesForm from "./NivelesForm.vue";
 
 const $q = useQuasar();
 const columns = [
-  { name: "id", label: "Id", align: "center", field: (row) => row.id, sortable: true },
-  { name: "nombre", label: "Nombre", align: "center", field: (row) => row.nombre, sortable: true },
+  {
+    name: "id",
+    label: "Id",
+    align: "center",
+    field: (row) => row.id,
+    sortable: true,
+  },
+  {
+    name: "nombre",
+    label: "Nombre",
+    align: "center",
+    field: (row) => row.nombre,
+    sortable: true,
+  },
 ];
 const tableRef = ref();
 const formDialog = ref(false);
@@ -234,7 +261,6 @@ function nuevo() {
   });
 }
 
-
 async function editar(row) {
   try {
     formTitle.value = "Editar Nivel";
@@ -248,7 +274,7 @@ async function editar(row) {
 
     if (nivelesFormRef.value) {
       nivelesFormRef.value.setValue({
-        nombre: data.nombre
+        nombre: data.nombre,
       });
     }
   } catch (error) {
@@ -256,7 +282,7 @@ async function editar(row) {
     $q.notify({
       type: "negative",
       message: "Error al cargar el nivel",
-      position: "top-right"
+      position: "top-right",
     });
   }
 }
@@ -288,14 +314,14 @@ async function save() {
       type: "positive",
       message: "Guardado con éxito",
       position: "top-right",
-      timeout: 2000
+      timeout: 2000,
     });
   } catch (error) {
     console.error("Error saving:", error);
     $q.notify({
       type: "negative",
       message: "Error al guardar",
-      position: "top-right"
+      position: "top-right",
     });
   }
 }

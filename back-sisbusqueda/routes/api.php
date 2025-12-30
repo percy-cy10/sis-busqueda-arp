@@ -85,15 +85,20 @@ Route::apiResource('/areas', AreaController::class)->middleware([HandlePrecognit
 
 Route::apiResource('/libros', LibroController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::patch('/libros/{libro}/toggle-estado', [LibroController::class, 'toggleEstado']);
+Route::get('/escrituras/buscar', [EscrituraController::class, 'buscar']);
 Route::apiResource('/escrituras', EscrituraController::class)->middleware([HandlePrecognitiveRequests::class]);
+
+
 Route::apiResource('/otorgantes', OtorganteController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/favorecidos', FavorecidoController::class)->middleware([HandlePrecognitiveRequests::class]);
 // Route::apiResource('favorecidos', FavorecidoController::class);
 
 
 Route::apiResource('/solicitantes', SolicitanteController::class)->middleware([HandlePrecognitiveRequests::class]);
-Route::get('/solicitantes/dni/{dni}', [SolicitanteController::class, 'getSolicitanteDni']);
+// Route::get('/solicitantes/dni/{dni}', [SolicitanteController::class, 'getSolicitanteDni']);
 Route::get('/solicitantes/solicitud_dni/{dni}', [SolicitanteController::class, 'solicitudesPorDni']);
+Route::get('/solicitante/dni/{dni}', [SolicitanteController::class, 'getSolicitanteDni']);
+Route::get('/solicitante/ruc/{ruc}', [SolicitanteController::class, 'getSolicitanteRuc']);
 
 
 Route::apiResource('/tupas', TupaController::class)->middleware([HandlePrecognitiveRequests::class]);
@@ -101,7 +106,7 @@ Route::apiResource('/solicitudes', SolicitudController::class)->middleware([Hand
 Route::apiResource('/registro_busquedas', RegistroBusquedaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/registro_verificaciones', RegistroVerificacionController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/pagos', PagoController::class)->middleware([HandlePrecognitiveRequests::class]);
-Route::patch('pagos/{pago}/toggle-estado', [PagoController::class, 'toggleEstado']);
+Route::put('pagos/{pago}/toggle-estado', [PagoController::class, 'toggleEstado']);
 Route::put('pagos/{pago}/anular', [PagoController::class, 'anular']);
 
 //Route::apiResource('/niveles', NivelController::class)->middleware([HandlePrecognitiveRequests::class]);

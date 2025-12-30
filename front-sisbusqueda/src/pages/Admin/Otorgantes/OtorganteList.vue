@@ -87,8 +87,20 @@ import OtorganteForm from "./OtorganteForm.vue";
 const $q = useQuasar();
 const columns = [
   { name: "id", label: "ID", field: "id", align: "center", sortable: true },
-  { name: "nombre_completo", label: "Nombre Completo", field: "nombre_completo", align: "center", sortable: true },
-  { name: "tipo", label: "Tipo", field: "tipo", align: "center", sortable: true },
+  {
+    name: "nombre_completo",
+    label: "Nombre Completo",
+    field: "nombre_completo",
+    align: "center",
+    sortable: true,
+  },
+  {
+    name: "tipo",
+    label: "Tipo",
+    field: "tipo",
+    align: "center",
+    sortable: true,
+  },
   { name: "actions", label: "Acciones", align: "center" },
 ];
 
@@ -109,24 +121,59 @@ const selectedId = ref(null);
 const formTitle = ref("Nuevo otorgante");
 const otorganteFormRef = ref();
 
+// const onRequest = async (props) => {
+//   loading.value = true;
+//   try {
+//     const { page, rowsPerPage, sortBy, descending } = props.pagination;
+//     const order_by = descending ? `-${sortBy}` : sortBy;
+//     const { data, total } = await OtorganteService.getData({
+//       params: {
+//         page,
+//         rowsPerPage,
+//         search: filter.value,
+//         order_by,
+//       },
+//     });
+
+//     rows.value = data;
+//     pagination.value.rowsNumber = total;
+//     pagination.value.page = page;
+//     pagination.value.rowsPerPage = rowsPerPage;
+//     pagination.value.sortBy = sortBy;
+//     pagination.value.descending = descending;
+//   } catch (error) {
+//     $q.notify({ type: "negative", message: "Error cargando datos" });
+//   } finally {
+//     loading.value = false;
+//   }
+// };
+
 const onRequest = async (props) => {
   loading.value = true;
   try {
     const { page, rowsPerPage, sortBy, descending } = props.pagination;
     const order_by = descending ? `-${sortBy}` : sortBy;
-    const { data, total } = await OtorganteService.getData({
-      params: {
-        page,
-        rowsPerPage,
-        search: filter.value,
-        order_by,
-      },
+
+    // const response = await OtorganteService.getData({
+    //   page,
+    //   per_page: rowsPerPage,   // 👈 backend espera per_page, no rowsPerPage
+    //   search: filter.value,
+    //   order_by,
+    // });
+
+    const response = await OtorganteService.getData({
+      page,
+      per_page: rowsPerPage, // Laravel espera "per_page"
+      search: filter.value,
+      sort_by: sortBy, // 👈 clave esperada en Laravel
+      sort_order: descending ? "desc" : "asc", // 👈 asc | desc
     });
 
-    rows.value = data;
-    pagination.value.rowsNumber = total;
-    pagination.value.page = page;
-    pagination.value.rowsPerPage = rowsPerPage;
+    // Ajuste a estructura de Laravel paginate
+    rows.value = response.data; // registros de la página
+    pagination.value.rowsNumber = response.total; // total registros
+    pagination.value.page = response.current_page;
+    pagination.value.rowsPerPage = response.per_page;
     pagination.value.sortBy = sortBy;
     pagination.value.descending = descending;
   } catch (error) {
@@ -166,7 +213,7 @@ const eliminar = async (id) => {
         message: "Eliminado correctamente",
         position: "top-right",
         progress: true,
-        timeout: 1000
+        timeout: 1000,
       });
     } catch (error) {
       $q.notify({
@@ -174,7 +221,7 @@ const eliminar = async (id) => {
         message: "Error al eliminar",
         position: "top-right",
         progress: true,
-        timeout: 1000
+        timeout: 1000,
       });
     }
   });

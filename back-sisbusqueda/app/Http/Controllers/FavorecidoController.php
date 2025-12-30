@@ -13,23 +13,79 @@ class FavorecidoController extends Controller
      * Mostrar una lista de los recursos.
      * GET /favorecidos
      */
+    // public function index(Request $request)
+    // {
+    //     $query = Favorecido::query();
+
+    //     // 🔍 Filtro de búsqueda (opcional)
+    //     if ($request->has('search') && $request->search !== '') {
+    //         $search = $request->search;
+    //         $query->where(function ($q) use ($search) {
+    //             $q->where('nombre_completo', 'like', "%{$search}%")
+    //             ->orWhere('razon_social', 'like', "%{$search}%")
+    //             ->orWhere('nombre', 'like', "%{$search}%")
+    //             ->orWhere('apellido_paterno', 'like', "%{$search}%")
+    //             ->orWhere('apellido_materno', 'like', "%{$search}%");
+    //         });
+    //     }
+
+    //     // Ordenar por fecha de actualización (descendente)
+    //     $query->orderBy('updated_at', 'desc');
+
+    //     // 📌 Si per_page = 0 → traer todos los registros
+    //     $perPage = (int) $request->get('per_page', 10);
+    //     if ($perPage === 0) {
+    //         return response()->json([
+    //             'data' => $query->get(),
+    //             'total' => $query->count()
+    //         ], 200);
+    //     }
+
+    //     // 📌 Caso normal: devolver con paginación
+    //     return response()->json($query->paginate($perPage), 200);
+    // }
+
+
     public function index(Request $request)
     {
-        // Consulta base para obtener los favorecidos
         $query = Favorecido::query();
 
-        
+        // 🔍 Filtro de búsqueda (opcional)
+        if ($request->has('search') && $request->search !== '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre_completo', 'like', "%{$search}%")
+                   ->orWhere('razon_social', 'like', "%{$search}%")
+                ->orWhere('nombre', 'like', "%{$search}%")
+                ->orWhere('apellido_paterno', 'like', "%{$search}%")
+                ->orWhere('apellido_materno', 'like', "%{$search}%");
+            });
+        }
 
-        // Ordenar por fecha de actualización (descendente)
-        $query->orderBy('updated_at', 'desc');
+        // 📌 Orden dinámico (id o nombre_completo)
+        $sortBy = $request->get('sort_by', 'updated_at'); // por defecto updated_at
+        $sortOrder = $request->get('sort_order', 'desc'); // por defecto descendente
 
-        // Paginación: se puede personalizar el número de resultados por página con 'per_page'
-        $perPage = $request->get('per_page', 10); // Por defecto, 10 resultados por página
-        $favorecidos = $query->paginate($perPage);
+        // Validamos que solo permita ordenar por columnas seguras
+        if (in_array($sortBy, ['id', 'nombre_completo'])) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('updated_at', 'desc');
+        }
 
-        // Retornar los resultados en formato JSON
-        return response()->json($favorecidos, 200);
+        // 📌 Si per_page = 0 → traer todos los registros
+        $perPage = (int) $request->get('per_page', 10);
+        if ($perPage === 0) {
+            return response()->json([
+                'data' => $query->get(),
+                'total' => $query->count()
+            ], 200);
+        }
+
+        // 📌 Caso normal: devolver con paginación
+        return response()->json($query->paginate($perPage), 200);
     }
+
 
     /**
      * Almacenar un nuevo recurso en la base de datos.

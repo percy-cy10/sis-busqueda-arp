@@ -59,9 +59,7 @@
             size="sm"
             outline
             round
-
             color="negative"
-
             @click="eliminar(props.row.id)"
           />
         </q-td>
@@ -89,8 +87,20 @@ import FavorecidoForm from "./FavorecidoForm.vue";
 const $q = useQuasar();
 const columns = [
   { name: "id", label: "ID", field: "id", align: "center", sortable: true },
-  { name: "nombre_completo", label: "Nombre Completo", field: "nombre_completo", align: "center", sortable: true },
-  { name: "tipo", label: "Tipo", field: "tipo", align: "center", sortable: true },
+  {
+    name: "nombre_completo",
+    label: "Nombre Completo",
+    field: "nombre_completo",
+    align: "center",
+    sortable: true,
+  },
+  {
+    name: "tipo",
+    label: "Tipo",
+    field: "tipo",
+    align: "center",
+    sortable: true,
+  },
   { name: "actions", label: "Acciones", align: "center" },
 ];
 
@@ -111,24 +121,58 @@ const selectedId = ref(null);
 const formTitle = ref("Nuevo Favorecido");
 const favorecidoFormRef = ref();
 
+// const onRequest = async (props) => {
+//   loading.value = true;
+//   try {
+//     const { page, rowsPerPage, sortBy, descending } = props.pagination;
+//     const order_by = descending ? `-${sortBy}` : sortBy;
+//     const { data, total } = await FavorecidoService.getData({
+//       params: {
+//         page,
+//         rowsPerPage,
+//         search: filter.value,
+//         order_by,
+//       },
+//     });
+
+//     rows.value = data;
+//     pagination.value.rowsNumber = total;
+//     pagination.value.page = page;
+//     pagination.value.rowsPerPage = rowsPerPage;
+//     pagination.value.sortBy = sortBy;
+//     pagination.value.descending = descending;
+//   } catch (error) {
+//     $q.notify({ type: "negative", message: "Error cargando datos" });
+//   } finally {
+//     loading.value = false;
+//   }
+// };
+
 const onRequest = async (props) => {
   loading.value = true;
   try {
     const { page, rowsPerPage, sortBy, descending } = props.pagination;
     const order_by = descending ? `-${sortBy}` : sortBy;
-    const { data, total } = await FavorecidoService.getData({
-      params: {
-        page,
-        rowsPerPage,
-        search: filter.value,
-        order_by,
-      },
+
+    // const response = await FavorecidoService.getData({
+    //   page,
+    //   per_page: rowsPerPage,   // 👈 Laravel espera "per_page"
+    //   search: filter.value,
+    //   order_by,
+    // });
+    const response = await FavorecidoService.getData({
+      page,
+      per_page: rowsPerPage, // Laravel espera "per_page"
+      search: filter.value,
+      sort_by: sortBy, // 👈 clave esperada en Laravel
+      sort_order: descending ? "desc" : "asc", // 👈 asc | desc
     });
 
-    rows.value = data;
-    pagination.value.rowsNumber = total;
-    pagination.value.page = page;
-    pagination.value.rowsPerPage = rowsPerPage;
+    // Laravel paginate devuelve { data, total, per_page, current_page }
+    rows.value = response.data; // registros
+    pagination.value.rowsNumber = response.total; // total registros
+    pagination.value.page = response.current_page;
+    pagination.value.rowsPerPage = response.per_page;
     pagination.value.sortBy = sortBy;
     pagination.value.descending = descending;
   } catch (error) {
@@ -166,13 +210,21 @@ const eliminar = async (id) => {
     try {
       await FavorecidoService.delete(id);
       refreshTable();
-      $q.notify({ type: "positive", message: "Eliminado correctamente", position: "top-right",
-      progress: true,
-      timeout: 1000 });
+      $q.notify({
+        type: "positive",
+        message: "Eliminado correctamente",
+        position: "top-right",
+        progress: true,
+        timeout: 1000,
+      });
     } catch (error) {
-      $q.notify({ type: "negative", message: "Error al eliminar" , position: "top-right",
-      progress: true,
-      timeout: 1000 });
+      $q.notify({
+        type: "negative",
+        message: "Error al eliminar",
+        position: "top-right",
+        progress: true,
+        timeout: 1000,
+      });
     }
   });
 };

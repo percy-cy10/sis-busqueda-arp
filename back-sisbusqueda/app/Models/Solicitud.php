@@ -9,10 +9,13 @@ class Solicitud extends Model
 {
     use HasFactory;
     protected $table = 'solicituds';
-    protected $with = ['solicitante','ubigeo','notario','SubSerie','tupa','user'];
+
+    protected $with = ['solicitante','ubigeo','notarioProceso','notario','SubSerie','tupa','user'];
 
     public $timestamps = false;
+
     protected $fillable = [
+        'solicitud_code',
         'notario_id',
         'subserie_id',
         'solicitante_id',
@@ -27,7 +30,6 @@ class Solicitud extends Model
         'mas_datos',
         'tipo_copia',
         'estado',
-        // 'pago_busqueda',
         'pago_busqueda',
         'segundo_pago',
         'orden_pago',
@@ -35,16 +37,55 @@ class Solicitud extends Model
         'nivel_id',
         'user_id',
         'created_at',
-        'updated_at'
+        'updated_at',
+
+        // Nuevos campos
+        'tipo_tramite',
+        'tipo_expediente',
+        'materia_proceso',
+        'demandante',
+        'demandado',
+        'causante',
+        'juzgado',
+        'secretario',
+        'tipo_partida',
+        'nombre_fallecido',
+        'nombre_nacido',
+        'nombre_esposo',
+        'nombre_esposa',
+        'contrato_privado',
+        'otorgante_enace',
+        'favorecido_enace',
+        'institucion_enace',
+        'causante_impuesto',
+        'direccion_impuesto',
+        'proceso_de',
+        'en_contra_de',
+        'causante_proceso',
+        'notario_proceso',
+        'tipo_expediente_mp',
+        'caso_mp',
+        'area_mp',
+        'materia_mp',
+        'agraviado_mp',
+        'imputado_mp',
+        'fiscalia_mp',
+        'numero_caso_mp',
+        'numero_paquete_mp',
+        'sescritura',
+        'sprotocolo',
+        'sfolio'
     ];
     public function notario()
     {
         return $this->belongsTo(Notario::class, 'notario_id');
     }
-    public function SubSerie()
+    public function subSerie()
     {
         return $this->belongsTo(SubSerie::class, 'subserie_id');
+
     }
+
     public function solicitante()
     {
         return $this->belongsTo(Solicitante::class, 'solicitante_id');
@@ -53,10 +94,7 @@ class Solicitud extends Model
     {
         return $this->hasOne(RegistroBusqueda::class, 'solicitud_id');
     }
-    // public function ubigeo()
-    // {
-    //     return $this->belongsTo(Ubigeo::class, 'ubigeo_cod','codigo');
-    // }
+
     public function ubigeo()
     {
         return $this->belongsTo(Ubigeo::class, 'ubigeo_cod', 'codigo');
@@ -84,4 +122,11 @@ class Solicitud extends Model
     {
         return $this->belongsTo(Nivel::class);
     }
+
+    public function notarioProceso()
+    {
+        return $this->belongsTo(Notario::class, 'notario_proceso');
+    }
+
+
 }

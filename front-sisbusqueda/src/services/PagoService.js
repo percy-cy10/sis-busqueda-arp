@@ -23,35 +23,31 @@ class PagoService {
         }
     }
 
-    static async toggleEstado(id) {
+    // static async toggleEstado(id) {
+    //     try {
+    //         return (await api.patch(`/api/pagos/${id}/toggle-estado`)).data;
+    //     } catch (error) {
+    //         console.error("Error al cambiar el estado del pago:", error);
+    //         throw error;
+    //     }
+    // }
+    static async anular(id) {
+        return (await api.put(`/api/pagos/${id}/anular`)).data;
+    }
+
+    // En PagoService.js
+    static async toggleEstado(id, data = {}) {
         try {
-            return (await api.patch(`/api/pagos/${id}/toggle-estado`)).data;
+            return (await api.put(`/api/pagos/${id}/toggle-estado`, data)).data;
         } catch (error) {
             console.error("Error al cambiar el estado del pago:", error);
             throw error;
         }
     }
-    static async anular(id) {
-        return (await api.put(`/api/pagos/${id}/anular`)).data;
-    }
 
 
 
-  //   static async toggleEstado(id) {
-  //   try {
-  //     // Llama a /api/pagos/{id}/toggle-estado
-  //     const response = await api.patch(`/pagos/${id}/toggle-estado`);
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error('Error al cambiar el estado del pago:', error);
-  //     if (error.response) {
-  //       console.error('Respuesta del servidor:', error.response.data);
-  //     }
-  //     throw new Error(
-  //       error.response?.data?.message || 'Error al cambiar el estado del pago'
-  //     );
-  //   }
-  // }
+
 
 }
 

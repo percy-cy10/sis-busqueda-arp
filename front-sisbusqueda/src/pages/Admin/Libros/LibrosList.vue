@@ -56,6 +56,7 @@
       @request="onRequest"
       :rows-per-page-options="[5, 10, 20]"
     > -->
+
     <q-table
       :rows-per-page-options="[7, 10, 15]"
       class="my-sticky-header-table htable q-ma-sm"
@@ -253,16 +254,15 @@ const loadInitialData = async () => {
   }
 };
 
-// Función principal para cargar datos
+
+
 // const onRequest = async (props) => {
 //   loading.value = true;
 //   try {
-//     // Actualizar paginación
 //     pagination.value = props.pagination;
 
-//     // Cargar notarios y libros en paralelo
 //     const [notariosResponse, librosResponse] = await Promise.all([
-//       NotarioService.getData({ params: { search: filter.value } }),
+//       NotarioService.getAll({ params: { search: filter.value } }),
 //       LibroService.getData({
 //         params: {
 //           page: pagination.value.page,
@@ -274,23 +274,21 @@ const loadInitialData = async () => {
 //       })
 //     ]);
 
-
-//     // Crear mapa de notarios utilizando su id como llave
-//     const notariosMap = notariosResponse.data.reduce((map, notario) => {
+//     // 🔑 Ahora notariosResponse es un array directamente
+//     const notariosMap = (notariosResponse || []).reduce((map, notario) => {
 //       if (notario?.id) {
 //         map[notario.id] = notario;
 //       }
 //       return map;
 //     }, {});
 
-//     // Combinar datos: cada libro obtiene su objeto notario_data a partir de notario_id
-//     rows.value = librosResponse.data.map(libro => ({
+
+//     rows.value = (librosResponse.data || []).map(libro => ({
 //       ...libro,
 //       notario_data: libro.notario_id ? notariosMap[libro.notario_id] : null,
 //       estado: Boolean(libro.estado)
 //     }));
 
-//         // Actualizar número total de filas
 //     pagination.value.rowsNumber = librosResponse.total || 0;
 //   } catch (error) {
 //     console.error('Error al cargar datos:', error);
@@ -307,32 +305,32 @@ const loadInitialData = async () => {
 //   }
 // };
 
+
+
+
+// Función para abrir formulario de creación
 const onRequest = async (props) => {
   loading.value = true;
   try {
     pagination.value = props.pagination;
 
     const [notariosResponse, librosResponse] = await Promise.all([
-      NotarioService.getData({ params: { search: filter.value } }),
+      NotarioService.getAll({ params: { search: filter.value } }),
       LibroService.getData({
-        params: {
-          page: pagination.value.page,
-          rowsPerPage: pagination.value.rowsPerPage,
-          search: props.filter,
-          sortBy: pagination.value.sortBy,
-          descending: pagination.value.descending
-        }
+        page: pagination.value.page,
+        per_page: pagination.value.rowsPerPage, // 👈 Laravel espera per_page
+        search: filter.value,                   // 👈 filtro backend
+        sortBy: pagination.value.sortBy,
+        descending: pagination.value.descending
       })
     ]);
 
-    const notariosMap = notariosResponse.data.reduce((map, notario) => {
-      if (notario?.id) {
-        map[notario.id] = notario;
-      }
+    const notariosMap = (notariosResponse || []).reduce((map, notario) => {
+      if (notario?.id) map[notario.id] = notario;
       return map;
     }, {});
 
-    rows.value = librosResponse.data.map(libro => ({
+    rows.value = (librosResponse.data || []).map(libro => ({
       ...libro,
       notario_data: libro.notario_id ? notariosMap[libro.notario_id] : null,
       estado: Boolean(libro.estado)
@@ -341,12 +339,6 @@ const onRequest = async (props) => {
     pagination.value.rowsNumber = librosResponse.total || 0;
   } catch (error) {
     console.error('Error al cargar datos:', error);
-    $q.notify({
-      type: 'negative',
-      message: 'Error al cargar datos',
-      caption: error.message,
-      position: 'top'
-    });
     rows.value = [];
     pagination.value.rowsNumber = 0;
   } finally {
@@ -356,7 +348,6 @@ const onRequest = async (props) => {
 
 
 
-// Función para abrir formulario de creación
 const openForm = () => {
   formLibros.value = true;
   edit.value = false;

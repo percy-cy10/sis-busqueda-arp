@@ -82,6 +82,15 @@ async function generarPDFPago(pago) {
   const subtotal = tupas.reduce((acc, tupa) => acc + Number(calcularSubtotalTupa(tupa)), 0)
   const igv = 0 // Cambia a subtotal * 0.18 si necesitas IGV
   const total = subtotal + igv
+
+  // NUEVO: Obtener valores de monto pagado y vuelto
+  const montoPagado = pago.monto_pagado || total // Si no hay monto_pagado, usar el total
+  const vuelto = pago.vuelto || 0
+
+  // NUEVO: Determinar forma de pago y condición
+  const formaPago = pago.forma_pago_id ? `ID: ${pago.forma_pago_id}` : 'EFECTIVO'
+  const condicionPago = pago.condicion_pago_id ? `ID: ${pago.condicion_pago_id}` : 'AL CONTADO'
+
   const qrData = {
     Numero_Boleta: pago.boleta_id ? pago.boleta_id.toString().padStart(8, '0') : '--------',
     Nombre_Completo: pago.nombre_completo,
@@ -90,7 +99,7 @@ async function generarPDFPago(pago) {
     Atendido_por: pago.user?.name,
   }
 
-  const doc = new jsPDF('p', 'mm', [80, 215 + tupas.length * 8])
+  const doc = new jsPDF('p', 'mm', [80, 240 + tupas.length * 8]) // Aumenté la altura para los nuevos campos
   doc.setFont('times')
   doc.setFontSize(11)
 
@@ -104,43 +113,36 @@ async function generarPDFPago(pago) {
   // Encabezado
   doc.setFont('times', 'bold')
   doc.text('GOBIERNO REGIONAL PUNO', 40, y, { align: 'center' }); y += 5
-   doc.setFontSize(9)
+  doc.setFontSize(9)
   doc.setFont('times', 'normal')
   doc.text('RUC: 20406325815', 40, y, { align: 'center' }); y += 5
   doc.text('Dirección: Av. El Ejercito 645 - Barrio Chanu Chanu - Puno - Perú - 21001', 40, y, { align: 'center', maxWidth: 70 }); y += 8
   doc.text('D. L. N° 19414 Y Ley N° 25323', 40, y, { align: 'center', maxWidth: 70 }); y += 5
   doc.text('Teléfono: (051) 600704', 40, y, { align: 'center', maxWidth: 70 }); y += 8
-  doc.setFont('times', 'bold')     // Negrita
-  doc.setFontSize(14)              // Tamaño más grande (ajusta según necesites)
+  doc.setFont('times', 'bold')
+  doc.setFontSize(14)
   doc.text('RECIBO ELECTRÓNICO', 40, y, { align: 'center' }); y += 8
-  doc.setFont('times', 'normal')   // Volver a fuente normal
-  doc.setFontSize(12)              // Volver al tamaño normal
+  doc.setFont('times', 'normal')
+  doc.setFontSize(12)
   doc.text(`N°: ${pago.boleta_id ? pago.boleta_id.toString().padStart(8, '0') : '--------'}`, 40, y, { align: 'center' }); y += 8
-  // doc.text(`N°: ${pago.id ? pago.id.toString().padStart(8, '0') : '--------'}`, 40, y, { align: 'center' }); y += 8
 
   // Datos del pago
   doc.setFontSize(10)
   doc.setFont('times', 'bold')
   doc.text('N° Solicitud:', 5, y)
-
   doc.setFont('times', 'normal')
-  doc.text(`${pago.solicitud?.id || ''}-${pago.solicitud?.bien || ''}`, 25, y) // Ajusta la posición "38" si es necesario
-
+  doc.text(`${pago.solicitud?.solicitud_code || ''}`, 25, y)
   y += 5
 
-  // doc.text(`N° Solicitud: ${pago.solicitud?.id || ''}-${pago.solicitud?.bien || ''}`, 5, y); y += 5
-  // Imprimir Nombre Completo del Solicitante
+  // Nombre Completo del Solicitante
   doc.setFont('times', 'bold')
   doc.text('Nombre Completo:', 5, y)
   doc.setFont('times', 'normal')
-
-  // Ajustar nombre completo al ancho máximo de 43mm
   const razonSocialLines = doc.splitTextToSize(pago.nombre_completo || '', 43)
   razonSocialLines.forEach((linea, index) => {
-    doc.text(linea, 35, y + (index * 5)) // Alineado a partir de x = 35mm
+    doc.text(linea, 35, y + (index * 5))
   })
-
-  y += razonSocialLines.length * 5 // Ajustar y al total de líneas escritas
+  y += razonSocialLines.length * 5
 
   doc.setFont('times', 'bold')
   doc.text('Tipo Doc:', 5, y)
@@ -171,11 +173,9 @@ async function generarPDFPago(pago) {
     const precio = Number(tupa.precio || tupa.costo || 0).toFixed(2)
     const subtotalTupa = calcularSubtotalTupa(tupa)
 
-    // Divide la descripción si es muy larga (máximo 32mm de ancho)
     const descLines = doc.splitTextToSize(descripcion, 32)
     const maxLines = Math.max(descLines.length, 1)
 
-    // Imprime la cantidad, precio y subtotal alineados a la derecha
     for (let i = 0; i < maxLines; i++) {
       doc.text(i === 0 ? cantidad : '', 5, y, { align: 'left', maxWidth: 4 })
       doc.text(descLines[i] || '', 15, y)
@@ -187,35 +187,45 @@ async function generarPDFPago(pago) {
 
   doc.line(5, y, 75, y); y += 5
 
-  // y += 2
-
   doc.setFontSize(10)
 
   // Gravadas
-  doc.setFont('times', 'bold')
-  doc.text('Gravadas:', 53, y, { align: 'right' })
-  doc.setFont('times', 'normal')
-  doc.text(`S/ ${subtotal.toFixed(2)}`, 75, y, { align: 'right' })
-  y += 5
+  // doc.setFont('times', 'bold')
+  // doc.text('i:', 53, y, { align: 'right' })
+  // doc.setFont('times', 'normal')
+  // doc.text(`S/ ${subtotal.toFixed(2)}`, 75, y, { align: 'right' })
+  // y += 5
 
-  // IGV
-  doc.setFont('times', 'bold')
-  doc.text('IGV:',  53, y, { align: 'right' })
-  doc.setFont('times', 'normal')
-  doc.text(`S/ ${igv.toFixed(2)}`, 75, y, { align: 'right' })
-  y += 5
+  // // IGV
+  // doc.setFont('times', 'bold')
+  // doc.text('IGV:',  53, y, { align: 'right' })
+  // doc.setFont('times', 'normal')
+  // doc.text(`S/ ${igv.toFixed(2)}`, 75, y, { align: 'right' })
+  // y += 5
 
   // Precio Venta
   doc.setFont('times', 'bold')
-
   doc.text('Importe Total:', 53, y, { align: 'right' })
   doc.setFontSize(12)
   doc.setFont('times', 'bold')
   doc.text(`S/ ${total.toFixed(2)}`, 75, y, { align: 'right' })
   y += 7
 
-  // SON
+  // NUEVO: MONTO PAGADO Y VUELTO
   doc.setFontSize(10)
+  doc.setFont('times', 'bold')
+  doc.text('Monto Pagado:', 5, y)
+  doc.setFont('times', 'normal')
+  doc.text(`S/ ${Number(montoPagado).toFixed(2)}`, 30, y)
+  y += 5
+
+  doc.setFont('times', 'bold')
+  doc.text('Vuelto:', 5, y)
+  doc.setFont('times', 'normal')
+  doc.text(`S/ ${Number(vuelto).toFixed(2)}`, 30, y)
+  y += 7
+
+  // SON
   doc.setFont('times', 'bold')
   doc.text('SON:', 5, y)
   doc.setFont('times', 'normal')
@@ -223,19 +233,19 @@ async function generarPDFPago(pago) {
   letras.forEach((linea, i) => {
     doc.text(linea, 15, y + (i * 5))
   })
-  y += letras.length * 5
+  y += letras.length * 5 + 5
 
   // NUEVO: Forma de pago y Condición
   doc.setFont('times', 'bold')
   doc.text('Forma de Pago:', 5, y)
   doc.setFont('times', 'normal')
-  doc.text(`${pago.forma_pago || 'EFECTIVO'}`, 30, y)
+  doc.text(`${formaPago}`, 30, y)
   y += 5
 
   doc.setFont('times', 'bold')
-  doc.text('Cond. de Pago :', 5, y)
+  doc.text('Cond. de Pago:', 5, y)
   doc.setFont('times', 'normal')
-  doc.text(`${pago.condicion_pago || 'AL CONTADO'}`, 30, y)
+  doc.text(`${condicionPago}`, 30, y)
   y += 7
 
   // QR
@@ -243,9 +253,7 @@ async function generarPDFPago(pago) {
   doc.addImage(qrDataUrl, 'PNG', 27.5, y, 25, 25)
   y += 32
 
-
-
- // Línea divisoria
+  // Línea divisoria
   doc.setDrawColor(0)
   doc.line(5, y, 75, y)
   y += 5
@@ -272,15 +280,13 @@ async function generarPDFPago(pago) {
   doc.setFont('times', 'bold')
   doc.text('Fecha:', 5, y)
   doc.setFont('times', 'normal')
-  doc.text(`${pago.user?.created_at || (new Date()).toLocaleDateString()}`, 35, y)
+  doc.text(`${pago.created_at || (new Date()).toLocaleDateString()}`, 35, y)
   y += 4
 
   // Línea divisoria
   doc.setDrawColor(0)
   doc.line(5, y, 75, y)
   y += 5
-
-
 
   // Pie de página
   doc.setFontSize(9)

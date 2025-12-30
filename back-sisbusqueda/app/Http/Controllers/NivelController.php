@@ -41,7 +41,7 @@ class NivelController extends Controller
     public function update(StoreNivelRequest $request, Nivel $nivel)
     {
         $nivel->update($request->all());
-        return response()->json($nivel);
+        return response()->json($nivel);    
     }
 
     public function destroy(Nivel $nivel)

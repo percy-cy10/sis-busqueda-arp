@@ -1,5 +1,6 @@
 <template>
   <q-page>
+    <!-- Migas de pan -->
     <div class="q-pa-md q-gutter-sm">
       <q-breadcrumbs>
         <q-breadcrumbs-el icon="home" />
@@ -8,639 +9,925 @@
     </div>
 
     <q-separator />
-    <!-- <q-card class="my-card"> -->
 
-      <!-- Botones de sección -->
-      <q-card-section class="row q-gutter-sm">
-        <q-btn
-          label="Nombres"
-          icon="person"
-          class="bg-primary text-white q-px-xl q-py-sm rounded-borders shadow-3"
-          :flat="seccionActiva !== 'nombres'"
-          :unelevated="seccionActiva === 'nombres'"
-          @click="seccionActiva = 'nombres'"
+    <!-- Botones de secciones -->
+    <q-card-section class="row q-gutter-sm">
+      <q-btn
+        label="Nombres"
+        icon="person"
+        class="bg-primary text-white q-px-xl q-py-sm rounded-borders shadow-3"
+        :flat="seccionActiva !== 'nombres'"
+        :unelevated="seccionActiva === 'nombres'"
+        @click="seccionActiva = 'nombres'"
+      />
+
+      <q-btn
+        label="Bien"
+        class="bg-primary text-white q-px-xl q-py-sm rounded-borders shadow-3"
+        :flat="seccionActiva !== 'bien'"
+        :unelevated="seccionActiva === 'bien'"
+        @click="seccionActiva = 'bien'"
+      />
+
+      <q-btn
+        label="Fecha"
+        class="bg-primary text-white q-px-xl q-py-sm rounded-borders shadow-3"
+        :flat="seccionActiva !== 'fecha'"
+        :unelevated="seccionActiva === 'fecha'"
+        @click="seccionActiva = 'fecha'"
+      />
+    </q-card-section>
+
+    <!-- Filtros por Nombres -->
+    <q-card-section v-if="seccionActiva === 'nombres'">
+      <div class="row q-col-gutter-md">
+        <!-- Otorgante -->
+        <div class="col-6 row items-center q-gutter-sm">
+          <q-select
+            filled
+            v-model="filtro.otorgante"
+            use-input
+            hide-selected
+            fill-input
+            input-debounce="200"
+            label="Otorgante"
+            :options="opcionesFiltradas.otorgante"
+            @filter="(val, update) => filtrar('otorgante', otorgantesBase, val, update)"
+            @input-value="actualizarInput('otorgante', $event)"
+            clearable
+            @update:model-value="guardarComoTexto('otorgante', $event)"
+            @keyup.enter="buscar('otorgante')"
+            class="col"
+            use-chips
+            new-value-mode="add-unique"
+          />
+          <q-btn
+            icon="search"
+            flat
+            dense
+            @click="buscar('otorgante')"
+            :disable="!puedeBuscar('otorgante')"
+          />
+        </div>
+
+        <!-- Favorecido -->
+        <div class="col-6 row items-center q-gutter-sm">
+          <q-select
+            filled
+            v-model="filtro.favorecido"
+            use-input
+            hide-selected
+            fill-input
+            input-debounce="200"
+            label="Favorecido"
+            :options="opcionesFiltradas.favorecido"
+            @filter="(val, update) => filtrar('favorecido', favorecidosBase, val, update)"
+            @input-value="actualizarInput('favorecido', $event)"
+            clearable
+            @update:model-value="guardarComoTexto('favorecido', $event)"
+            @keyup.enter="buscar('favorecido')"
+            class="col"
+            use-chips
+            new-value-mode="add-unique"
+          />
+          <q-btn
+            icon="search"
+            flat
+            dense
+            @click="buscar('favorecido')"
+            :disable="!puedeBuscar('favorecido')"
+          />
+        </div>
+      </div>
+
+      <!-- Buscar por nombre general (Otorgante o Favorecido) -->
+      <div class="row items-center q-gutter-sm q-mt-md">
+        <q-select
+          filled
+          v-model="filtro.nombres"
+          use-input
+          hide-selected
+          fill-input
+          input-debounce="200"
+          label="Buscar por Nombre (Otorgante o Favorecido)"
+          :options="opcionesFiltradas.nombres"
+          @filter="(val, update) => filtrar('nombres', nombresBase, val, update)"
+          @input-value="actualizarInput('nombres', $event)"
+          clearable
+          @update:model-value="guardarComoTexto('nombres', $event)"
+          @keyup.enter="buscar('nombres')"
+          class="col"
+          use-chips
+          new-value-mode="add-unique"
         />
-        <!-- <q-btn
-          label="Notarios"
-          class="bg-primary text-white q-px-xl q-py-sm rounded-borders shadow-3"
-          :flat="seccionActiva !== 'notarios'"
-          :unelevated="seccionActiva === 'notarios'"
-          @click="seccionActiva = 'notarios'"
-        /> -->
         <q-btn
-          label="Bien"
-          class="bg-primary text-white q-px-xl q-py-sm rounded-borders shadow-3"
-          :flat="seccionActiva !== 'bien'"
-          :unelevated="seccionActiva === 'bien'"
-          @click="seccionActiva = 'bien'"
+          icon="search"
+          flat
+          dense
+          @click="buscar('nombres')"
+          :disable="!puedeBuscar('nombres')"
         />
-        <q-btn
-          label="Fecha"
-          class="bg-primary text-white q-px-xl q-py-sm rounded-borders shadow-3"
-          :flat="seccionActiva !== 'fecha'"
-          :unelevated="seccionActiva === 'fecha'"
-          @click="seccionActiva = 'fecha'"
-        />
-      </q-card-section>
+      </div>
+    </q-card-section>
 
-      <!-- Filtros por Nombres -->
-
-      <q-card-section v-if="seccionActiva === 'nombres'">
-        <div class="row">
-          <!-- Otorgante -->
-          <div class="col-6 row items-center q-gutter-sm">
-            <q-select filled v-model="filtro.otorgante" use-input hide-selected fill-input input-debounce="200"
-              label="Otorgante" :options="opcionesFiltradas.otorgante" :option-label="o => o" :option-value="o => o"
-              @filter="(val, update) => filtrar('otorgante', otorgantesBase, val, update)"
-              @input-value="actualizarInput('otorgante', $event)" clearable
-              @update:model-value="guardarComoTexto('otorgante', $event)" @keyup.enter="buscar('otorgante')"
-              class="col" use-chips new-value-mode="add-unique"
-            />
-            <q-btn icon="search" flat dense @click="buscar('otorgante')" :disable="!puedeBuscar('otorgante')" />
-          </div>
-          <!-- Favorecido -->
-          <div class="col-6 row items-center q-gutter-sm">
-            <q-select filled v-model="filtro.favorecido" use-input hide-selected fill-input input-debounce="200"
-              label="Favorecido" :options="opcionesFiltradas.favorecido" :option-label="o => o" :option-value="o => o"
-              @filter="(val, update) => filtrar('favorecido', favorecidosBase, val, update)"
-              @input-value="actualizarInput('favorecido', $event)" clearable
-              @update:model-value="guardarComoTexto('favorecido', $event)" @keyup.enter="buscar('favorecido')"
-              class="col" use-chips new-value-mode="add-unique"
-            />
-            <q-btn icon="search" flat dense @click="buscar('favorecido')" :disable="!puedeBuscar('favorecido')" />
-          </div>
+    <!-- Filtros por Bien -->
+    <q-card-section v-if="seccionActiva === 'bien'">
+      <div class="row">
+        <div class="col-12 row items-center q-gutter-sm">
+          <q-select
+            filled
+            v-model="filtro.bien"
+            use-input
+            hide-selected
+            fill-input
+            input-debounce="200"
+            label="Bien"
+            :options="opcionesFiltradas.bien"
+            @filter="(val, update) => filtrar('bien', bienesBase, val, update)"
+            @input-value="actualizarInput('bien', $event)"
+            clearable
+            @update:model-value="guardarComoTexto('bien', $event)"
+            @keyup.enter="buscar('bien')"
+            class="col"
+          />
+          <q-btn
+            icon="search"
+            flat
+            dense
+            @click="buscar('bien')"
+            :disable="!puedeBuscar('bien')"
+          />
         </div>
-      </q-card-section>
+      </div>
+    </q-card-section>
 
-      <!-- Filtros por Notarios -->
-      <!-- <q-card-section v-if="seccionActiva === 'notarios'">
-        <div class="row">
-          <div class="col-12 row items-center q-gutter-sm">
-            <q-select filled v-model="filtro.notario" use-input hide-selected fill-input input-debounce="200"
-              label="Notario" :options="opcionesFiltradas.notario" :option-label="o => o" :option-value="o => o"
-              @filter="(val, update) => filtrar('notario', notariosBase, val, update)"
-              @input-value="actualizarInput('notario', $event)" clearable
-              @update:model-value="guardarComoTexto('notario', $event)" @keyup.enter="buscar('notario')" class="col"
-            />
-            <q-btn icon="search" flat dense @click="buscar('notario')" />
-          </div>
+    <!-- Filtros por Fecha -->
+    <q-card-section v-if="seccionActiva === 'fecha'">
+      <div class="row q-col-gutter-md">
+        <!-- Año -->
+        <div class="col-3 row items-center q-gutter-sm">
+
+          <InputAnio
+            filled
+            v-model.number="filtro.anio"
+            type="number"
+            label="Año"
+            min="1900"
+            max="2100"
+            clearable
+            class="col"
+            @clear="filtro.anio = null"
+            @keyup.enter="buscar('anio')"
+          />
+          <q-btn icon="search" flat dense @click="buscar('anio')" :disable="!puedeBuscar('anio')" />
         </div>
-      </q-card-section> -->
 
-      <!-- Filtros por Bien -->
-      <q-card-section v-if="seccionActiva === 'bien'">
-        <div class="row">
-          <div class="col-12 row items-center q-gutter-sm">
-            <q-select filled v-model="filtro.bien" use-input hide-selected fill-input input-debounce="200"
-              label="Bien" :options="opcionesFiltradas.bien" :option-label="o => o" :option-value="o => o"
-              @filter="(val, update) => filtrar('bien', bienesBase, val, update)"
-              @input-value="actualizarInput('bien', $event)" clearable
-              @update:model-value="guardarComoTexto('bien', $event)" @keyup.enter="buscar('bien')" class="col"
-            />
-            <q-btn icon="search" flat dense @click="buscar('bien')" :disable="!puedeBuscar('bien')" />
-          </div>
+        <!-- Mes -->
+        <div class="col-3 row items-center q-gutter-sm">
+
+          <InputMes
+            filled
+            v-model="filtro.mes"
+            label="Mes"
+            clearable
+            class="col"
+            @clear="filtro.mes = null"
+            @keyup.enter="buscar('mes')"
+          />
+
+          <q-btn icon="search" flat dense @click="buscar('mes')" :disable="!puedeBuscar('mes')" />
         </div>
-      </q-card-section>
 
-      <!-- Filtros por Fecha -->
-      <!-- <q-card-section v-if="seccionActiva === 'fecha'">
-        <div class="row q-col-gutter-md items-end">
-          <div class="col-3">
-            <div class="row items-end no-wrap">
-              <InputAnio filled v-model="filtro.anio" type="number" label="Año" @keyup.enter="buscar('anio')" class="col" />
-              <q-btn icon="search" flat dense @click="buscar('anio')" class="q-ml-sm" />
-            </div>
-          </div>
-          <div class="col-3">
-            <div class="row items-end no-wrap">
-              <InputMes filled v-model="filtro.mes" type="number" label="Mes" min="1" max="12"
-                @keyup.enter="buscar('mes')" class="col" />
-              <q-btn icon="search" flat dense @click="buscar('mes')" class="q-ml-sm" />
-            </div>
-          </div>
-          <div class="col-3">
-            <div class="row items-end no-wrap">
-              <InputDia filled v-model="filtro.dia" type="number" label="Día" min="1" max="31"
-                @keyup.enter="buscar('dia')" class="col" />
-              <q-btn icon="search" flat dense @click="buscar('dia')" class="q-ml-sm" />
-            </div>
-          </div>
-          <div class="col-3">
-            <q-btn icon="search" label="Buscar Fecha" color="primary" @click="buscar('fecha')" class="full-width" />
-          </div>
-        </div>
-      </q-card-section> -->
+        <!-- Día -->
+        <div class="col-3 row items-center q-gutter-sm">
 
-      <!-- Filtros por Fecha -->
-      <q-card-section v-if="seccionActiva === 'fecha'">
-        <div class="row q-col-gutter-md">
-          <!-- Año -->
-          <div class="col-3 row items-center q-gutter-sm">
-            <InputAnio
-              filled
-              v-model="filtro.anio"
-              type="number"
-              label="Año"
-              min="1900"
-              max="2100"
-              clearable
-              class="col"
-              @clear="filtro.anio = ''"
-              @keyup.enter="buscar('anio')"
-            />
-            <q-btn icon="search" flat dense @click="buscar('anio')" :disable="!puedeBuscar('anio')" />
-          </div>
-          <!-- Mes -->
-          <div class="col-3 row items-center q-gutter-sm">
-            <InputMes
-              filled
-              v-model="filtro.mes"
-              type="number"
-              label="Mes"
-              min="1"
-              max="12"
-              clearable
-              class="col"
-              @clear="filtro.mes = ''"
-              @keyup.enter="buscar('mes')"
-            />
-            <q-btn icon="search" flat dense @click="buscar('mes')" :disable="!puedeBuscar('mes')" />
-          </div>
-          <!-- Día -->
-          <div class="col-3 row items-center q-gutter-sm">
-            <InputDia
-              filled
-              v-model="filtro.dia"
-              type="number"
-              label="Día"
-              min="1"
-              max="31"
-              clearable
-              class="col"
-              @clear="filtro.dia = ''"
-              @keyup.enter="buscar('dia')"
-            />
+          <InputDia
+
+            class="col"
+            filled
+            clearable
+            outlined
+            min="1"
+            max="31"
+            v-model="filtro.dia"
+            v-model:modelAnio="filtro.anio"
+            v-model:modelMes="filtro.mes"
+            :readonly="!filtro.anio || !filtro.mes"
+            :error="!!filtro.errors?.dia"
+            @clear="filtro.dia = null"
+            @keyup.enter="buscar('dia')"
+          />
+
             <q-btn icon="search" flat dense @click="buscar('dia')" :disable="!puedeBuscar('dia')" />
-          </div>
-          <!-- Buscar Fecha Completa -->
-          <div class="col-3 row items-center q-gutter-sm">
-            <q-btn icon="search" label="Buscar Fecha" color="primary" @click="buscar('fecha')" class="full-width"
-              :disable="!puedeBuscar('fecha')" />
-          </div>
         </div>
-      </q-card-section>
-      <!-- Buscar todo -->
-      <!-- <q-card-section>
-        <q-btn label="Buscar todo" color="primary" @click="buscar('todos')" class="full-width" />
-      </q-card-section> -->
 
-      <!-- Mensaje de búsqueda activa -->
-      <!-- <q-card-section v-if="busquedaActiva">
-        <div class="text-primary text-bold">
-          Buscar por {{ busquedaActivaLabel }}: {{ filtro[busquedaActiva] }}
+        <!-- Fecha completa -->
+        <div class="col-3 row items-center q-gutter-sm">
+          <q-btn
+            icon="search"
+            label="Buscar Fecha"
+            color="primary"
+            @click="buscar('fecha')"
+            class="full-width"
+            :disable="!puedeBuscar('fecha')"
+          />
         </div>
-      </q-card-section> -->
+      </div>
+    </q-card-section>
 
-      <!-- Resultados -->
-      <q-card-section>
-        <q-table
-          :rows-per-page-options="[7, 10, 15]"
-          class="my-sticky-header-table htable q-ma-sm"
-          title="Resultados de la búsqueda"
-          ref="tableRef"
-          :rows="resultados"
-          :columns="columnsConCoincidencia"
-          row-key="id"
-          v-model:pagination="pagination"
-          :loading="loading"
-          :filter="filter"
-          binary-state-sort
-          @request="onRequest"
-        >
-          <!-- Columna de Ver Escritura -->
-          <template v-slot:body-cell-ver="props">
-            <q-td :props="props">
-              <q-btn v-if="props.row.file_name" icon="visibility" color="primary" flat dense label="Ver"
-                @click="verArchivo(props.row.file_name)" />
-              <span v-else class="text-grey">No disponible</span>
-            </q-td>
-          </template>
+    <!-- Tabla de resultados -->
+    <q-card-section>
+      <!-- QTable -->
+      <!-- <q-table
+        :pagination="{rowsPerPage: 0}"
+        class="my-sticky-header-table htable q-ma-sm"
+        title="Resultados de la búsqueda"
+        ref="tableRef"
+        :rows="resultados"
+        :columns="columnsConCoincidencia"
+        row-key="id"
+        :loading="loading"
+        :filter="filter"
+        binary-state-sort
+      > -->
+      <q-table
+        :rows="resultados"
+        :columns="columnsConCoincidencia"
+        v-model:pagination="pagination"
+        :rows-per-page-options="[7, 10,15, 30, 50, 100, 0]"
+        row-key="id"
+        :loading="loading"
+        @request="onRequest"
+        binary-state-sort
+      >
+        <!-- Botón Ver Escritura -->
+        <template v-slot:body-cell-ver="props">
+          <q-td :props="props">
+            <q-btn
+              v-if="props.row.file_name"
+              icon="visibility"
+              color="primary"
+              flat
+              dense
+              label="Ver"
+              @click="verArchivo(props.row.file_name)"
+            />
+            <span v-else class="text-grey">No disponible</span>
+          </q-td>
+        </template>
 
-          <!-- Mensaje cuando no hay datos -->
-          <template v-slot:no-data>
-            <div class="full-width row flex-center text-grey q-gutter-sm">
-              <q-icon name="warning" size="2em" />
-              <span v-if="loading">Cargando datos...</span>
-              <span v-else>No se encontraron resultados.</span>
+        <!-- Mensaje si no hay datos -->
+        <template v-slot:no-data>
+          <div class="full-width row flex-center text-grey q-gutter-sm">
+            <q-icon name="warning" size="2em" />
+            <span v-if="loading">Cargando datos...</span>
+            <span v-else>No se encontraron resultados.</span>
+          </div>
+        </template>
+
+        <!-- Resaltado de coincidencias -->
+        <template v-slot:body-cell-otorgante="props">
+          <q-td :props="props" class="col-nombres">
+            <span v-html="resaltarCoincidencia(props.row.otorgante || '', 'otorgante')"></span>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-favorecido="props">
+          <q-td :props="props" class="col-nombres">
+            <span v-html="resaltarCoincidencia(props.row.favorecido || '', 'favorecido')"></span>
+          </q-td>
+        </template>
+
+
+        <template v-slot:body-cell-protocolo="props">
+          <q-td :props="props">
+            <div>
+              <strong>{{ props.row.protocolo }}</strong>
+              <div class="text-caption text-grey">
+                ({{ props.row.notario }})
+              </div>
             </div>
-          </template>
-          <template v-slot:body-cell-otorgante="props">
-            <q-td :props="props">
-              <span v-html="resaltarCoincidencia(props.row.otorgante, 'otorgante')"></span>
-            </q-td>
-          </template>
-          <template v-slot:body-cell-favorecido="props">
-            <q-td :props="props">
-              <span v-html="resaltarCoincidencia(props.row.favorecido, 'favorecido')"></span>
-            </q-td>
-          </template>
-          <template v-slot:body-cell-notario="props">
-            <q-td :props="props">
-              <span v-html="resaltarCoincidencia(props.row.notario, 'notario')"></span>
-            </q-td>
-          </template>
-          <template v-slot:body-cell-bien="props">
-            <q-td :props="props">
-              <span v-html="resaltarCoincidencia(props.row.bien, 'bien')"></span>
-            </q-td>
-          </template>
-          <template v-slot:body-cell-fecha="props">
-            <q-td :props="props">
-              <span :class="resaltarFecha(props.row.fecha)">
-                {{ props.row.fecha }}
-              </span>
-            </q-td>
-          </template>
-        </q-table>
-      </q-card-section>
-    <!-- </q-card> -->
+          </q-td>
+        </template>
+
+        <!-- <template v-slot:body-cell-bien="props">
+          <q-td :props="props">
+            <span v-html="resaltarCoincidencia(props.row.bien || '', 'bien')"></span>
+          </q-td>
+        </template> -->
+        <template v-slot:body-cell-bien="props">
+          <q-td :props="props" class="col-bien no-wrap">
+            <div class="text-bien" v-html="resaltarCoincidencia(props.row.bien || '', 'bien')"></div>
+          </q-td>
+        </template>
+
+
+
+        <template v-slot:body-cell-fecha="props">
+          <q-td :props="props">
+            <span :class="resaltarFecha(props.row.fecha)">
+              {{ props.row.fecha }}
+            </span>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-detalles="props">
+          <q-td :props="props">
+            <q-btn
+              icon="info"
+              color="secondary"
+              flat
+              dense
+              round
+              @click="abrirDetalles(props.row)"
+            >
+              <q-tooltip>Ver detalles</q-tooltip>
+            </q-btn>
+          </q-td>
+        </template>
+      </q-table>
+    </q-card-section>
+
+    <!-- Modal de detalles -->
+    <q-dialog v-model="modalDetalles" maximized>
+      <q-card class="q-pa-none shadow-10 rounded-borders" style="width: 80%; height: 85%;">
+        <!-- Encabezado -->
+        <q-card-section class="row items-center justify-between bg-primary text-white">
+          <div class="text-h6">📄 Detalles de Escritura</div>
+          <q-btn icon="close" color="negative" round dense v-close-popup />
+        </q-card-section>
+
+        <q-separator />
+
+        <!-- Contenido -->
+        <div class="row no-wrap" style="height: calc(100% - 11%);">
+          <!-- Columna izquierda (scrollable) -->
+          <div class="col-5 q-pa-md bg-grey-1" style="overflow-y: auto;">
+            <q-list bordered separator class="rounded-borders">
+              <q-item>
+                <q-item-section>
+                  <div><q-icon name="mdi-text-box" color="primary" /> <b>Protocolo:</b> {{ escrituraSeleccionada.libro?.protocolo }}</div>
+                  <div><b>N° Escritura:</b> {{ escrituraSeleccionada.cod_escritura }}</div>
+                  <div><b>Folio Inicial:</b> {{ escrituraSeleccionada.cod_folioInicial }}</div>
+                  <div><b>Folio Final:</b> {{ escrituraSeleccionada.cod_folioFinal }}</div>
+                  <div><b>Fecha:</b> {{ escrituraSeleccionada.fecha }}</div>
+                  <div><b>Año:</b> {{ escrituraSeleccionada.anio }} - <b>Mes:</b> {{ escrituraSeleccionada.mes }} - <b>Día:</b> {{ escrituraSeleccionada.dia }}</div>
+                  <div><b>Subserie:</b> {{ escrituraSeleccionada.sub_serie?.nombre }}</div>
+                </q-item-section>
+              </q-item>
+
+              <q-separator spaced />
+
+              <q-item>
+                <q-item-section>
+                  <div><q-icon name="mdi-account-multiple" color="primary" /> <b>Otorgantes:</b></div>
+                  <ul>
+                    <li v-for="o in (escrituraSeleccionada.otorgantes || [])" :key="o.id || o.nombre_completo">
+                      {{ o.nombre_completo }}
+                    </li>
+                  </ul>
+                </q-item-section>
+              </q-item>
+
+              <q-item>
+                <q-item-section>
+                  <div><q-icon name="mdi-handshake" color="primary" /> <b>Favorecidos:</b></div>
+                  <ul>
+                    <li v-for="f in (escrituraSeleccionada.favorecidos || [])" :key="f.id || f.nombre_completo">
+                      {{ f.nombre_completo }}
+                    </li>
+                  </ul>
+                </q-item-section>
+              </q-item>
+
+              <q-separator spaced />
+
+              <q-item>
+                <q-item-section>
+                  <div>
+                    <q-icon name="mdi-account-tie" color="primary" class="q-mr-sm" />
+                    <b>Notario:</b> {{ escrituraSeleccionada.notario }}
+                  </div>
+                  <div>
+                    <q-icon name="place" color="primary" class="q-mr-sm" />
+                    <b>Ubicación:</b> {{ ubicacionNotarioSeleccionado }}
+                  </div>
+                  <div><b>Bien:</b> {{ escrituraSeleccionada.bien }}</div>
+                  <div><b>Archivo:</b> {{ escrituraSeleccionada.file_name }}</div>
+                  <div><b>Observaciones:</b> {{ escrituraSeleccionada.observaciones || 'Sin observaciones' }}</div>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </div>
+
+          <!-- Columna derecha (PDF) -->
+          <div class="col-7 bg-grey-3 flex flex-center">
+            <template v-if="pdfUrl">
+              <iframe
+                :src="pdfUrl"
+                style="width: 98%; height: 98%; border: none; border-radius: 12px; background: white;"
+              ></iframe>
+            </template>
+            <div v-else class="text-grey text-center">📑 PDF no disponible</div>
+          </div>
+        </div>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, computed, onMounted, watch } from "vue"
+import { api } from "src/boot/axios"
 import OtorganteService from 'src/services/OtorganteService'
 import FavorecidoService from 'src/services/FavorecidoService'
-import { api } from 'src/boot/axios'
-import InputAnio from "src/components/InputAnio.vue";
-import InputMes from "src/components/InputMes.vue";
-import InputDia from "src/components/InputDia.vue";
-import InputTextSelect from "src/components/InputTextSelect.vue";
+import InputAnio from 'src/components/InputAnio.vue'
+import InputMes from 'src/components/InputMes.vue'
+import InputDia from 'src/components/InputDia.vue'
+import NotarioService from "src/services/NotarioService"
+import EscrituraService from "src/services/EscrituraService"
 
-// Estado de filtros y opciones
+// Estado global
+const seccionActiva = ref("nombres")
 const filtro = ref({
-  otorgante: '',
-  favorecido: '',
-  notario: '',
-  bien: '',
-  anio: '',
-  mes: '',
-  dia: ''
+  otorgante: "",
+  favorecido: "",
+  nombres: "",
+  notario: "",
+  bien: "",
+  anio: "",
+  mes: "",
+  dia: ""
 })
 
+const baseUrl = import.meta.env.VITE_APP_STORAGE_URL
+const notariosMapCompleto = ref({})
+const escrituraSeleccionada = ref({
+  libro: {},
+  otorgantes: [],
+  favorecidos: [],
+  fecha: '',
+  file_name: null
+})
+const pdfUrl = computed(() => {
+  return escrituraSeleccionada.value.file_name ? `${baseUrl}/${escrituraSeleccionada.value.file_name}` : null
+})
+
+const filter = ref('')
+const resultados = ref([])
+const loading = ref(false)
+
+// Opciones base (listas completas de BD)
+const modalDetalles = ref(false)
+const otorgantesBase = ref([])
+const favorecidosBase = ref([])
+const nombresBase = ref([])
+const bienesBase = ref([])
 const opcionesFiltradas = ref({
   otorgante: [],
   favorecido: [],
-  notario: [],
+  nombres: [],
   bien: []
 })
 
-const otorgantesBase = ref([])
-const favorecidosBase = ref([])
-const notariosBase = ref([])
-const bienesBase = ref([])
-const seccionActiva = ref('')
-
-// Resultados y tabla
-const resultados = ref([])
-const filter = ref('')
-const loading = ref(false)
-const pagination = ref({
-  sortBy: "id",
-  descending: false,
-  page: 1,
-  rowsPerPage: 10,
-  rowsNumber: 10,
-})
-
-function limpiarFecha() {
-  filtro.value.anio = ''
-  filtro.value.mes = ''
-  filtro.value.dia = ''
-}
-
-
-// ...existing code...
-function puedeBuscar(tipo) {
-  if (['otorgante', 'favorecido', 'bien', 'notario'].includes(tipo)) {
-    return filtro.value[tipo] && filtro.value[tipo].toString().trim().length >= 3
-  }
-  if (tipo === 'anio') {
-    return filtro.value.anio && filtro.value.anio.toString().trim().length >= 4
-  }
-  if (tipo === 'mes') {
-    return filtro.value.mes && filtro.value.mes.toString().trim().length >= 1
-  }
-  if (tipo === 'dia') {
-    return filtro.value.dia && filtro.value.dia.toString().trim().length >= 2
-  }
-  if (tipo === 'fecha') {
-    return filtro.value.anio && filtro.value.mes
-  }
-  return false
-}
-// ...existing code...
-
-// Columnas base
-const columns = [
-  { name: 'otorgante', label: 'Otorgante', field: 'otorgante', align: 'center' },
-  { name: 'favorecido', label: 'Favorecido', field: 'favorecido', align: 'center' },
-  { name: 'bien', label: 'Bien', field: 'bien', align: 'center' },
-  { name: 'protocolo', label: 'N° Protocolo', field: 'protocolo', align: 'center' },
-  { name: 'cod_escritura', label: 'N° Escritura', field: 'cod_escritura', align: 'center' },
-  { name: 'folio_inicial', label: 'Folio Inicial', field: 'folio_inicial', align: 'center' },
-  { name: 'fecha', label: 'Fecha', field: 'fecha', align: 'center' },
-  { name: 'ver', label: 'Ver Escritura', field: 'ver', align: 'center' }
+// Columnas de la tabla
+const columnsConCoincidencia = [
+  { name: "otorgante", label: "Otorgante(s)", field: "otorgante", align: "left" },
+  { name: "favorecido", label: "Favorecido(s)", field: "favorecido", align: "left" },
+  { name: "protocolo", label: "Protocolo", field: "protocolo", align: "center" },
+  { name: "bien", label: "Bien", field: "bien", align: "left" },
+  { name: "cod_escritura", label: "N° Escritura", field: "cod_escritura", align: "center" },
+  { name: "cod_folioInicial", label: "Folio Inicial", field: "cod_folioInicial", align: "center" },
+  { name: "fecha", label: "Fecha", field: "fecha", align: "center" },
+  { name: "ver", label: "Archivo", field: "ver", align: "center" },
+  { name: "detalles", label: "Detalles", field: "detalles", align: "center" }
 ]
 
-// Detecta si solo hay un filtro de texto activo (y cuál)
-const busquedaActiva = computed(() => {
-  const campos = ['otorgante', 'favorecido', 'notario', 'bien']
-  const activos = campos.filter(c => filtro.value[c] && filtro.value[c].length >= 3)
-  return activos.length === 1 ? activos[0] : ''
-})
-
-// Etiqueta legible para el mensaje
-const busquedaActivaLabel = computed(() => {
-  switch (busquedaActiva.value) {
-    case 'otorgante': return 'otorgante'
-    case 'favorecido': return 'favorecido'
-    case 'notario': return 'notario'
-    case 'bien': return 'bien'
-    default: return ''
-  }
-})
-
-// Agrega la columna "Coincidencia" solo si hay un filtro activo
-const columnsConCoincidencia = computed(() => {
-  if (busquedaActiva.value) {
-    return [
-      ...columns,
-      { name: 'coincidencia', label: 'Coincidencia', field: 'coincidencia', align: 'center' }
-    ]
-  }
-  return columns
-})
-
-// Carga inicial de datos para selects
+// Cargar datos iniciales
 onMounted(async () => {
-  const otorgantes = await OtorganteService.getData({ per_page: 1000 })
-  otorgantesBase.value = otorgantes.data.map(o => o.nombre_completo)
-  opcionesFiltradas.value.otorgante = otorgantesBase.value
+  try {
+    // Cargar otorgantes
+    const otorgantes = await OtorganteService.getData({ per_page: 1000 })
+    otorgantesBase.value = otorgantes.data.map(o => o.nombre_completo)
+    opcionesFiltradas.value.otorgante = otorgantesBase.value
 
-  const favorecidos = await FavorecidoService.getData({ per_page: 1000 })
-  favorecidosBase.value = favorecidos.data.map(f => f.nombre_completo)
-  opcionesFiltradas.value.favorecido = favorecidosBase.value
+    // Cargar favorecidos
+    const favorecidos = await FavorecidoService.getData({ per_page: 1000 })
+    favorecidosBase.value = favorecidos.data.map(f => f.nombre_completo)
+    opcionesFiltradas.value.favorecido = favorecidosBase.value
 
-  const notariosResp = await api.get('/api/notarios', { params: { rowsPerPage: 1000 } })
-  notariosBase.value = notariosResp.data.data.map(n => n.nombre_completo)
-  opcionesFiltradas.value.notario = notariosBase.value
+    // Combinar para búsqueda general de nombres
+    nombresBase.value = [...new Set([...otorgantesBase.value, ...favorecidosBase.value])]
+    opcionesFiltradas.value.nombres = nombresBase.value
 
-  const bienesResp = await api.get('/api/escrituras', { params: { per_page: 1000 } })
-  bienesBase.value = [...new Set(bienesResp.data.data.map(e => e.bien).filter(Boolean))]
-  opcionesFiltradas.value.bien = bienesBase.value
+    // Cargar bienes
+    const bienesResp = await api.get('/api/escrituras', { params: { per_page: 1000 } })
+    bienesBase.value = [...new Set(bienesResp.data.data.map(e => e.bien).filter(Boolean))]
+    opcionesFiltradas.value.bien = bienesBase.value
+
+    // Cargar notarios
+    cargarNotarios()
+  } catch (error) {
+    console.error("Error cargando datos iniciales:", error)
+  }
 })
 
-// Métodos para los filtros de los selects
+// Cargar notarios
+async function cargarNotarios() {
+  try {
+    const lista = await NotarioService.getAll()
+    notariosMapCompleto.value = Object.fromEntries(lista.map(n => [n.id, n]))
+  } catch (err) {
+    console.error("Error cargando notarios:", err)
+  }
+}
+
+// Verifica si se puede buscar (mínimo 3 caracteres o campo numérico válido)
+function puedeBuscar(campo) {
+  const valor = filtro.value[campo]
+
+  if (campo === "anio") {
+    return Number(valor) >= 1900 && Number(valor) <= 2100
+  }
+
+  if (campo === "mes") {
+    return Number(valor) >= 1 && Number(valor) <= 12
+  }
+
+  if (campo === "dia") {
+    return Number(valor) >= 1 && Number(valor) <= 31
+  }
+
+  if (campo === "fecha") {
+    // ✅ habilitar si hay Año y Mes válidos
+    const anioOk = Number(filtro.value.anio) >= 1900 && Number(filtro.value.anio) <= 2100
+    const mesOk = Number(filtro.value.mes) >= 1 && Number(filtro.value.mes) <= 12
+
+    return anioOk && mesOk
+  }
+
+  // Para otros filtros tipo texto
+  return valor && valor.length >= 3
+}
+
+
+// Filtrado dinámico en los selects
+function filtrar(campo, base, val, update) {
+  if (val === "") {
+    update(() => { opcionesFiltradas.value[campo] = base.value })
+    return
+  }
+
+  update(() => {
+    if (!base.value) return
+    const needle = val.toLowerCase()
+    opcionesFiltradas.value[campo] = base.value.filter(v =>
+      v.toLowerCase().includes(needle)
+    )
+  })
+}
+
+// Mantener siempre el texto escrito en el input
 function actualizarInput(campo, valor) {
   filtro.value[campo] = valor
 }
 
+// Guardar el valor como string (por si viene como objeto de Quasar)
 function guardarComoTexto(campo, valor) {
-  if (typeof valor === 'string') {
-    filtro.value[campo] = valor
-  } else if (valor?.label) {
-    filtro.value[campo] = valor.label
-  } else {
-    filtro.value[campo] = valor
-  }
+  if (typeof valor === "string") filtro.value[campo] = valor
 }
 
-function filtrar(campo, base, val, update) {
-  if (!val) {
-    update(() => {
-      opcionesFiltradas.value[campo] = base
-    })
-  } else {
-    const texto = val.toLowerCase()
-    if (texto.length >= 3) {
-      const resultados = base.filter(op => op.toLowerCase().includes(texto))
-      update(() => {
-        opcionesFiltradas.value[campo] = resultados
-      })
-    } else {
-      update(() => {
-        opcionesFiltradas.value[campo] = []
-      })
-    }
-  }
-}
+// Búsqueda
 
-// Cuenta cuántos filtros están activos
-function filtrosActivos() {
-  let count = 0
-  if (filtro.value.otorgante) count++
-  if (filtro.value.favorecido) count++
-  if (filtro.value.notario) count++
-  if (filtro.value.bien) count++
-  if (filtro.value.anio) count++
-  if (filtro.value.mes) count++
-  if (filtro.value.dia) count++
-  return count
-}
-
-// Búsqueda automática cuando hay al menos 2 filtros activos
-// watch(filtro, () => {
-//   if (filtrosActivos() >= 2) {
-//     buscarAuto()
-//   } else {
-//     resultados.value = []
-//   }
-// }, { deep: true })
-
-function resaltarFecha(fecha) {
-  const { anio, mes, dia } = filtro.value
-  if (!anio && !mes && !dia) return ''
-  // Formatea la fecha buscada
-  const pad = n => n.toString().padStart(2, '0')
-  let buscada = ''
-  if (anio && mes && dia) buscada = `${anio}-${pad(mes)}-${pad(dia)}`
-  else if (anio && mes) buscada = `${anio}-${pad(mes)}`
-  else if (anio) buscada = `${anio}`
-  // Resalta si coincide
-  return fecha && fecha.startsWith(buscada) ? 'bg-yellow text-black' : ''
-}
-
-// Lógica de búsqueda automática usando datos reales de la API
-async function buscarAuto() {
-  const tieneFiltroTexto = ['otorgante', 'favorecido', 'notario', 'bien'].some(
-    campo => filtro.value[campo] && filtro.value[campo].length >= 3
-  )
-  if (!tieneFiltroTexto && filtrosActivos() < 2) {
-    resultados.value = []
-    return
-  }
-  const params = {
-    otorgante: filtro.value.otorgante,
-    favorecido: filtro.value.favorecido,
-    notario: filtro.value.notario,
-    bien: filtro.value.bien,
-    anio: filtro.value.anio,
-    mes: filtro.value.mes,
-    dia: filtro.value.dia,
-    per_page: 100
-  }
-  // const resp = await api.get('/api/escrituras', { params })
-  // // resultados.value = (resp.data.data || resp.data).map(e => ({
-  // //   id: e.id,
-  // //   favorecido: e.favorecidos?.map(f => f.nombre_completo).join(', '),
-  // //   otorgante: e.otorgantes?.map(o => o.nombre_completo).join(', '),
-  // //   bien: e.bien,
-  // //   protocolo: e.libro?.protocolo || '',
-  // //   cod_escritura: e.cod_escritura,
-  // //   folio_inicial: e.cod_folioInicial,
-  // //   fecha: e.fecha,
-  // //   file_name: e.file_name,
-  // //   coincidencia: e.coincidencia || ''
-  // // }))
-
-  const resp = await api.get('/api/escrituras', { params })
-  resultados.value = (resp.data.data || resp.data).map(e => ({
-    id: e.id,
-    // favorecido: e.favorecidos?.map(f => f.nombre_completo).join('<br>'),
-    // otorgante: e.otorgantes?.map(o => o.nombre_completo).join('<br>'),
-    // favorecido: e.favorecidos
-    //   ? e.favorecidos.map(f => f.nombre_completo).join(
-    //       e.favorecidos.length > 1 ? '<br>' : ', '
-    //     )
-    //   : '',
-    // otorgante: e.otorgantes
-    //   ? e.otorgantes.map(o => o.nombre_completo).join(
-    //       e.otorgantes.length > 1 ? '<br>' : ', '
-    //     )
-    //   : '',
+const pagination = ref({
+  sortBy: 'desc',
+  descending: false,
+  page: 1,
+  rowsPerPage: 10,
+  rowsNumber: 0
+})
 
 
-    bien: e.bien,
-    protocolo: e.libro?.protocolo || '',
-    cod_escritura: e.cod_escritura,
-    folio_inicial: e.cod_folioInicial,
-    fecha: e.fecha, // <-- AGREGA ESTA LÍNEA
-    file_name: e.file_name,
-    coincidencia: e.coincidencia || ''
-  }))
-}
-
-
-
-// Lógica para abrir el archivo PDF usando la variable de entorno
-function verArchivo(fileName) {
-  if (fileName) {
-    const baseUrl = import.meta.env.VITE_APP_STORAGE_URL
-    const url = `${baseUrl}/${fileName}`
-    window.open(url, '_blank')
-  }
-}
-function resaltarCoincidencia(texto, campo) {
-  const valor = filtro.value[campo]
-  if (!valor || valor.length < 3 || !texto) return texto
-  // Escapa caracteres especiales para RegExp
-  const valorEscapado = valor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const regex = new RegExp(`(${valorEscapado})`, 'gi')
-  return texto.replace(regex, '<span style="background:yellow">$1</span>')
-}
-
-
-
-/// 2. MODIFICA el método buscar para que sí consulte la API y actualice resultados:
-
-async function buscar(tipo) {
-  loading.value = true
-  const pad = (n) => n.toString().padStart(2, '0')
-  const anio = filtro.value.anio?.toString().trim() || ''
-  const mes = filtro.value.mes?.toString().trim() || ''
-  const dia = filtro.value.dia?.toString().trim() || ''
-  let fechaCompleta = ''
-  if (anio && mes && dia) {
-    fechaCompleta = `${anio}-${pad(mes)}-${pad(dia)}`
-  }
-
-  // Prepara los parámetros según el tipo de búsqueda
-  const params = {
-    otorgante: tipo === 'otorgante' ? filtro.value.otorgante : '',
-    favorecido: tipo === 'favorecido' ? filtro.value.favorecido : '',
-    notario: tipo === 'notario' ? filtro.value.notario : '',
-    bien: tipo === 'bien' ? filtro.value.bien : '',
-    anio: tipo === 'anio' || tipo === 'fecha' ? anio : '',
-    mes: tipo === 'mes' || tipo === 'fecha' ? mes : '',
-    dia: tipo === 'dia' || tipo === 'fecha' ? dia : '',
-    per_page: 100
-  }
-
-  // Si es "todos", manda todos los filtros
-  if (tipo === 'todos') {
-    params.otorgante = filtro.value.otorgante
-    params.favorecido = filtro.value.favorecido
-    params.notario = filtro.value.notario
-    params.bien = filtro.value.bien
-    params.anio = anio
-    params.mes = mes
-    params.dia = dia
-  }
-
-  // Si es búsqueda por fecha completa, solo busca si hay año, mes y día
-  if (tipo === 'fecha' && !(anio && mes && dia)) {
-    loading.value = false
-    return
-  }
-
+async function buscar(tipo = "general", extra = {}) {
   try {
-    const resp = await api.get('/api/escrituras', { params })
-    resultados.value = (resp.data.data || resp.data).map(e => ({
-      id: e.id,
-      favorecido: e.favorecidos?.map(f => f.nombre_completo).join('<br>'),
-      otorgante: e.otorgantes?.map(o => o.nombre_completo).join('<br>'),
-      // favorecido: e.favorecidos
-      //   ? e.favorecidos.map(f => f.nombre_completo).join(
-      //       e.favorecidos.length > 1 ? '<br>' : ', '
-      //     )
-      //   : '',
-      // otorgante: e.otorgantes
-      //   ? e.otorgantes.map(o => o.nombre_completo).join(
-      //       e.otorgantes.length > 1 ? '<br>' : ', '
-      //     )
-      //   : '',
+    loading.value = true
 
-      bien: e.bien,
-      fecha:e.fecha,
+
+    const params = {
+      page: pagination.value.page,
+      rowsPerPage: pagination.value.rowsPerPage, // <-- cambiar aquí
+      sortBy: pagination.value.sortBy === 'desc' ? 'id' : pagination.value.sortBy || 'id',
+      sortOrder: pagination.value.descending ? 'desc' : 'asc'
+    }
+
+    // Agregar el filtro según el tipo de búsqueda
+    if (tipo === "otorgante" && filtro.value.otorgante) {
+      params.otorgante = filtro.value.otorgante
+    } else if (tipo === "favorecido" && filtro.value.favorecido) {
+      params.favorecido = filtro.value.favorecido
+    } else if (tipo === "nombres" && filtro.value.nombres) {
+      params.nombres = filtro.value.nombres
+    } else if (tipo === "bien" && filtro.value.bien) {
+      params.bien = filtro.value.bien
+    } else if (tipo === "anio" && filtro.value.anio) {
+      params.anio = filtro.value.anio
+    } else if (tipo === "mes" && filtro.value.mes) {
+      params.mes = filtro.value.mes
+    } else if (tipo === "dia" && filtro.value.dia) {
+      params.dia = filtro.value.dia
+    } else if (tipo === "fecha") {
+      if (filtro.value.anio) params.anio = filtro.value.anio
+      if (filtro.value.mes) params.mes = filtro.value.mes
+      if (filtro.value.dia) params.dia = filtro.value.dia
+    }
+
+    // llamada al backend
+    const res = await api.get("/api/escrituras/buscar", { params })
+
+    resultados.value = (res.data.data || []).map(e => ({
+      ...e,
+      otorgante: e.otorgantes?.map(o => o.nombre_completo).join('<br>') || '',
+      favorecido: e.favorecidos?.map(f => f.nombre_completo).join('<br>') || '',
+      otorgantes: e.otorgantes || [],
+      favorecidos: e.favorecidos || [],
+      libro: e.libro || {},
       protocolo: e.libro?.protocolo || '',
-      cod_escritura: e.cod_escritura,
-      folio_inicial: e.cod_folioInicial,
-      file_name: e.file_name,
-      coincidencia: e.coincidencia || ''
+      notario: e.libro?.notario?.nombre_completo ||
+        notariosMapCompleto.value[e.libro?.notario_id]?.nombre_completo || 'No asignado',
+      cod_folioInicial: e.folio_inicial || e.cod_folioInicial || '',
+      cod_folioFinal: e.folio_final || e.cod_folioFinal || ''
     }))
-  } catch (e) {
-    resultados.value = []
+
+    // Actualizar paginación
+    pagination.value.rowsNumber = res.data.total
+    pagination.value.page = res.data.current_page
+    pagination.value.rowsPerPage = res.data.per_page
+
+  } catch (error) {
+    console.error("Error en buscar:", error)
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
+// ...existing code...
+
+// async function buscar(tipo = "general", extra = {}) {
+//   try {
+//     loading.value = true
+
+//     // parámetros que pide tu backend
+//     const params = {
+//       page: pagination.value.page,
+//       per_page: pagination.value.rowsPerPage,
+//       ...extra
+//     }
+//         // Agregar el filtro según el tipo de búsqueda
+//     if (tipo === "otorgante" && filtro.value.otorgante) {
+//       params.otorgante = filtro.value.otorgante
+//     } else if (tipo === "favorecido" && filtro.value.favorecido) {
+//       params.favorecido = filtro.value.favorecido
+//     } else if (tipo === "nombres" && filtro.value.nombres) {
+//       params.nombres = filtro.value.nombres
+//     } else if (tipo === "bien" && filtro.value.bien) {
+//       params.bien = filtro.value.bien
+//     } else if (tipo === "fecha") {
+//       if (filtro.value.anio) params.anio = filtro.value.anio
+//       if (filtro.value.mes) params.mes = filtro.value.mes
+//       if (filtro.value.dia) params.dia = filtro.value.dia
+//     }
+
+//     // llamada al backend
+//     const res = await api.get("/api/escrituras/buscar", { params })
+
+//     // ✅ solo guardamos la parte de registros en la tabla
+//         resultados.value = (res.data.data || []).map(e => ({
+//         ...e,
+//         otorgante: e.otorgantes?.map(o => o.nombre_completo).join('<br>') || '',
+//         favorecido: e.favorecidos?.map(f => f.nombre_completo).join('<br>') || '',
+//         otorgantes: e.otorgantes || [],
+//         favorecidos: e.favorecidos || [],
+//         libro: e.libro || {},
+//         protocolo: e.libro?.protocolo || '',
+//         notario: e.libro?.notario?.nombre_completo ||
+//           notariosMapCompleto.value[e.libro?.notario_id]?.nombre_completo || 'No asignado',
+//         cod_folioInicial: e.folio_inicial || e.cod_folioInicial || '',
+//         cod_folioFinal: e.folio_final || e.cod_folioFinal || ''
+//       }))
+
+
+//     // ✅ sincronizamos la paginación del Quasar con Laravel
+//     pagination.value.rowsNumber = res.data.total       // total de registros
+//     pagination.value.page = res.data.current_page      // página actual
+//     pagination.value.rowsPerPage = res.data.per_page   // registros por página
+
+//     // 🔎 depuración opcional
+//     console.log("Resultados cargados:", resultados.value.length)
+//     console.log("Página:", pagination.value.page, "/", Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage))
+//   } catch (error) {
+//     console.error("Error en buscar:", error)
+//   } finally {
+//     loading.value = false
+//   }
+// }
+
+
+
+
+
+// async function onRequest(props) {
+//   const { page, rowsPerPage, sortBy, descending } = props.pagination
+
+//   // Evitar mostrar todo si rowsPerPage = 0
+//   if (rowsPerPage === 0) return
+
+//   // Mantener coherencia en el estado de paginación
+//   pagination.value = {
+//     ...pagination.value,
+//     page,
+//     rowsPerPage,
+//     sortBy,
+//     descending
+//   }
+
+//   // Ejecutar búsqueda con los nuevos parámetros
+//   await buscar("general", { pagination: pagination.value })
+// }
+
 
 // ...existing code...
 
-function onRequest() {
-  loading.value = false
+
+async function onRequest(props) {
+  const { page, rowsPerPage, sortBy, descending } = props.pagination
+
+  // Actualiza la paginación
+  pagination.value = {
+    ...pagination.value,
+    page,
+    rowsPerPage,
+    sortBy,
+    descending
+  }
+
+  // Ejecuta la búsqueda con el filtro activo
+  if (seccionActiva.value === 'nombres' && filtro.value.otorgante) {
+    await buscar('otorgante')
+  } else if (seccionActiva.value === 'nombres' && filtro.value.favorecido) {
+    await buscar('favorecido')
+  } else if (seccionActiva.value === 'nombres' && filtro.value.nombres) {
+    await buscar('nombres')
+  } else if (seccionActiva.value === 'bien' && filtro.value.bien) {
+    await buscar('bien')
+  } else if (seccionActiva.value === 'fecha' && (filtro.value.anio || filtro.value.mes || filtro.value.dia)) {
+    await buscar('fecha')
+  } else {
+    await buscar('general')
+  }
+}
+// ...existing code...
+
+
+// Resaltado de coincidencias
+function escapeRegExp(string) {
+  return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+
+
+function resaltarCoincidencia(texto, campo) {
+  if (!texto || typeof texto !== "string") return texto || ""
+
+  // ✅ Si buscas por 'nombres', usar ese valor también para otorgante/favorecido
+  let termino = filtro.value[campo] || ""
+  if ((campo === "otorgante" || campo === "favorecido") && !termino) {
+    termino = filtro.value.nombres
+  }
+
+  // Si el filtro viene como array (use-chips), unirlo en un string
+  if (Array.isArray(termino)) {
+    termino = termino.join(" ")
+  }
+
+  if (!termino || String(termino).length < 1) return texto
+
+  try {
+    const safe = escapeRegExp(String(termino))
+    const regex = new RegExp(`(${safe})`, "gi")
+    return texto.replace(regex, '<span class="bg-yellow text-black"><b>$1</b></span>')
+  } catch (err) {
+    console.error("Error en resaltarCoincidencia:", err)
+    return texto
+  }
+}
+
+
+function resaltarFecha(fecha) {
+  if (!fecha) return ""
+  const { anio, mes, dia } = filtro.value
+  let coincide = false
+  if (anio && fecha.includes(anio)) coincide = true
+  if (mes && fecha.includes(String(mes).padStart(2, '0'))) coincide = true
+  if (dia && fecha.includes(String(dia).padStart(2, '0'))) coincide = true
+  return coincide ? "bg-yellow" : ""
+}
+
+const ubicacionNotarioSeleccionado = computed(() => {
+  const libro = escrituraSeleccionada.value.libro || {}
+  const notarioObj = libro.notario || null
+
+  // Si el notario está embebido en el objeto 'libro'
+  if (notarioObj && notarioObj.ubigeo && notarioObj.ubigeo.nombre) {
+    return notarioObj.ubigeo.nombre
+  }
+
+  // Si solo está el ID del notario, buscamos en el mapa
+  const notarioId = libro.notario_id
+  const mapa = notariosMapCompleto.value || {}
+
+  if (notarioId != null && mapa[notarioId] && mapa[notarioId].ubigeo && mapa[notarioId].ubigeo.nombre) {
+    return mapa[notarioId].ubigeo.nombre
+  }
+
+  return 'No asignado'
+})
+
+// Abrir detalles
+function abrirDetalles(escritura) {
+  escrituraSeleccionada.value = {
+    ...escritura,
+    fecha: escritura.fecha || "",
+    libro: escritura.libro || {},
+    otorgantes: escritura.otorgantes || [],
+    favorecidos: escritura.favorecidos || [],
+    file_name: escritura.file_name || null
+  }
+  modalDetalles.value = true
+}
+
+// Eventos de tabla
+// async function onRequest(props) {
+//   pagination.value = props.pagination
+//   await buscar("general")
+// }
+
+// async function onRequest(props) {
+//   pagination.value = props.pagination
+
+//   // Si no hay filtros, no traemos nada
+//   const hayFiltros = Object.values(filtro.value).some(v => v && v !== "")
+//   if (!hayFiltros) {
+//     resultados.value = []   // vacío hasta que hagan una búsqueda
+//     pagination.value.rowsNumber = 0
+//     return
+//   }
+
+//   // Ejecutar búsqueda con los filtros actuales
+//   await buscar("general")
+// }
+
+
+// Ya no necesitamos la función onRequest
+
+// Abrir archivo PDF
+function verArchivo(fileName) {
+  if (!fileName) return
+  const url = `${baseUrl}/${fileName}`
+  window.open(url, "_blank")
 }
 </script>
 
 <style scoped>
-.my-card {
-  width: 100%;
-  max-width: auto;
-  margin: 0 auto;
-}
 .bg-yellow {
   background: #fff59d;
   border-radius: 4px;
   padding: 2px 6px;
 }
+
+/* Forzar a que el campo Bien haga salto de línea */
+.col-bien {
+  max-width: 250px; /* puedes ajustar */
+  white-space: normal !important;
+}
+
+.col-bien .text-bien {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+
+.col-nombres {
+  max-width: 250px;    /* 👈 Ajusta el ancho máximo */
+  white-space: normal; /* Permite saltos de línea */
+  word-break: break-word; /* Rompe palabras largas */
+  font-size: 14px;     /* 👈 Tamaño definido */
+  line-height: 1.4;    /* Mejor legibilidad */
+}
+
+.col-nombres span {
+  display: block;
+  overflow-wrap: break-word;
+}
+
+
 </style>

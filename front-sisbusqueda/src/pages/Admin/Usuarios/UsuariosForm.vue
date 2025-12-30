@@ -13,7 +13,8 @@
           outlined
           v-model="form.dni"
           label="DNI *"
-          maxlength="15"
+          maxlength="8"
+          mask="########"
           autocomplete="off"
           @change="form.validate('dni')"
           :error="form.invalid('dni')"
@@ -74,12 +75,13 @@
           <template v-slot:error><div>{{ form.errors.password }}</div></template>
         </q-input>
 
-        <!-- Nivel -->
         <q-select
           dense
           outlined
-          v-model="form.nivel"
+          v-model="form.nivel_id"
           :options="nivelOptions"
+          option-value="value"
+          option-label="label"
           label="Nivel *"
           emit-value
           map-options
@@ -88,6 +90,8 @@
         >
           <template v-slot:prepend><q-icon name="mdi-account-star" /></template>
         </q-select>
+
+
 
         <!-- Estado -->
         <q-select
@@ -150,18 +154,15 @@ import { useForm } from 'laravel-precognition-vue'
 import { onMounted, ref } from 'vue'
 import RoleService from 'src/services/RoleService'
 import SelectArea from 'src/components/SelectArea.vue'
+import NivelService from 'src/services/NivelService'
 
 const isPwd = ref(true)
 const roles = ref([])
 const emits = defineEmits(['save'])
 const areaSelectRef = ref()
 const idSelectArea = ref(null)
+const nivelOptions = ref([])
 
-const nivelOptions = [
-  { label: 'Archivo Central', value: 'central' },
-  { label: 'Archivo Historico', value: 'historico' },
-  { label: 'Archivo Intermedio', value: 'intermedio' }
-]
 
 const estadoOptions = [
   { label: 'Activo', value: true },
@@ -178,18 +179,25 @@ let form
 if (props.edit) {
   form = useForm('put', `api/usuarios/${props.id}`, {
     id: '', name: '', email: '', password: '',
-    area_id: null, rolesSelected: [], dni: '', nivel: '', estado: true
+    area_id: null, rolesSelected: [], dni: '', nivel_id: '', estado: true
   })
 } else {
   form = useForm('post', 'api/usuarios', {
     id: '', name: '', email: '', password: '',
-    area_id: '', rolesSelected: [], dni: '', nivel: '', estado: true
+    area_id: '', rolesSelected: [], dni: '', nivel_id: '', estado: true
   })
 }
 
 async function cargar() {
   const { data } = await RoleService.getData({ params: { rowsPerPage: 0, order_by: 'id' } })
   roles.value = data
+
+  // 🔹 Cargar niveles desde backend
+  const response = await NivelService.getData({ params: { rowsPerPage: 0 } })
+  nivelOptions.value = response.data.map(n => ({
+    label: n.nombre, // 👈 el campo real en BD
+    value: n.id
+  }))
 }
 
 function updateArea(event) {

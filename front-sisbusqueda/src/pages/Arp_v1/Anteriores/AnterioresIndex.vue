@@ -8,23 +8,28 @@
     </div>
     <q-separator />
     <div class="q-gutter-xs q-pa-sm">
-
       <div class="row">
-        <SelectInput dense clearable
+        <SelectInput
+          dense
+          clearable
           class="col-4 q-px-xs"
           label="Notarios"
           v-model="nombreNotario"
           :options="GenerateListService"
           :GenerateList="{ column: 'notario', table: 'anterior' }"
         />
-        <SelectInput dense clearable
+        <SelectInput
+          dense
+          clearable
           class="col-4 q-px-xs"
           label="Lugar"
           v-model="nombreLugar"
           :options="GenerateListService"
           :GenerateList="{ column: 'lugar', table: 'anterior' }"
         />
-        <SelectInput dense clearable
+        <SelectInput
+          dense
+          clearable
           class="col-4 q-px-xs"
           label="Subserie"
           v-model="nombreSubserie"
@@ -32,7 +37,9 @@
           :GenerateList="{ column: 'subserie', table: 'anterior' }"
         />
 
-        <InputTextSelect dense clearable
+        <InputTextSelect
+          dense
+          clearable
           class="col-4 q-px-xs"
           label="Otorgantes"
           v-model="nombreNotario_"
@@ -92,7 +99,7 @@
             <span v-else>{{ col.label }}</span>
             <q-icon
               v-if="col.search"
-              class="q-pa-xs q-mx-xs cursor-pointer"
+              class="q-pa-sm q-mx-xs cursor-pointer"
               :class="$q.dark.isActive ? 'btn-buscar-dark' : 'btn-buscar'"
               name="search"
               size="xs"
@@ -189,17 +196,83 @@ async function verDat() {
 // verDat(); //
 const nombreNotario_ = ref();
 const columns = [
-  { name: 'index', label: '#', field: 'index' },
-  { field: (row) => row.notario, name: "notario", label: "Notario", align: "left", sortable_: true, search: true },
-  { field: (row) => row.lugar, name: "lugar", label: "Lugar", align: "left", sortable_: true, search: true },
-  { field: (row) => row.subserie, name: "subserie", label: "Subserie", align: "center", sortable_: true, search: true },
-  { field: (row) => row.fecha, name: "fecha", label: "Fecha", align: "center", sortable_: true, search: true },
-  { field: (row) => row.bien, name: "bien", label: "Bien", align: "left", sortable_: true, },
-  { field: (row) => row.protocolo, name: "protocolo", label: "Protocolo", align: "center", sortable_: true, },
-  { field: (row) => row.nescritura, name: "nescritura", label: "Escritura", align: "center", sortable_: true, },
-  { field: (row) => row.folio, name: "folio", label: "Folio", align: "center", sortable_: true, },
-  { field: (row) => row.otorgantes, name: "otorgantes", label: "Otorgantes", align: "center", sortable_: true, search: true},
-  { field: (row) => row.favorecidos, name: "favorecidos", label: "Favorecidos", align: "center", sortable_: true,  search: true},
+  { name: "index", label: "#", field: "index" },
+  {
+    field: (row) => row.notario,
+    name: "notario",
+    label: "Notario",
+    align: "left",
+    sortable_: true,
+    search: true,
+  },
+  {
+    field: (row) => row.lugar,
+    name: "lugar",
+    label: "Lugar",
+    align: "left",
+    sortable_: true,
+    search: true,
+  },
+  {
+    field: (row) => row.subserie,
+    name: "subserie",
+    label: "Subserie",
+    align: "center",
+    sortable_: true,
+    search: true,
+  },
+  {
+    field: (row) => row.fecha,
+    name: "fecha",
+    label: "Fecha",
+    align: "center",
+    sortable_: true,
+    search: true,
+  },
+  {
+    field: (row) => row.bien,
+    name: "bien",
+    label: "Bien",
+    align: "left",
+    sortable_: true,
+  },
+  {
+    field: (row) => row.protocolo,
+    name: "protocolo",
+    label: "Protocolo",
+    align: "center",
+    sortable_: true,
+  },
+  {
+    field: (row) => row.nescritura,
+    name: "nescritura",
+    label: "Escritura",
+    align: "center",
+    sortable_: true,
+  },
+  {
+    field: (row) => row.folio,
+    name: "folio",
+    label: "Folio",
+    align: "center",
+    sortable_: true,
+  },
+  {
+    field: (row) => row.otorgantes,
+    name: "otorgantes",
+    label: "Otorgantes",
+    align: "center",
+    sortable_: true,
+    search: true,
+  },
+  {
+    field: (row) => row.favorecidos,
+    name: "favorecidos",
+    label: "Favorecidos",
+    align: "center",
+    sortable_: true,
+    search: true,
+  },
 ];
 
 const tableRef = ref();

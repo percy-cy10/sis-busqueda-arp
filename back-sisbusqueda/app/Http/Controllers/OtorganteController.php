@@ -13,21 +13,79 @@ class OtorganteController extends Controller
      * Mostrar una lista de los recursos.
      * GET /otorgantes
      */
+    // public function index(Request $request)
+    // {
+    //     $query = Otorgante::query();
+
+    //     // 🔍 Filtro de búsqueda (opcional)
+    //     if ($request->has('search') && $request->search !== '') {
+    //         $search = $request->search;
+    //         $query->where(function ($q) use ($search) {
+    //             $q->where('nombre_completo', 'like', "%{$search}%")
+    //                 ->orWhere('razon_social', 'like', "%{$search}%")
+    //                 ->orWhere('nombre', 'like', "%{$search}%")
+    //                 ->orWhere('apellido_paterno', 'like', "%{$search}%")
+    //                 ->orWhere('apellido_materno', 'like', "%{$search}%");
+    //         });
+    //     }
+
+    //     // Ordenar por fecha de actualización (descendente)
+    //     $query->orderBy('updated_at', 'desc');
+
+    //     // 📌 Si per_page = 0 → traer todos los registros
+    //     $perPage = (int) $request->get('per_page', 10);
+    //     if ($perPage === 0) {
+    //         return response()->json([
+    //             'data' => $query->get(),
+    //             'total' => $query->count()
+    //         ], 200);
+    //     }
+
+    //     // 📌 Caso normal: devolver con paginación
+    //     return response()->json($query->paginate($perPage), 200);
+    // }
+
     public function index(Request $request)
     {
-        // Consulta base para obtener los otorgantes
         $query = Otorgante::query();
 
-        // Ordenar por fecha de actualización (descendente)
-        $query->orderBy('updated_at', 'desc');
+        // 🔍 Filtro de búsqueda (opcional)
+        if ($request->has('search') && $request->search !== '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre_completo', 'like', "%{$search}%")
+                    ->orWhere('razon_social', 'like', "%{$search}%")
+                    ->orWhere('nombre', 'like', "%{$search}%")
+                    ->orWhere('apellido_paterno', 'like', "%{$search}%")
+                    ->orWhere('apellido_materno', 'like', "%{$search}%");
+            });
+        }
 
-        // Paginación con opción de resultados por página
-        $perPage = $request->get('per_page', 10);
-        $otorgantes = $query->paginate($perPage);
+        // 📌 Orden dinámico (id o nombre_completo)
+        $sortBy = $request->get('sort_by', 'updated_at');   // default updated_at
+        $sortOrder = $request->get('sort_order', 'desc');   // default desc
 
-        return response()->json($otorgantes, 200);
+        // Validar que solo se permita ordenar por campos seguros
+        if (in_array($sortBy, ['id', 'nombre_completo'])) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('updated_at', 'desc');
+        }
+
+        // 📌 Si per_page = 0 → traer todos los registros
+        $perPage = (int) $request->get('per_page', 10);
+        if ($perPage === 0) {
+            return response()->json([
+                'data' => $query->get(),
+                'total' => $query->count()
+            ], 200);
+        }
+
+        // 📌 Caso normal: devolver con paginación
+        return response()->json($query->paginate($perPage), 200);
     }
-    
+
+
     /**
      * Show the form for creating a new resource.
      */

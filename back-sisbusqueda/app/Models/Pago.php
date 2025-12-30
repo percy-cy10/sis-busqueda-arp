@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Pago extends Model
 {
@@ -22,6 +23,12 @@ class Pago extends Model
         'total',
         'user_id',
         'estado', // <-- agregado
+        'created_by', // Agregar
+        'updated_by', // Agregar
+        'monto_pagado',      // nuevo
+        'vuelto',           // nuevo
+        'forma_pago_id',    // nuevo
+        'condicion_pago_id', // nuevo
         'created_at',
         'updated_at',
     ];
@@ -35,7 +42,7 @@ class Pago extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function tupas()
@@ -48,6 +55,17 @@ class Pago extends Model
     // Accesor para mostrar el estado en texto
     public function getEstadoTextoAttribute()
     {
+        if ($this->estado === null) return 'Anulado';
         return $this->estado ? 'Pendiente' : 'Pagado';
+    }
+
+    public function creador()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function actualizador()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

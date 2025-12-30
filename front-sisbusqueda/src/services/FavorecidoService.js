@@ -5,6 +5,10 @@ class FavorecidoService {
     return (await api.get("/api/favorecidos", { params })).data;
   }
 
+  static async getAll() {
+    return (await api.get("/api/favorecidos", { params: { per_page: 0 } })).data;
+  }
+
   static async get(id) {
     return (await api.get(`/api/favorecidos/${id}`)).data;
   }
@@ -19,6 +23,10 @@ class FavorecidoService {
     } else {
       return (await api.put(`/api/favorecidos/${reg.id}`, reg)).data;
     }
+  }
+
+  static async buscar(query) {
+    return (await api.get("/api/favorecidos", { params: { search: query, per_page: 0 } })).data;
   }
 }
 

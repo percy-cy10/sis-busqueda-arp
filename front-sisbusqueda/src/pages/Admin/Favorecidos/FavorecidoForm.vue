@@ -118,12 +118,48 @@ const loadData = async (id) => {
   }
 };
 
+// const submit = () => {
+//   if (form.tipo === "natural") {
+//     form.nombre_completo = `${form.nombre} ${form.apellido_paterno} ${form.apellido_materno}`.trim();
+//     form.razon_social = null;
+//   } else {
+//     form.nombre_completo = form.razon_social;
+//     form.nombre = null;
+//     form.apellido_paterno = null;
+//     form.apellido_materno = null;
+//   }
+
+//   form.submit()
+//     .then(() => {
+
+//       $q.notify({ type: "positive", message: "Guardado exitoso!", position: "top-right",
+//       progress: true,
+//       timeout: 1000 });
+//       emits("save");
+//     })
+//     .catch((error) => {
+//       $q.notify({ type: "negative", message: "Error al guardar", position: "top-right",
+//       progress: true,
+//       timeout: 1000 });
+//     });
+// };
+
+
+const normalizeName = (text) => {
+  if (!text) return "";
+  return text
+    .trim()                // elimina espacios al inicio y final
+    .replace(/\s+/g, " "); // reemplaza múltiples espacios por uno solo
+};
+
 const submit = () => {
   if (form.tipo === "natural") {
-    form.nombre_completo = `${form.nombre} ${form.apellido_paterno} ${form.apellido_materno}`.trim();
+    form.nombre_completo = `${normalizeName(form.nombre)} ${normalizeName(form.apellido_paterno)} ${normalizeName(form.apellido_materno)}`
+      .trim()
+      .replace(/\s+/g, " "); // seguridad extra para limpiar dobles espacios
     form.razon_social = null;
   } else {
-    form.nombre_completo = form.razon_social;
+    form.nombre_completo = normalizeName(form.razon_social);
     form.nombre = null;
     form.apellido_paterno = null;
     form.apellido_materno = null;
@@ -131,18 +167,27 @@ const submit = () => {
 
   form.submit()
     .then(() => {
-
-      $q.notify({ type: "positive", message: "Guardado exitoso!", position: "top-right",
-      progress: true,
-      timeout: 1000 });
+      $q.notify({
+        type: "positive",
+        message: "Guardado exitoso!",
+        position: "top-right",
+        progress: true,
+        timeout: 1000
+      });
       emits("save");
     })
     .catch((error) => {
-      $q.notify({ type: "negative", message: "Error al guardar", position: "top-right",
-      progress: true,
-      timeout: 1000 });
+      $q.notify({
+        type: "negative",
+        message: "Error al guardar",
+        position: "top-right",
+        progress: true,
+        timeout: 1000
+      });
     });
 };
+
+
 
 
 defineExpose({

@@ -1,176 +1,489 @@
 <template>
   <q-card class="my-card">
-    <q-card-section class="bg-primary text-white">
+    <!-- ===========================
+         HEADER DEL FORMULARIO
+    ============================ -->
+    <q-card-section class="bg-primary text-white relative-position">
       <div class="text-h6">{{ title }}</div>
+      <!-- Botón Cerrar en esquina superior derecha -->
+      <q-btn
+        icon="close"
+        color="negative"
+        round
+        v-close-popup
+        class="absolute-top-right q-ma-xs"
+      />
     </q-card-section>
 
     <q-form @submit.prevent="submit" class="q-gutter-md">
       <q-card-section class="q-pa-md">
-        <!-- 1. Selección de Solicitud -->
-        <q-select
-          dense outlined
-          v-model="form.solicitud_id"
-          :options="filteredSolicitudes"
-          option-value="id"
-          option-label="label"
-          label="Solicitud *"
-          emit-value map-options
-          class="q-mb-sm"
-          placeholder=""
-          clearable
-          :disable="false"
-          use-input
-          input-debounce="0"
-          @filter="filterSolicitudes"
-        >
-          <template v-slot:prepend>
-            <q-icon name="assignment" />
-          </template>
-        </q-select>
 
-        <!-- 2. Tipo de Documento -->
-        <q-select
-          dense outlined
-          v-model="form.tipo_documento"
-          :options="tipoDocumentoOptions"
-          label="Tipo Documento *"
-          class="q-mb-sm"
-          :rules="[val => !!val || 'Campo requerido']"
-          clearable
-          :disable="!!form.solicitud_id"
-          emit-value
-          map-options
-        >
-          <template v-slot:prepend>
-            <q-icon name="badge" />
-          </template>
-        </q-select>
-
-        <!-- 3. Número de Documento -->
-        <q-input
-          dense outlined
-          v-model="form.num_documento"
-          label="Número Documento *"
-          class="q-mb-sm"
-          :rules="[
-            val => !!val || 'Campo requerido',
-            val => form.tipo_documento === 'RUC' ? (val && val.length === 11) || 'El RUC debe tener 11 dígitos' : true
-          ]"
-          :mask="form.tipo_documento === 'RUC' ? '###########' : '###########'"
-          @blur="autocompletarSolicitante"
-          :disable="!!form.solicitud_id"
-        >
-          <template v-slot:prepend>
-            <q-icon name="confirmation_number" />
-          </template>
-        </q-input>
-
-        <!-- 4. Nombre Completo -->
-        <q-input
-          dense outlined
-          v-model="form.nombre_completo"
-          label="Nombre Completo *"
-          class="q-mb-sm"
-          :rules="[val => !!val || 'Campo requerido']"
-          :readonly="!!form.solicitud_id"
-          :disable="!!form.solicitud_id"
-        >
-          <template v-slot:prepend>
-            <q-icon name="person" />
-          </template>
-        </q-input>
-
-        <!-- 5. Total (solo lectura) -->
-        <q-input
-          dense outlined
-          v-model.number="form.total"
-          label="Total *"
-          type="number"
-          class="q-mb-sm"
-          :rules="[val => val > 0 || 'Debe ser mayor a 0']"
-          readonly
-        >
-          <template v-slot:after>
-            <div class="text-subtitle1 q-pa-sm">
-              {{ formatNumberToSoles(redondearConDecimales(form.total)) }}
-            </div>
-          </template>
-        </q-input>
-
-        <!-- 6. Tupas (detalle de pagos) -->
-        <div class="q-mb-sm">
-          <label class="text-bold">Tupas</label>
-          <div v-for="(tupaSel, idx) in form.tupas" :key="idx" class="row q-gutter-sm items-center q-mb-xs">
+        <!-- ===========================
+             PRIMERA FILA: SOLICITUD
+        ============================ -->
+        <div class="row q-mb-md">
+          <div class="col-12">
             <q-select
-              dense outlined
-              v-model="tupaSel.tupa_id"
-              :options="tupas"
+              outlined
+              v-model="form.solicitud_id"
+              :options="filteredSolicitudes"
               option-value="id"
               option-label="label"
-              label="Tupa"
-              emit-value map-options
-              style="min-width: 220px"
-              :rules="[val => !!val || 'Seleccione un tupa']"
-              @update:model-value="val => actualizarPrecioTupa(idx, val)"
+              label="Buscar Solicitud"
+              emit-value
+              map-options
               clearable
+              use-input
+              input-debounce="300"
+              @filter="filterSolicitudes"
+              @update:model-value="onSolicitudSeleccionada"
+              :loading="loadingSolicitudes"
+              hide-dropdown-icon
+              @clear="limpiarCamposSolicitante"
+              :readonly="campoSolicitudBloqueado"
+              :disable="campoSolicitudBloqueado"
             >
               <template v-slot:prepend>
-                <q-icon name="description" />
+                <q-icon name="search" />
+              </template>
+
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No se encontraron solicitudes
+                  </q-item-section>
+                </q-item>
+              </template>
+
+              <template v-slot:option="scope">
+                <q-item v-bind="scope.itemProps" class="q-pa-xs">
+                  <q-item-section>
+                    <q-item-label class="text-weight-medium">{{ scope.opt.label }}</q-item-label>
+                    <q-item-label caption class="text-capitalize">
+                      {{ scope.opt.solicitante?.nombre_completo || 'Sin nombre' }}
+                    </q-item-label>
+                    <q-item-label caption>
+                      {{ scope.opt.solicitante?.tipo_documento || 'DOC' }}:
+                      {{ scope.opt.solicitante?.num_documento || 'Sin documento' }}
+                    </q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-badge color="primary">
+                      {{ scope.opt.estado || 'Pendiente' }}
+                    </q-badge>
+                  </q-item-section>
+                </q-item>
+              </template>
+
+              <template v-slot:selected>
+                <template v-if="form.solicitud_id">
+                  <div class="text-weight-medium">
+                    {{ obtenerLabelSolicitudSeleccionada() }}
+                  </div>
+                  <div class="text-caption text-grey">
+                    {{ form.tipo_documento }}: {{ form.num_documento }} -
+                    {{ form.nombre_completo }}
+                  </div>
+                </template>
+                <template v-else></template>
+              </template>
+
+              <template v-slot:after>
+                <q-icon
+                  v-if="campoSolicitudBloqueado"
+                  name="lock"
+                  color="orange"
+                  class="q-ml-xs"
+                >
+                  <q-tooltip>Campo bloqueado - Complete los datos manualmente</q-tooltip>
+                </q-icon>
               </template>
             </q-select>
 
-            <q-input
-              dense outlined
-              v-model.number="tupaSel.cantidad"
-              type="number"
-              label="Cantidad"
-              style="width: 90px"
-              min="1"
-              :rules="[val => val > 0 || 'Debe ser mayor a 0']"
-              @update:model-value="val => actualizarSubtotal(idx)"
-            />
+            <!-- Mensaje informativo -->
+            <q-card v-if="campoSolicitudBloqueado" class="bg-orange-1 q-mt-xs">
+              <q-card-section class="q-pa-xs">
+                <div class="row items-center">
+                  <q-icon name="info" color="orange" class="q-mr-xs" />
+                  <div class="text-weight-medium">
+                    Complete los datos manualmente. El campo de solicitud está bloqueado.
+                  </div>
+                </div>
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
 
-            <q-input
-              dense outlined
-              v-model.number="tupaSel.Subtotal"
-              type="number"
-              label="Subtotal"
-              style="width: 120px"
-              min="0"
-              :readonly="true"
-            />
+        <!-- ===========================
+             SEGUNDA FILA: 2 COLUMNAS
+        ============================ -->
+        <div class="row q-col-gutter-md">
 
-            <q-btn icon="delete" color="red" flat round dense @click="() => quitarTupa(idx)" />
+          <!-- COLUMNA IZQUIERDA: DATOS PERSONALES -->
+          <div class="col-12 col-md-6">
+
+            <!-- Información de Solicitud Seleccionada -->
+            <q-card v-if="form.solicitud_id" class="bg-blue-1 q-mb-sm">
+              <q-card-section class="q-pa-xs">
+                <div class="row items-center">
+                  <q-icon name="info" color="primary" class="q-mr-xs" />
+                  <div class="text-weight-medium">
+                    Datos cargados desde la solicitud seleccionada
+                  </div>
+                </div>
+              </q-card-section>
+            </q-card>
+
+            <!-- Tipo de Documento -->
+            <q-select
+              dense
+              outlined
+              v-model="form.tipo_documento"
+              :options="tipoDocumentoOptions"
+              label="Tipo Documento *"
+              class="q-mb-sm"
+              :rules="[val => !form.solicitud_id ? !!val || 'Campo requerido' : true]"
+              clearable
+              :disable="!!form.solicitud_id"
+              emit-value
+              map-options
+              @update:model-value="onTipoDocumentoChange"
+            >
+              <template v-slot:prepend>
+                <q-icon name="badge" />
+              </template>
+              <template v-slot:after>
+                <q-icon
+                  v-if="form.solicitud_id"
+                  name="lock"
+                  color="green"
+                  class="q-ml-xs"
+                >
+                  <q-tooltip>Campo autocompletado desde la solicitud</q-tooltip>
+                </q-icon>
+              </template>
+            </q-select>
+
+            <!-- Número de Documento -->
+            <q-input
+              dense
+              outlined
+              v-model="form.num_documento"
+              label="Número Documento *"
+              class="q-mb-sm"
+              :rules="[
+                val => !form.solicitud_id ? !!val || 'Campo requerido' : true,
+                (val) => validarDocumento(val)
+              ]"
+              :mask="obtenerMascaraDocumento()"
+              @blur="autocompletarSolicitante"
+              :disable="!!form.solicitud_id"
+              @update:model-value="onNumDocumentoChange"
+            >
+              <template v-slot:prepend>
+                <q-icon name="confirmation_number" />
+              </template>
+
+              <template v-slot:after>
+                <q-icon
+                  v-if="form.solicitud_id"
+                  name="lock"
+                  color="green"
+                  class="q-ml-xs"
+                >
+                  <q-tooltip>Campo autocompletado desde la solicitud</q-tooltip>
+                </q-icon>
+                <q-btn
+                  v-else-if="form.tipo_documento === 'DNI' && form.num_documento?.length === 8"
+                  icon="search"
+                  flat
+                  dense
+                  @click="autocompletarSolicitante"
+                  :loading="buscandoDni"
+                >
+                  <q-tooltip>Buscar en RENIEC</q-tooltip>
+                </q-btn>
+              </template>
+            </q-input>
+
+            <!-- Nombre Completo -->
+            <q-input
+              dense
+              outlined
+              v-model="form.nombre_completo"
+              label="Nombre Completo *"
+              class="q-mb-sm"
+              :rules="[val => !form.solicitud_id ? !!val || 'Campo requerido' : true]"
+              :readonly="!!form.solicitud_id"
+              :disable="!!form.solicitud_id"
+            >
+              <template v-slot:prepend>
+                <q-icon name="person" />
+              </template>
+              <template v-slot:after>
+                <q-icon
+                  v-if="form.solicitud_id"
+                  name="lock"
+                  color="green"
+                  class="q-ml-xs"
+                >
+                  <q-tooltip>Campo autocompletado desde la solicitud</q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
+
           </div>
 
-          <q-btn icon="add" color="primary" flat dense @click="agregarTupa" label="Agregar Tupa" />
+          <!-- COLUMNA DERECHA: INFORMACIÓN DE PAGO -->
+          <div class="col-12 col-md-6">
+
+            <!-- Total - Ahora es solo texto -->
+            <div class="q-mb-md">
+              <div class="text-weight-medium q-mb-xs">Total a Pagar:</div>
+              <div class="text-h5 text-green text-weight-bold text-center q-pa-md bg-grey-2 rounded-borders">
+                {{ formatNumberToSoles(redondearConDecimales(totalComputed)) }}
+              </div>
+            </div>
+
+            <!-- Selección Rápida de Tupas Importantes -->
+            <div class="q-mb-md">
+              <div class="text-weight-medium q-mb-xs">Tupas Importantes:</div>
+              <div class="row q-col-gutter-xs">
+                <div class="col-4" v-for="tupa in tupasImportantes" :key="tupa.id">
+                  <q-btn
+                    :icon="tupa.icon"
+                    :color="tupa.color"
+                    flat
+                    dense
+                    class="full-width tupa-importante-btn"
+                    @click="agregarTupaImportante(tupa.id)"
+                    :label="tupa.nombreCorto"
+                    :disable="!tupa.disponible"
+                  >
+                    <q-tooltip>
+                      <div class="text-center">
+                        <div class="text-weight-bold">{{ tupa.simbolo }} Tupa {{ tupa.id }}</div>
+                        <div>{{ tupa.denominacion }}</div>
+                        <div class="text-green">{{ formatNumberToSoles(tupa.costo) }}</div>
+                      </div>
+                    </q-tooltip>
+                  </q-btn>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
+
+        <!-- ===========================
+             TERCERA FILA: TUPAS COMPACTOS
+        ============================ -->
+        <div class="row">
+          <div class="col-12">
+            <div class="q-mb-xs">
+              <div class="row items-center justify-between q-mb-sm">
+                <label class="text-bold text-subtitle1">Servicios/Tupas *</label>
+                <div class="text-h6 text-primary text-weight-bold">
+                  Total: {{ formatNumberToSoles(redondearConDecimales(totalComputed)) }}
+                </div>
+              </div>
+
+              <!-- Mensaje cuando no hay tupas -->
+              <q-card v-if="form.tupas.length === 0" class="bg-grey-2 q-mb-sm">
+                <q-card-section class="text-center q-pa-sm">
+                  <q-icon name="info" color="grey" class="q-mb-xs" />
+                  <div class="text-grey">
+                    No hay tupas agregados. Use los botones de arriba o agregue uno manualmente.
+                  </div>
+                </q-card-section>
+              </q-card>
+
+              <!-- Lista Compacta de Tupas -->
+              <div
+                v-for="(tupaSel, idx) in form.tupas"
+                :key="idx"
+                class="row items-center q-mb-xs q-pa-xs rounded-borders tupa-item"
+                :class="idx % 2 === 0 ? 'bg-grey-2' : 'bg-grey-1'"
+              >
+                <!-- Selección de Tupa -->
+                <div class="col-12 col-sm-4 q-pr-sm">
+                  <q-select
+                    dense
+                    outlined
+                    v-model="tupaSel.tupa_id"
+                    :options="tupasDisponibles(idx)"
+                    option-value="id"
+                    option-label="denominacion"
+                    label="Seleccionar Tupa *"
+                    emit-value
+                    map-options
+                    class="full-width"
+                    :rules="[(val) => !!val || 'Seleccione un tupa']"
+                    @update:model-value="(val) => onTupaSeleccionado(idx, val)"
+                    clearable
+                    use-input
+                    @filter="filterTupas"
+                  >
+                    <template v-slot:prepend>
+                      <q-icon name="description" />
+                    </template>
+
+                    <template v-slot:option="scope">
+                      <q-item v-bind="scope.itemProps" class="tupa-option q-pa-xs">
+                        <q-item-section>
+                          <q-item-label>{{ scope.opt.denominacion }}</q-item-label>
+                          <q-item-label caption>
+                            {{ formatNumberToSoles(scope.opt.costo) }}
+                          </q-item-label>
+                        </q-item-section>
+                        <q-item-section side>
+                          <q-badge color="green">
+                            {{ formatNumberToSoles(scope.opt.costo) }}
+                          </q-badge>
+                        </q-item-section>
+                      </q-item>
+                    </template>
+                  </q-select>
+                </div>
+
+                <!-- Precio Unitario -->
+                <div class="col-12 col-sm-2 q-px-sm">
+                  <q-input
+                    dense
+                    outlined
+                    :value="tupaSel.precio"
+                    type="number"
+                    label="Precio Unitario"
+                    class="full-width"
+                    min="0"
+                    readonly
+                  >
+                    <template v-slot:after>
+                      <div class="text-blue text-weight-medium">
+                        {{ formatNumberToSoles(redondearConDecimales(tupaSel.precio)) }}
+                      </div>
+                    </template>
+                  </q-input>
+                </div>
+
+                <!-- Cantidad -->
+                <div class="col-12 col-sm-2 q-px-sm">
+                  <q-input
+                    dense
+                    outlined
+                    v-model.number="tupaSel.cantidad"
+                    type="number"
+                    label="Cantidad *"
+                    class="full-width"
+                    min="1"
+                    :rules="[(val) => val > 0 || 'Debe ser mayor a 0']"
+                    @update:model-value="() => actualizarSubtotal(idx)"
+                    @blur="() => actualizarSubtotal(idx)"
+                  />
+                </div>
+
+                <!-- Subtotal -->
+                <div class="col-12 col-sm-2 q-px-sm">
+                  <q-input
+                    dense
+                    outlined
+                    :value="tupaSel.Subtotal"
+                    type="number"
+                    label="Subtotal"
+                    class="full-width"
+                    min="0"
+                    readonly
+                  >
+                    <template v-slot:after>
+                      <div class="text-green text-weight-medium">
+                        {{ formatNumberToSoles(redondearConDecimales(tupaSel.Subtotal)) }}
+                      </div>
+                    </template>
+                  </q-input>
+                </div>
+
+                <!-- Botón Eliminar - ALINEADO PERFECTAMENTE -->
+                <div class="col-12 col-sm-2 q-pl-sm">
+                  <div class="flex justify-center items-center full-height">
+                    <q-btn
+                      icon="delete"
+                      color="red"
+                      flat
+                      round
+                      dense
+                      @click="() => quitarTupa(idx)"
+                      class="eliminar-btn"
+                    >
+                      <q-tooltip>Eliminar tupa</q-tooltip>
+                    </q-btn>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botón Agregar Tupa -->
+              <div class="row justify-between items-center q-mt-md">
+                <q-btn
+                  icon="add"
+                  color="primary"
+                  flat
+                  dense
+                  @click="agregarTupa"
+                  label="Agregar Tupa"
+                />
+
+                <q-btn
+                  icon="refresh"
+                  color="orange"
+                  flat
+                  dense
+                  @click="limpiarTupas"
+                  label="Limpiar"
+                  v-if="form.tupas.length > 0"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
       </q-card-section>
 
       <q-separator />
 
+      <!-- ===========================
+           ACCIONES DEL FORMULARIO
+      ============================ -->
       <q-card-actions align="right" class="q-pa-md">
-        <q-btn label="Cancelar" flat v-close-popup class="q-mr-sm" />
-        <q-btn label="Guardar" :loading="form.processing" type="submit" color="positive" />
+        <q-btn
+          label="Cancelar"
+          flat
+          v-close-popup
+          class="q-mr-sm"
+          :disable="form.processing"
+        />
+        <q-btn
+          label="Guardar Pago"
+          :loading="form.processing"
+          type="submit"
+          color="positive"
+          :disable="!formValido"
+          icon="save"
+        />
       </q-card-actions>
     </q-form>
   </q-card>
 </template>
 
-
-
 <script setup>
-import { ref,computed, onMounted, watch } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
+import { useQuasar } from 'quasar';
 import PagoService from "src/services/PagoService";
 import SolicitudService from "src/services/SolicitudService";
 import UsuarioService from "src/services/UsuarioService";
 import TupaService from "src/services/TupaService";
 import DniService from "src/services/DniService";
-import {
-  formatNumberToSoles,
-  redondearConDecimales,
-} from "src/utils/ConvertMoney";
+import { formatNumberToSoles, redondearConDecimales } from "src/utils/ConvertMoney";
 
+const $q = useQuasar();
 const emits = defineEmits(["save", "close"]);
 const props = defineProps({
   title: String,
@@ -178,206 +491,487 @@ const props = defineProps({
   edit: { type: Boolean, default: false },
 });
 
+/* ===========================
+   FORMULARIO
+=========================== */
 const form = ref({
   solicitud_id: null,
   tipo_documento: "",
   num_documento: "",
   nombre_completo: "",
-  total: 0,
-  // user_id: null,
-  // tupas: [],
-  tupas: [
-    // Selecciona por defecto el tupa con id 14
-    { tupa_id: 14, cantidad: 1, Subtotal: 0, precio: 0, denominacion: '' }
-  ],
+  tupas: [],
   processing: false,
 });
 
-
+/* ===========================
+   VARIABLES
+=========================== */
 const solicitudesOriginal = ref([]);
-const solicitudes = ref([]);
 const filteredSolicitudes = ref([]);
+const tupasOriginal = ref([]);
+const tupasFiltradas = ref([]);
+const loadingSolicitudes = ref(false);
+const buscandoDni = ref(false);
+const campoSolicitudBloqueado = ref(false);
 
-
-// const solicitudes = ref([]);
-const usuarios = ref([]);
-const tupas = ref([]);
 const tipoDocumentoOptions = [
   { label: "DNI", value: "DNI" },
   { label: "RUC", value: "RUC" },
 ];
 
-function solicitudOptionLabel(solicitud) {
-  if (!solicitud) return '';
-  const nombre = solicitud.solicitante?.nombre_completo || '-';
-  const tipoDoc = solicitud.solicitante?.tipo_documento || '';
-  const numDoc = solicitud.solicitante?.num_documento || '';
-  return `N° = ${solicitud.id} - ${nombre}`;
-}
+/* ===========================
+   COMPUTED
+=========================== */
+const totalComputed = computed(() => {
+  return form.value.tupas.reduce((sum, t) => {
+    const subtotal = Number(t.Subtotal) || 0;
+    return sum + subtotal;
+  }, 0);
+});
 
-onMounted(async () => {
+const formValido = computed(() => {
+  const tupasValidos = form.value.tupas.length > 0 &&
+                       form.value.tupas.every(t => t.tupa_id && t.cantidad > 0);
+  const totalValido = totalComputed.value > 0;
 
-  // solicitudesOriginal.value = ((await SolicitudService.getData()).data || []).map(s => ({
-  solicitudesOriginal.value = ((await SolicitudService.getData({ params: { rowsPerPage: -1 } })).data || []).map(s => ({
-    ...s,
-    id: Number(s.id),
-    label: `N° = ${s.id} - Solicitante: ${s.solicitante?.nombre_completo || '-'}`,
-  }));
-  solicitudes.value = solicitudesOriginal.value;
-  filteredSolicitudes.value = solicitudesOriginal.value;
+  if (form.value.solicitud_id) {
+    return totalValido && tupasValidos;
+  } else {
+    const documentosValidos = form.value.tipo_documento &&
+                             form.value.num_documento &&
+                             form.value.nombre_completo;
+    return documentosValidos && totalValido && tupasValidos;
+  }
+});
 
-  usuarios.value = ((await UsuarioService.getData()).data || []).map(u => ({
-    ...u,
-    id: Number(u.id),
-    name: u.name,
-    email: u.email,
-  }));
-  tupas.value = ((await TupaService.getData()).data || []).map(t => ({
-    ...t,
-    id: Number(t.id),
-    // label: t.denominacion,
-    label: `${t.denominacion} -  ${t.costo || '-'}`,
-    costo: t.costo,
-  }));
+const tupasImportantes = computed(() => {
+  const importantes = [
+    {
+      id: 14,
+      nombreCorto: "T14",
+      icon: "star",
+      color: "primary",
+      simbolo: "★"
+    },
+    {
+      id: 5,
+      nombreCorto: "T5",
+      icon: "star",
+      color: "secondary",
+      simbolo: "★"
+    },
+    {
+      id: 7,
+      nombreCorto: "T7",
+      icon: "star",
+      color: "accent",
+      simbolo: "★"
+    }
+  ];
 
-  // Pruebas de consola para depuración
-  console.log('Solicitudes:', solicitudes.value);
-  console.log('Usuarios:', usuarios.value);
-  console.log('Tupas:', tupas.value);
+  return importantes.map(t => {
+    const tupaEncontrado = tupasOriginal.value.find(tupa => tupa.id === t.id);
+    return {
+      ...t,
+      disponible: !!tupaEncontrado,
+      denominacion: tupaEncontrado?.denominacion || "No disponible",
+      costo: tupaEncontrado?.costo || 0
+    };
+  });
+});
 
-  // Si NO es edición, setea los datos del tupa por defecto
+/* ===========================
+   WATCHERS
+=========================== */
+watch(
+  () => form.value.solicitud_id,
+  (newVal) => {
+    if (!newVal) {
+      limpiarCamposSolicitante();
+      return;
+    }
 
-  if (!props.edit) {
-    const tupaDefault = tupas.value.find(t => t.id === 14);
-    if (tupaDefault) {
-      form.value.tupas = [{
-        tupa_id: 14,
-        cantidad: 1,
-        Subtotal: Number(tupaDefault.costo),
-        precio: Number(tupaDefault.costo),
-        denominacion: tupaDefault.denominacion
-      }];
-      actualizarTotal();
+    const solicitud = solicitudesOriginal.value.find(s => s.id === newVal);
+    if (solicitud) {
+      autocompletarDesdeSolicitud(solicitud);
     }
   }
+);
+
+watch(
+  () => [form.value.tipo_documento, form.value.num_documento, form.value.nombre_completo],
+  (newValues) => {
+    const [tipoDoc, numDoc, nombre] = newValues;
+
+    if (!form.value.solicitud_id && (tipoDoc || numDoc || nombre)) {
+      campoSolicitudBloqueado.value = true;
+    }
+
+    if (!tipoDoc && !numDoc && !nombre) {
+      campoSolicitudBloqueado.value = false;
+    }
+  },
+  { deep: true }
+);
+
+/* ===========================
+   CARGA INICIAL
+=========================== */
+onMounted(async () => {
+  await cargarSolicitudes();
+  await cargarTupas();
 
   if (props.edit && props.id) {
-    const pago = await PagoService.get(props.id);
-    Object.assign(form.value, pago);
-    form.value.solicitud_id = Number(pago.solicitud_id);
-    form.value.user_id = Number(pago.user_id);
-    form.value.tupas = pago.tupas?.map(t => ({
-      tupa_id: Number(t.id),
-      cantidad: t.pivot.cantidad,
-      Subtotal: Number(t.pivot.Subtotal),
-      precio: Number(t.costo),
-      denominacion: t.denominacion
-    })) || [];
-    actualizarTotal();
-    // Prueba de consola para ver el form cargado en edición
-    console.log('Form cargado para edición:', form.value);
+    await cargarPagoEdicion();
   }
 });
 
+async function cargarSolicitudes() {
+  loadingSolicitudes.value = true;
+  try {
+    const data = (await SolicitudService.getData({ params: { rowsPerPage: -1 } })).data || [];
+    solicitudesOriginal.value = data.map((s) => {
+      const hasCode = !!s.solicitud_code;
+      return {
+        ...s,
+        id: Number(s.id),
+        solicitud_code: s.solicitud_code,
+        label: hasCode
+          ? `COD: ${s.solicitud_code} - ${s.solicitante?.nombre_completo || '-'}`
+          : `ID: ${s.id} - ${s.solicitante?.nombre_completo || '-'}`,
+        displayText: hasCode
+          ? `COD: ${s.solicitud_code} - ${s.solicitante?.nombre_completo || "-"}`
+          : `ID: ${s.id} - ${s.solicitante?.nombre_completo || "-"}`,
+      };
+    }).sort((a, b) => {
+      if (!a.solicitud_code && b.solicitud_code) return 1;
+      if (a.solicitud_code && !b.solicitud_code) return -1;
+      if (!a.solicitud_code && !b.solicitud_code) return b.id - a.id;
+      const [numA, yearA] = a.solicitud_code.split("-");
+      const [numB, yearB] = b.solicitud_code.split("-");
+      if (yearA !== yearB) return Number(yearB) - Number(yearA);
+      return Number(numB) - Number(numA);
+    });
 
-watch(() => form.value.solicitud_id, (newVal) => {
-  if (!newVal) return;
-  const solicitud = solicitudes.value.find(s => s.id === newVal);
-  if (solicitud) {
-    form.value.tipo_documento = solicitud.solicitante?.tipo_documento || "";
-    // Fuerza a string para evitar truncamiento de ceros
-    form.value.num_documento = solicitud.solicitante?.num_documento ? String(solicitud.solicitante.num_documento) : "";
-    // Si no hay nombre_completo y es RUC, intenta buscarlo por servicio
-    if (!solicitud.solicitante?.nombre_completo && solicitud.solicitante?.tipo_documento === "RUC") {
-      form.value.nombre_completo = "";
-    } else {
-      form.value.nombre_completo = solicitud.solicitante?.nombre_completo || "";
-    }
-  }
-});
-
-
-async function autocompletarSolicitante() {
-  if (form.value.tipo_documento === "DNI" && form.value.num_documento.length === 8) {
-    const res = await DniService.getSolicitanteDni(form.value.num_documento);
-    if (res?.existe) {
-      form.value.nombre_completo = `${res.nombres} ${res.apellido_paterno} ${res.apellido_materno}`;
-      console.log('Autocompletado desde DNI:', form.value.nombre_completo);
-    }
-  }
-  if (form.value.tipo_documento === "RUC" && form.value.num_documento.length === 11) {
-    // Aquí deberías llamar a tu servicio de RUC, por ejemplo:
-    // const res = await RucService.getSolicitanteRuc(form.value.num_documento);
-    // if (res?.existe) {
-    //   form.value.nombre_completo = res.razon_social;
-    //   console.log('Autocompletado desde RUC:', form.value.nombre_completo);
-    // }
+    filteredSolicitudes.value = solicitudesOriginal.value.slice(0, 50);
+  } catch (error) {
+    console.error("Error cargando solicitudes:", error);
+  } finally {
+    loadingSolicitudes.value = false;
   }
 }
 
+async function cargarTupas() {
+  try {
+    tupasOriginal.value = (await TupaService.getData()).data?.map(t => ({
+      ...t,
+      id: Number(t.id),
+      label: `${t.denominacion} - ${formatNumberToSoles(t.costo)}`,
+      costo: t.costo,
+    })) || [];
+
+    tupasFiltradas.value = tupasOriginal.value;
+  } catch (error) {
+    console.error("Error cargando tupas:", error);
+  }
+}
+
+async function cargarPagoEdicion() {
+  try {
+    const pago = await PagoService.get(props.id);
+
+    form.value.solicitud_id = Number(pago.solicitud_id);
+    form.value.tipo_documento = pago.tipo_documento || "";
+    form.value.num_documento = pago.num_documento || "";
+    form.value.nombre_completo = pago.nombre_completo || "";
+
+    if (pago.tupas?.length > 0) {
+      form.value.tupas = pago.tupas.map(t => ({
+        tupa_id: Number(t.id),
+        cantidad: t.pivot.cantidad,
+        Subtotal: Number(t.pivot.Subtotal),
+        precio: Number(t.costo),
+        denominacion: t.denominacion,
+      }));
+    }
+  } catch (error) {
+    console.error("Error cargando pago para edición:", error);
+  }
+}
+
+/* ===========================
+   MÉTODOS DE SOLICITUDES
+=========================== */
 function filterSolicitudes(val, update) {
   if (!val) {
     update(() => {
-      filteredSolicitudes.value = solicitudesOriginal.value;
+      filteredSolicitudes.value = solicitudesOriginal.value.slice(0, 50);
     });
     return;
   }
+
   const needle = val.toLowerCase();
   update(() => {
     filteredSolicitudes.value = solicitudesOriginal.value.filter(s =>
-      s.label.toLowerCase().includes(needle)
+      (s.solicitud_code || "").toLowerCase().includes(needle) ||
+      (s.displayText || "").toLowerCase().includes(needle) ||
+      (s.solicitante?.nombre_completo || "").toLowerCase().includes(needle) ||
+      (s.solicitante?.num_documento || "").includes(needle) ||
+      (s.id.toString().includes(needle))
+    ).slice(0, 50);
+  });
+}
+
+function onSolicitudSeleccionada(solicitudId) {
+  console.log("Solicitud seleccionada ID:", solicitudId);
+  campoSolicitudBloqueado.value = false;
+}
+
+function autocompletarDesdeSolicitud(solicitud) {
+  if (!solicitud) return;
+
+  form.value.tipo_documento = solicitud.solicitante?.tipo_documento || "";
+  form.value.num_documento = solicitud.solicitante?.num_documento || "";
+  form.value.nombre_completo = solicitud.solicitante?.nombre_completo || "";
+
+  if (solicitud.tupas && solicitud.tupas.length > 0) {
+    form.value.tupas = solicitud.tupas.map(t => ({
+      tupa_id: Number(t.id),
+      cantidad: 1,
+      Subtotal: Number(t.costo),
+      precio: Number(t.costo),
+      denominacion: t.denominacion,
+    }));
+  }
+
+  console.log("Datos autocompletados desde solicitud:", solicitud);
+}
+
+function obtenerLabelSolicitudSeleccionada() {
+  if (!form.value.solicitud_id) return "";
+  const solicitud = solicitudesOriginal.value.find(s => s.id === form.value.solicitud_id);
+  if (!solicitud) return "";
+
+  return solicitud.solicitud_code
+    ? `COD: ${solicitud.solicitud_code}`
+    : `ID: ${solicitud.id}`;
+}
+
+function limpiarCamposSolicitante() {
+  form.value.tipo_documento = "";
+  form.value.num_documento = "";
+  form.value.nombre_completo = "";
+  campoSolicitudBloqueado.value = false;
+}
+
+/* ===========================
+   MÉTODOS DE DOCUMENTOS
+=========================== */
+function onTipoDocumentoChange(newValue) {
+  form.value.num_documento = "";
+  if (newValue && !form.value.solicitud_id) {
+    campoSolicitudBloqueado.value = true;
+  }
+}
+
+function onNumDocumentoChange(newValue) {
+  if (newValue && form.value.tipo_documento === 'RUC' && newValue.length !== 11) {
+    console.warn("El RUC debe tener 11 dígitos");
+  }
+  if (newValue && !form.value.solicitud_id) {
+    campoSolicitudBloqueado.value = true;
+  }
+}
+
+function validarDocumento(val) {
+  if (!val) return true;
+
+  if (form.value.tipo_documento === 'RUC') {
+    return (val && val.length === 11) || 'El RUC debe tener 11 dígitos';
+  }
+
+  if (form.value.tipo_documento === 'DNI') {
+    return (val && val.length === 8) || 'El DNI debe tener 8 dígitos';
+  }
+
+  return true;
+}
+
+function obtenerMascaraDocumento() {
+  if (form.value.tipo_documento === 'RUC') {
+    return '###########';
+  }
+  return '########';
+}
+
+/* ===========================
+   AUTOCOMPLETAR DNI
+=========================== */
+async function autocompletarSolicitante() {
+  if (form.value.tipo_documento === "DNI" && form.value.num_documento?.length === 8 && !form.value.solicitud_id) {
+    buscandoDni.value = true;
+    try {
+      const res = await DniService.getSolicitanteDni(form.value.num_documento);
+      if (res?.existe) {
+        form.value.nombre_completo = `${res.nombres} ${res.apellido_paterno} ${res.apellido_materno}`.trim();
+      } else {
+        form.value.nombre_completo = "";
+      }
+    } catch (error) {
+      console.error("Error al consultar DNI:", error);
+    } finally {
+      buscandoDni.value = false;
+    }
+  }
+}
+
+/* ===========================
+   MÉTODOS DE TUPAS
+=========================== */
+function filterTupas(val, update) {
+  if (!val) {
+    update(() => {
+      tupasFiltradas.value = tupasOriginal.value;
+    });
+    return;
+  }
+
+  const needle = val.toLowerCase();
+  update(() => {
+    tupasFiltradas.value = tupasOriginal.value.filter(t =>
+      t.denominacion.toLowerCase().includes(needle) ||
+      t.label.toLowerCase().includes(needle)
     );
   });
 }
 
-function agregarTupa() {
-  form.value.tupas.push({ tupa_id: null, cantidad: 1, Subtotal: 0, precio: 0, denominacion: '' });
-  actualizarTotal();
-  console.log('Tupa agregado:', form.value.tupas);
+function tupasDisponibles(currentIndex) {
+  return tupasFiltradas.value.filter(tupa =>
+    !form.value.tupas.some((t, idx) =>
+      idx !== currentIndex && t.tupa_id === tupa.id
+    )
+  );
 }
+
+function tupaSeleccionado(tupaId, currentIndex) {
+  const yaSeleccionado = form.value.tupas.some((t, idx) =>
+    idx !== currentIndex && t.tupa_id === tupaId
+  );
+
+  if (yaSeleccionado) {
+    $q.notify({
+      type: 'warning',
+      message: 'Este tupa ya ha sido seleccionado en otra fila',
+      position: 'top',
+      timeout: 3000
+    });
+    return true;
+  }
+
+  return false;
+}
+
+function agregarTupa() {
+  form.value.tupas.push({
+    tupa_id: null,
+    cantidad: 1,
+    Subtotal: 0,
+    precio: 0,
+    denominacion: ""
+  });
+}
+
+function agregarTupaImportante(tupaId) {
+  const tupa = tupasOriginal.value.find(t => t.id === tupaId);
+  if (tupa) {
+    const tupaExistente = form.value.tupas.find(t => t.tupa_id === tupaId);
+
+    if (tupaExistente) {
+      tupaExistente.cantidad += 1;
+      actualizarSubtotal(form.value.tupas.indexOf(tupaExistente));
+    } else {
+      form.value.tupas.push({
+        tupa_id: tupaId,
+        cantidad: 1,
+        Subtotal: Number(tupa.costo),
+        precio: Number(tupa.costo),
+        denominacion: tupa.denominacion,
+      });
+    }
+  } else {
+    console.warn(`No se encontró el tupa con ID ${tupaId}`);
+  }
+}
+
+function limpiarTupas() {
+  form.value.tupas = [];
+}
+
 function quitarTupa(idx) {
   form.value.tupas.splice(idx, 1);
-  actualizarTotal();
-  console.log('Tupa quitado. Tupas actuales:', form.value.tupas);
 }
-function actualizarPrecioTupa(idx, tupa_id) {
-  const tupa = tupas.value.find(t => t.id === tupa_id);
+
+function onTupaSeleccionado(idx, tupa_id) {
+  // Verificar si el tupa ya está seleccionado en otra fila
+  if (tupaSeleccionado(tupa_id, idx)) {
+    // Si ya está seleccionado, limpiar la selección actual
+    form.value.tupas[idx].tupa_id = null;
+    form.value.tupas[idx].precio = 0;
+    form.value.tupas[idx].denominacion = "";
+    actualizarSubtotal(idx);
+    return;
+  }
+
+  const tupa = tupasOriginal.value.find(t => t.id === tupa_id);
   if (tupa) {
     form.value.tupas[idx].precio = Number(tupa.costo);
     form.value.tupas[idx].denominacion = tupa.denominacion;
     actualizarSubtotal(idx);
-    console.log(`Precio actualizado para tupa[${idx}]:`, tupa);
+  } else {
+    form.value.tupas[idx].precio = 0;
+    form.value.tupas[idx].denominacion = "";
+    actualizarSubtotal(idx);
   }
 }
+
 function actualizarSubtotal(idx) {
-  const tupaSel = form.value.tupas[idx];
-  tupaSel.Subtotal = Number(tupaSel.precio) * Number(tupaSel.cantidad);
-  actualizarTotal();
-  console.log(`Subtotal actualizado para tupa[${idx}]:`, tupaSel.Subtotal);
-}
-function actualizarTotal() {
-  form.value.total = form.value.tupas.reduce((sum, t) => sum + Number(t.Subtotal), 0);
-  console.log('Total actualizado:', form.value.total);
+  const t = form.value.tupas[idx];
+  // Asegurarnos de que los valores sean números
+  const precio = Number(t.precio) || 0;
+  const cantidad = Number(t.cantidad) || 0;
+
+  t.Subtotal = precio * cantidad;
+
+  console.log(`Tupa ${idx}:`, {
+    precio: precio,
+    cantidad: cantidad,
+    subtotal: t.Subtotal
+  });
 }
 
-
+/* ===========================
+   SUBMIT
+=========================== */
 async function submit() {
+  if (!formValido.value) {
+    console.error("Formulario inválido");
+    return;
+  }
+
   form.value.processing = true;
   try {
-    // Forzar tipo_documento a string si es objeto
-    if (typeof form.value.tipo_documento === 'object' && form.value.tipo_documento !== null) {
-      form.value.tipo_documento = form.value.tipo_documento.value;
-    }
-    console.log('Formulario a enviar:', form.value);
-
     const payload = {
       ...form.value,
+      total: totalComputed.value, // Usar el total computado
       estado: 1,
-      boleta_id: null
+      boleta_id: null,
+      solicitud_id: form.value.solicitud_id ? Number(form.value.solicitud_id) : null,
+      tupas: form.value.tupas.map(t => ({
+        ...t,
+        tupa_id: Number(t.tupa_id)
+      }))
     };
 
-
-    console.log('Formulario a enviar:', payload);
     if (props.edit && props.id) {
       await PagoService.save({ ...payload, id: props.id });
     } else {
@@ -385,35 +979,168 @@ async function submit() {
     }
     emits("save");
   } catch (error) {
-    // Mostrar errores de validación del backend
-    if (error.response && error.response.data && error.response.data.errors) {
-      const errores = Object.values(error.response.data.errors).flat().join('\n');
-      // Si usas Quasar:
-      if (typeof $q !== 'undefined' && $q.notify) {
-        $q.notify({ type: 'negative', message: errores });
-      } else {
-        alert(errores);
-      }
-      console.error("Errores de validación:", error.response.data.errors);
-    } else {
-      // Otro error
-      if (typeof $q !== 'undefined' && $q.notify) {
-        $q.notify({ type: 'negative', message: 'Error al guardar el pago' });
-      } else {
-        alert('Error al guardar el pago');
-      }
-      console.error("Error en submit:", error);
-    }
+    console.error("Error guardando pago:", error);
   } finally {
     form.value.processing = false;
   }
 }
-
 </script>
 
 <style scoped>
 .my-card {
   width: 100%;
-  max-width: 80vw;
+  max-width: 95vw;
+  min-width: 300px;
+}
+
+.rounded-borders {
+  border-radius: 6px;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+/* Mejoras visuales para los campos */
+.q-field {
+  margin-bottom: 0;
+}
+
+/* Estilo para los tupas en grid responsive */
+.tupa-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  padding: 8px;
+  min-height: 60px;
+  gap: 8px;
+}
+
+/* Asegurar que todos los campos tengan la misma altura */
+.tupa-item .q-field {
+  margin-bottom: 0;
+}
+
+.tupa-item .q-input,
+.tupa-item .q-select {
+  height: 56px;
+}
+
+/* Contenedor para el botón eliminar */
+.full-height {
+  height: 56px;
+}
+
+/* Estilo específico para el botón eliminar */
+.eliminar-btn {
+  height: 20px;
+  width: 20px;
+}
+
+/* Estilo para los botones de tupas importantes */
+.tupa-importante-btn {
+  min-height: 36px;
+}
+
+/* Botón cerrar en header */
+.absolute-top-right {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .col-md-6 {
+    width: 100%;
+  }
+
+  .tupa-item > div {
+    margin-bottom: 8px;
+  }
+
+  .full-width-sm {
+    width: 100%;
+  }
+
+  .tupa-item .q-input,
+  .tupa-item .q-select,
+  .tupa-item .q-btn {
+    height: auto;
+  }
+
+  .full-height {
+    height: auto;
+  }
+}
+
+@media (min-width: 769px) {
+  .tupa-item > div {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .tupa-item > div:first-child {
+    flex: 0 0 40%;
+  }
+
+  .tupa-item > div:nth-child(2) {
+    flex: 0 0 15%;
+  }
+
+  .tupa-item > div:nth-child(3) {
+    flex: 0 0 15%;
+  }
+
+  .tupa-item > div:nth-child(4) {
+    flex: 0 0 20%;
+  }
+
+  .tupa-item > div:last-child {
+    flex: 0 0 5%;
+  }
+
+  /* Asegurar que los campos estén perfectamente alineados */
+  .tupa-item .q-field__control {
+    height: 40px;
+  }
+
+  .tupa-item .q-field__native,
+  .tupa-item .q-field__input {
+    min-height: 40px;
+  }
+
+  /* Alinear verticalmente el botón eliminar */
+  .full-height {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 10px;
+  }
+}
+
+/* Estilos adicionales para mejor alineación */
+.tupa-item .q-field--dense .q-field__control,
+.tupa-item .q-field--dense .q-field__marginal {
+  height: 40px;
+}
+
+.tupa-item .q-field--dense .q-field__native,
+.tupa-item .q-field--dense .q-field__input {
+  min-height: 40px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* Alineación perfecta para todos los elementos */
+.tupa-item {
+  align-items: stretch;
+}
+
+.tupa-item > div {
+  display: flex;
+  align-items: center;
 }
 </style>

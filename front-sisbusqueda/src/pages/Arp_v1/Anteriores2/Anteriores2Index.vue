@@ -9,12 +9,33 @@
     </div>
     <q-separator />
     <div class="row">
-      <SelectInput class="col-4 q-px-xs" label="Notarios" dense clearable
-        v-model="nombreNotario" :options="GenerateListService" :GenerateList="{ column: 'notario', table: 'anterior2' }" />
-      <SelectInput class="col-4 q-px-xs" label="Lugar" dense clearable
-        v-model="nombreLugar" :options="GenerateListService" :GenerateList="{ column: 'lugar', table: 'anterior2' }" />
-      <SelectInput class="col-4 q-px-xs" label="Subserie" dense clearable
-        v-model="nombreSubserie" :options="GenerateListService" :GenerateList="{ column: 'subserie', table: 'anterior2' }" />
+      <SelectInput
+        class="col-4 q-px-xs"
+        label="Notarios"
+        dense
+        clearable
+        v-model="nombreNotario"
+        :options="GenerateListService"
+        :GenerateList="{ column: 'notario', table: 'anterior2' }"
+      />
+      <SelectInput
+        class="col-4 q-px-xs"
+        label="Lugar"
+        dense
+        clearable
+        v-model="nombreLugar"
+        :options="GenerateListService"
+        :GenerateList="{ column: 'lugar', table: 'anterior2' }"
+      />
+      <SelectInput
+        class="col-4 q-px-xs"
+        label="Subserie"
+        dense
+        clearable
+        v-model="nombreSubserie"
+        :options="GenerateListService"
+        :GenerateList="{ column: 'subserie', table: 'anterior2' }"
+      />
     </div>
     <q-table
       :rows-per-page-options="[7, 10, 15]"
@@ -48,14 +69,39 @@
       <template v-slot:header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
-            <span v-if="col.sortable_" class="span-icono" @click="props.sort(col.name)">
-              <q-icon class="q-table__sort-icon icon-sort" style="" name="arrow_downward" />
+            <span
+              v-if="col.sortable_"
+              class="span-icono"
+              @click="props.sort(col.name)"
+            >
+              <q-icon
+                class="q-table__sort-icon icon-sort"
+                style=""
+                name="arrow_downward"
+              />
               {{ col.label }}
             </span>
             <span v-else>{{ col.label }}</span>
-            <q-icon v-if="col.search" class="q-pa-xs q-mx-xs cursor-pointer" :class="$q.dark.isActive ? 'btn-buscar-dark' : 'btn-buscar'" name="search" size="xs">
-              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                <q-input clearable class="q-px-sm" dense debounce="500" v-model="busColum[col.name]" placeholder="Buscar">
+            <q-icon
+              v-if="col.search"
+              class="q-pa-sm q-mx-xs cursor-pointer"
+              :class="$q.dark.isActive ? 'btn-buscar-dark' : 'btn-buscar'"
+              name="search"
+              size="xs"
+            >
+              <q-popup-proxy
+                cover
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-input
+                  clearable
+                  class="q-px-sm"
+                  dense
+                  debounce="500"
+                  v-model="busColum[col.name]"
+                  placeholder="Buscar"
+                >
                   <template v-slot:append> <q-icon name="search" /> </template>
                 </q-input>
               </q-popup-proxy>
@@ -113,26 +159,89 @@ import SelectInput from "src/components/SelectInput.vue";
 
 const $q = useQuasar();
 
-async function verDat(){
-  const filtros = {lugar:'col1',col2:'col2',notario:'col1',col4:'col2'};
+async function verDat() {
+  const filtros = {
+    lugar: "col1",
+    col2: "col2",
+    notario: "col1",
+    col4: "col2",
+  };
   const dato = await Anterior2Service.getData({
-    params: { rowsPerPage: 10, page:1, search: 'roger', order_by:''},
-  })
+    params: { rowsPerPage: 10, page: 1, search: "roger", order_by: "" },
+  });
   console.log(dato);
 }
 
 // verDat();
 
 const columns = [
-  { field: (row) => row.id, name: "id", label: "Id", align: "center", sortable_: true, },
-  { field: (row) => row.notario, name: "notario", label: "Notario", align: "center", sortable_: true, search: true},
-  { field: (row) => row.lugar, name: "lugar", label: "Lugar", align: "center", sortable_: true, search: true},
-  { field: (row) => row.subserie, name: "subserie", label: "Subserie", align: "center", sortable_: true,},
-  { field: (row) => row.fecha, name: "fecha", label: "Fecha", align: "center", sortable_: true,},
-  { field: (row) => row.bien, name: "bien", label: "Bien", align: "center", sortable_: true,},
-  { field: (row) => row.protocolo, name: "protocolo", label: "Protocolo", align: "center", sortable_: true,},
-  { field: (row) => row.otorgantes, name: "otorgantes", label: "Otorgantes", align: "center", sortable_: true, search: true},
-  { field: (row) => row.favorecidos, name: "favorecidos", label: "Favorecidos", align: "center", sortable_: true, search: true},
+  {
+    field: (row) => row.id,
+    name: "id",
+    label: "Id",
+    align: "center",
+    sortable_: true,
+  },
+  {
+    field: (row) => row.notario,
+    name: "notario",
+    label: "Notario",
+    align: "center",
+    sortable_: true,
+    search: true,
+  },
+  {
+    field: (row) => row.lugar,
+    name: "lugar",
+    label: "Lugar",
+    align: "center",
+    sortable_: true,
+    search: true,
+  },
+  {
+    field: (row) => row.subserie,
+    name: "subserie",
+    label: "Subserie",
+    align: "center",
+    sortable_: true,
+  },
+  {
+    field: (row) => row.fecha,
+    name: "fecha",
+    label: "Fecha",
+    align: "center",
+    sortable_: true,
+  },
+  {
+    field: (row) => row.bien,
+    name: "bien",
+    label: "Bien",
+    align: "center",
+    sortable_: true,
+  },
+  {
+    field: (row) => row.protocolo,
+    name: "protocolo",
+    label: "Protocolo",
+    align: "center",
+    sortable_: true,
+  },
+  {
+    field: (row) => row.otorgantes,
+    name: "otorgantes",
+    label: "Otorgantes",
+    align: "center",
+    sortable_: true,
+    search: true,
+  },
+  {
+    field: (row) => row.favorecidos,
+    name: "favorecidos",
+    label: "Favorecidos",
+    align: "center",
+    sortable_: true,
+    search: true,
+  },
 ];
 
 const nombreNotario = ref();
@@ -177,11 +286,22 @@ async function onRequest(props) {
   loading.value = true;
 
   const fetchCount = rowsPerPage === 0 ? 0 : rowsPerPage;
-  const order_by = filter? '': descending ? "-" + sortBy : sortBy;
-  const filtros = {notario: nombreNotario.value, lugar: nombreLugar.value, subserie: nombreSubserie.value};
+  const order_by = filter ? "" : descending ? "-" + sortBy : sortBy;
+  const filtros = {
+    notario: nombreNotario.value,
+    lugar: nombreLugar.value,
+    subserie: nombreSubserie.value,
+  };
   const { data, total = 0 } = await Anterior2Service.getData({
-    params: { rowsPerPage: fetchCount, page, search: filter, order_by, search_by:busColum.value, filter_by:filtros,},
-  });;
+    params: {
+      rowsPerPage: fetchCount,
+      page,
+      search: filter,
+      order_by,
+      search_by: busColum.value,
+      filter_by: filtros,
+    },
+  });
   // clear out existing data and add new
   rows.value.splice(0, rows.value.length, ...data);
   for (const key in columns) {
@@ -204,7 +324,6 @@ async function onRequest(props) {
   // ...and turn of loading indicator
   loading.value = false;
 }
-
 
 onMounted(() => {
   tableRef.value.requestServerInteraction();
